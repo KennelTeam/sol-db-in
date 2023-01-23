@@ -6,7 +6,7 @@ from cheroot.wsgi import Server, PathInfoDispatcher
 import config_loader
 
 
-def start_production_server():
+def start_production_server() -> None:
     dispatcher = PathInfoDispatcher({'/': app.app})
     server = Server(('0.0.0.0', config_loader.get_config("PORT")), dispatcher,
                     numthreads=int(config_loader.get_config("NUM_THREADS")))
@@ -17,7 +17,7 @@ def start_production_server():
         server.stop()
 
 
-def start_development_server():
+def start_development_server() -> None:
     app.app.run(host='0.0.0.0', port=config_loader.get_config("PORT"), debug=True)
 
 
