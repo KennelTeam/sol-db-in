@@ -1,4 +1,4 @@
-#  Copyright (c) 2020-2020-2023. KennelTeam.
+#  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 
 from flask_sqlalchemy import SQLAlchemy
