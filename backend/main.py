@@ -1,3 +1,6 @@
+#  Copyright (c) 2020-2020-2023. KennelTeam.
+#  All rights reserved.
+
 import app
 from cheroot.wsgi import Server, PathInfoDispatcher
 import config_loader

@@ -1,3 +1,6 @@
+#  Copyright (c) 2020-2020-2023. KennelTeam.
+#  All rights reserved.
+
 from flask_sqlalchemy import SQLAlchemy
 from .. import app
 import config_loader
