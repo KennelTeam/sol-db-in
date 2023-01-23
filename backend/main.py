@@ -3,7 +3,7 @@ from cheroot.wsgi import Server, PathInfoDispatcher
 import config_loader
 
 
-if __name__ == '__main__':
+def start_production_server():
     dispatcher = PathInfoDispatcher({'/': app.app})
     server = Server(('0.0.0.0', config_loader.get_config("PORT")), dispatcher,
                     numthreads=int(config_loader.get_config("NUM_THREADS")))
@@ -12,3 +12,14 @@ if __name__ == '__main__':
         server.start()
     except KeyboardInterrupt:
         server.stop()
+
+
+def start_development_server():
+    app.app.run(host='0.0.0.0', port=config_loader.get_config("PORT"), debug=True)
+
+
+if __name__ == '__main__':
+    if config_loader.get_config("MODE") == "dev":
+        start_development_server()
+    else:
+        start_production_server()
