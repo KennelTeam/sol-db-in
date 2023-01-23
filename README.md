@@ -1,5 +1,3 @@
 # sol-db-in
 
-komodo - back
-
-sumatran - front
+React tyling guideline: https://github.com/airbnb/javascript/tree/master/react
