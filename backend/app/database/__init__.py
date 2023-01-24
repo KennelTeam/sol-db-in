@@ -3,7 +3,7 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from .. import app
-import config_loader
+from backend import config_loader
 import os
 
 
