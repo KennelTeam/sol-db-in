@@ -1,0 +1,7 @@
+Flask~=2.2.2
+cheroot~=9.0.0
+python-dotenv~=0.21.1
+mysqlclient~=2.1.1
+flask_sqlalchemy~=3.0.2
+sqlalchemy~=1.4.46
+flask_restful~=0.3.9
