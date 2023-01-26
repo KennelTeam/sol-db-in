@@ -3,11 +3,13 @@ import Handbook from "./Handbook";
 import Leader from "./Leader";
 import LeadersList from "./LeadersList";
 import Login from "./Login";
+import NavigationMenu from "./NavigationMenu";
 import Project from "./Project";
 import ProjectsList from "./ProjectsList";
 import Settings from "./Settings";
 import Statistics from "./Statistics";
 import Tags from "./Tags";
+import { UserType } from "./types/global.d";
 import Users from "./Users";
 
 function App() {
@@ -27,6 +29,7 @@ function App() {
           <Route path='/users' element={<Users />}/>
         </Routes>
       </BrowserRouter>
+      <NavigationMenu user={UserType.Editor}/> {/* side navigation menu. Later it may be moved to more correct place */}
     </div>
   );
 }
