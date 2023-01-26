@@ -2,7 +2,7 @@
 #  All rights reserved.
 
 from flask import Flask
-from flask_restful import Api
+from flask_restful import Api  # type: ignore[import]
 
 
 app = Flask(__name__)

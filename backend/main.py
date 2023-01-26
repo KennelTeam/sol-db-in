@@ -1,9 +1,9 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 
-import app
-from cheroot.wsgi import Server, PathInfoDispatcher
-import config_loader
+from backend import app
+from cheroot.wsgi import Server, PathInfoDispatcher  # type: ignore[import]
+from backend import config_loader
 
 
 def start_production_server() -> None:
