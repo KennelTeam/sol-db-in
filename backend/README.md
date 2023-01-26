@@ -23,5 +23,6 @@ configured as you want it to be
 - `config.json` - all the public configuration of server is stored there
 - `app/` - folder with flask app
   - `app/api/` - folred to store API requests processors
-  - `app/database/` - folder to store DB connection processors 
-and DB ORM classes
+  - `app/database/` - folder to store DB connection processors
+and DB ORM classes. You can read further about database architecture 
+in [database readme](app/database/README.md)
