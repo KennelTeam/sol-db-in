@@ -12,7 +12,9 @@
             "settings": "Settings",
             "users": "User's Settings",
             "tags": "Tags",
-            "handbook": "Handbook"
+            "catalog": "Catalog",
+            "questionary": "Questionary",
+            "answers": "Answers"
         }
     }
 }

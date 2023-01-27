@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Handbook from "./Handbook";
+import Catalog from "./Catalog";
 import Leader from "./Leader";
 import LeadersList from "./LeadersList";
 import Login from "./Login";
@@ -17,7 +17,7 @@ function App() {
     <div>
       <BrowserRouter>
         <Routes>
-          <Route path='/handbook' element={<Handbook />}/>
+          <Route path='/catalog' element={<Catalog />}/>
           <Route path='/leader/:id' element={<Leader />}/>
           <Route path='/leaders' element={<LeadersList />}/>
           <Route path='/login' element={<Login />}/>
