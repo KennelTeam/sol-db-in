@@ -3,5 +3,12 @@
     "description": {
         "part1": "To get started, edit <1>src/App.js</1> and save to reload.",
         "part2": "Switch language between english and german using buttons above."
+    },
+    "settings": {
+        "title": "Settings",
+        "leaders-per-page": "Leaders per page",
+        "projects-per-page": "Projects per page",
+        "leader-comment-max-length": "Comment max length on leaders interviews",
+        "save": "Save"
     }
 }
