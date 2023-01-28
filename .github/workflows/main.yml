@@ -3,6 +3,7 @@ jobs:
     name: static backend code checks
     runs-on: ubuntu-22.04
     steps:
+    - uses: actions/checkout@github_settings_test
     - name: checks
       run: ls
     - name: checks1
