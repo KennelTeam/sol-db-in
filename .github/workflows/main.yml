@@ -4,10 +4,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v1
-    - name: checks
-      run: ls
-    - name: checks1
-      run: ls ../
+    
     - name: preparations
       run: python3 -m pip install -r backend/requirements.txt
     
