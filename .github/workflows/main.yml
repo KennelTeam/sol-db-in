@@ -1,0 +1,27 @@
+jobs:
+  backend_checks:
+    name: static backend code checks
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.8' 
+    - uses: actions/checkout@v1
+    
+    - name: preparations
+      run: python3 -m pip install -r backend/requirements.txt
+    
+    - name: pytype checks
+      run: python3 -m pytype --config backend/pytype.config
+      
+    - name: pylint checks
+      run: python3 -m pylint --rcfile=backend/.pylintrc backend
+
+on:
+  pull_request:
+    branches:
+    - develop
+  push:
+    branches:
+    - github_settings_test
+    

@@ -2,7 +2,7 @@
 #  All rights reserved.
 from . import db
 from .editable_mixin import EditableMixin
-from config_loader import get_config
+from backend.config_loader import ConfigLoader
 
 
 class Answer(EditableMixin, db.Model):
@@ -12,6 +12,6 @@ class Answer(EditableMixin, db.Model):
     leader_id = db.Column('leader_id', db.ForeignKey('leaders.id'), nullable=True)
     project_id = db.Column('project_id', db.ForeignKey('projects.id'), nullable=True)
     int_value = db.Column('int_value', db.Integer, nullable=True)
-    text_value = db.Column('text_value', db.Text(get_config("MAX_ANSWER_SIZE")), nullable=True)
+    text_value = db.Column('text_value', db.Text(ConfigLoader.get_config("MAX_ANSWER_SIZE")), nullable=True)
     timestamp_value = db.Column('timestamp_value', db.DateTime, nullable=True)
 
