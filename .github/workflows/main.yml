@@ -3,6 +3,10 @@ jobs:
     name: static backend code checks
     runs-on: ubuntu-22.04
     steps:
+    - name: checks
+      run: |
+        echo $PWD
+        ls
     - name: preparations
       run: python3 -m pip install -r backend/requirements.txt
     
