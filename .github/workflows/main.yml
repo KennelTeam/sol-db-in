@@ -5,7 +5,7 @@ jobs:
     steps:
     - name: checks
       run: |
-        ls backend
+        ls
         echo "test"
         echo $PWD
         ls backend | cat
