@@ -3,6 +3,9 @@ jobs:
     name: static backend code checks
     runs-on: ubuntu-22.04
     steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.8' 
     - uses: actions/checkout@v1
     
     - name: preparations
