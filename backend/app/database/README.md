@@ -1,6 +1,6 @@
 ## This is a documentation for Database module
 
-The database is representing a form and answers of people to this form.
+The database represents a form and answers of people to this form.
 Also, there are users and some auxiliary tables.
 
 ### The main concept
