@@ -4,7 +4,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: preparations
-      run: python3 pip install -r backend/requirements.txt
+      run: python3 -m pip install -r backend/requirements.txt
     
     - name: pytype checks
       run: python3 -m pytype --config backend/pytype.config
