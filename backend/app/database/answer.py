@@ -3,6 +3,7 @@
 from . import db
 from .editable_mixin import EditableMixin
 from backend.config_loader import ConfigLoader
+from typing import Any
 
 
 class Answer(EditableMixin, db.Model):
@@ -14,4 +15,8 @@ class Answer(EditableMixin, db.Model):
     int_value = db.Column('int_value', db.Integer, nullable=True)
     text_value = db.Column('text_value', db.Text(ConfigLoader.get_config("MAX_ANSWER_SIZE")), nullable=True)
     timestamp_value = db.Column('timestamp_value', db.DateTime, nullable=True)
+
+    def __init__(self, question_id: int, value: Any, respondent_id: int, table_row=-1):
+        pass
+
 
