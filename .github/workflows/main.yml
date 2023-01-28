@@ -5,8 +5,10 @@ jobs:
     steps:
     - name: checks
       run: |
+        ls backend
+        echo "test"
         echo $PWD
-        ls
+        ls backend | cat
     - name: preparations
       run: python3 -m pip install -r backend/requirements.txt
     
