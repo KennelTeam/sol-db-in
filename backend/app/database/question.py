@@ -1,6 +1,6 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-from backend.config_loader import ConfigLoader
+from backend.constants import MAX_QUESTION_TEXT_SIZE, MAX_LANGUAGES_COUNT, MAX_COMMENT_SIZE
 from . import db
 from .editable_mixin import EditableMixin
 
@@ -20,13 +20,9 @@ types = {
 
 class Question(EditableMixin, db.Model):
     __tablename__ = 'questions'
-    text = db.Column('text', db.Text(ConfigLoader.get_config("MAX_QUESTION_TEXT_SIZE")
-                                     * ConfigLoader.get_config("MAX_LANGUAGES_COUNT")))
-
+    text = db.Column('text', db.Text(MAX_QUESTION_TEXT_SIZE * MAX_LANGUAGES_COUNT))
     question_type = db.Column('question_type', db.Integer)
-    comment = db.Column('comment', db.Text(ConfigLoader.get_config("MAX_COMMENT_SIZE")
-                                           * ConfigLoader.get_config("MAX_LANGUAGES_COUNT")))
-
+    comment = db.Column('comment', db.Text(MAX_COMMENT_SIZE * MAX_LANGUAGES_COUNT))
     answer_block_id = db.Column('answer_block_id', db.ForeignKey('answer_blocks.id'), nullable=True)
     tag_type_id = db.Column('tag_type_id', db.ForeignKey('tag_types.id'), nullable=True)
     show_on_main_page = db.Column('show_on_main_page', db.Boolean)

@@ -59,6 +59,7 @@ Toponyms table.
 10. Editable Mixin is a mixin for most of ORM Classes - it saves 
 info about creation and edit time of the table row. And uses the id 
 as primary key
+11. All the database history of changes is stored in Actions table
 
 Now let's discuss each non-trivial table in the database:
 ### Answers
@@ -121,7 +122,7 @@ leader-project we'll look at project-leader)
 ### Tags and Toponyms are stored as Trees
 
 ### Users
-1. `login` and `login_hash` provide uniqueness and login for a user
+1. `login` provides uniqueness and login for a user
 2. `name` - full name to describe user to others
 3. `comment` - some info about who is this user (filled by admin)
 4. `password_salt` is added to password before hashing
@@ -135,6 +136,16 @@ logging in)
 form questions and other users' roles and permissions)
    5. Admin (can everything)
 7. `jwt_refresh` - a JSON web refresh token stored in a DB
+
+### Actions
+1. `user_id` - who made the change
+2. `ip` - from what IP address did he/she made the change
+3. `table_id` and `column_id` - what column of what table had been changed
+4. `row_id` - the id of a changed object
+5. `timestamp` - when did the change took place
+6. `value_int`, `value_datetime`, `value_text`, `value_bool` - one hot
+stored new changed value of the cell.
+
 
 `initialize_database.py` contains only one function which creates 
 all the missing tables in the DB

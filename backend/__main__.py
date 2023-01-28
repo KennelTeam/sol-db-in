@@ -2,28 +2,27 @@
 #  All rights reserved.
 from backend import app
 from backend.app.database import initialize_database
-from cheroot.wsgi import Server, PathInfoDispatcher  # type: ignore[import]
-from backend.config_loader import ConfigLoader
+from cheroot.wsgi import Server, PathInfoDispatcher
+from backend.constants import NUM_THREADS, PORT, MODE
 
 
 def start_production_server():
-    dispatcher = PathInfoDispatcher({'/': app.app})
-    server = Server(('0.0.0.0', ConfigLoader.get_config("PORT")), dispatcher,
-                    numthreads=int(ConfigLoader.get_config("NUM_THREADS")))
+    dispatcher = PathInfoDispatcher({'/': app.app_instance})
+    server = Server(('0.0.0.0', PORT), dispatcher, numthreads=NUM_THREADS)
     try:
-        print(f"the server is working at http://127.0.0.1:{ConfigLoader.get_config('PORT')}")
+        print(f"the server is working at http://127.0.0.1:{PORT}")
         server.start()
     except KeyboardInterrupt:
         server.stop()
 
 
 def start_development_server() -> None:
-    app.app.run(host='0.0.0.0', port=ConfigLoader.get_config("PORT"), debug=True)
+    app.app_instance.run(host='0.0.0.0', port=PORT, debug=True)
 
 
 if __name__ == '__main__':
     initialize_database.initialize_database()
-    if ConfigLoader.get_config("MODE") == "dev":
+    if MODE == "dev":
         start_development_server()
     else:
         start_production_server()
