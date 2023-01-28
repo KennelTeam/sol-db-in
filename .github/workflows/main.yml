@@ -4,11 +4,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: checks
-      run: |
-        cd ../
-        echo "test"
-        echo $PWD
-        echo ls
+      run: ls
+    - name: checks1
+      run: ls ../
     - name: preparations
       run: python3 -m pip install -r backend/requirements.txt
     
