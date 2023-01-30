@@ -8,5 +8,22 @@
     "description": {
         "part1": "To get started, edit <1>src/App.js</1> and save to reload.",
         "part2": "Switch language between english and german using buttons above."
+    },
+    "users": {
+        "title": "Manage Users",
+        "role": "Role",
+        "full-name": "Full Name",
+        "edit": "Edit",
+        "dialog": {
+            "title": "Edit User",
+            "save": "Save",
+            "cancel": "Cancel",
+            "editor": "Editor",
+            "intern": "Intern",
+            "guest": "Guest",
+            "new-password": "New password",
+            "comment": "Comment",
+            "block-access": "Block access to the site"
+        }
     }
 }
