@@ -4,17 +4,15 @@
         "part1": "To get started, edit <1>src/App.js</1> and save to reload.",
         "part2": "Switch language between english and german using buttons above."
     },
-    "translation": {
-        "page_names": {
-            "projects": "Projects",
-            "leaders": "Leaders",
-            "statistics": "Statistics",
-            "settings": "Settings",
-            "users": "User's Settings",
-            "tags": "Tags",
-            "catalog": "Catalog",
-            "questionary": "Questionary",
-            "answers": "Answers"
-        }
+    "menu": {
+        "projects": "Projects",
+        "leaders": "Leaders",
+        "statistics": "Statistics",
+        "settings": "Settings",
+        "users": "User's Settings",
+        "tags": "Tags",
+        "catalog": "Catalog",
+        "questionnaire": "Questionnaire",
+        "options": "Answers"
     }
 }

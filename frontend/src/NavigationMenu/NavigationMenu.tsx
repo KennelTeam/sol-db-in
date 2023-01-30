@@ -3,54 +3,61 @@ import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { UserType, UserTypeProps } from '../types/global.d'
 import { useTranslation } from 'react-i18next'
 import { TFunction } from 'i18next'
-import React, { useEffect } from 'react'
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
-const menu_button = (text: string, path: string, t : TFunction, padding=2) : JSX.Element => (
-    <ListItem disablePadding>
-        <ListItemButton href={path} sx={{ pl: padding}}>
-            <ListItemText primary={t(text)} />
+const MenuButton = (text: string, path: string, t : TFunction, padding=2) : JSX.Element => (
+    <ListItem component={Link} to={path}
+        style={{ color: "inherit", textDecoration: "none" }}
+        disablePadding
+        >
+        <ListItemButton sx={{ pl: padding}} selected={useLocation().pathname === path}>
+                <ListItemText primary={t(text)}/>
         </ListItemButton>
     </ListItem>
 )
 
-function make_catalog_element(openCatalog: boolean, 
-        setOpen: React.Dispatch<React.SetStateAction<boolean>>, t : TFunction) : JSX.Element {
+function DropDownList(text: string, itemsNames: string[], itemsPaths: string[]) : JSX.Element {
+    const { t } = useTranslation('translation', { keyPrefix: "menu" })
 
-    // PROBLEM with this architecture: after clicking on any button and going to another page Catalog's menu is closing
+    const [open, setOpen] = React.useState(false)
     let handleClick = () => {
-        setOpen(!openCatalog)
+        setOpen(!open)
     }
 
-    const tags : JSX.Element = menu_button("tags", "/tags", t, 4)
-    const questionary : JSX.Element = menu_button("questionary", "/", t, 4)
-    const answers : JSX.Element = menu_button("answers", "/", t, 4)
+    let items = []
+    for (let i = 0; i < itemsNames.length; i++) {
+        items.push(MenuButton(itemsNames[i], itemsPaths[i], t, 4))
+    }
     return (
         <div>
             <ListItem disablePadding>
                 <ListItemButton onClick={handleClick}>
                     <ListItemText primary={t("catalog")}/>
-                    {openCatalog ? <ExpandLess /> : <ExpandMore />}
+                    {open ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
             </ListItem>
-            <Collapse in={openCatalog} timeout="auto" unmountOnExit>
+            <Collapse in={open} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                    {[tags, questionary, answers]}
+                    {items}
                 </List>
             </Collapse>
         </div>
     )
 }
 
-function choice_options_list(user: UserType, openCatalog: boolean, 
-        setOpen: React.Dispatch<React.SetStateAction<boolean>>, t : TFunction) : JSX.Element[] {
+function ChoiceOptionsList(user: UserType) : JSX.Element[] {
     // now you can test menu translation by going on /login page and press "Submit" button
+    const { t } = useTranslation('translation', { keyPrefix: "menu" })
 
-    const projects: JSX.Element = menu_button('projects', "/projects", t)
-    const leaders: JSX.Element = menu_button("leaders", "/leaders", t)
-    const statistics: JSX.Element = menu_button("statistics", "/statistics", t)
-    const settings: JSX.Element = menu_button("settings", "/settings", t)
-    const users: JSX.Element = menu_button("users", "/users", t)
-    const catalog: JSX.Element = make_catalog_element(openCatalog, setOpen, t)
+    const projects: JSX.Element = MenuButton('projects', "/projects", t)
+    const leaders: JSX.Element = MenuButton("leaders", "/leaders", t)
+    const statistics: JSX.Element = MenuButton("statistics", "/statistics", t)
+    const settings: JSX.Element = MenuButton("settings", "/settings", t)
+    const users: JSX.Element = MenuButton("users", "/users", t)
+    const catalog: JSX.Element = DropDownList("catalog", ["tags", "questionnaire", "options"],
+                                                        ["/tags", "/", "/"])
 
     let options_list : JSX.Element[]
     switch (user) { // this switch choices pages that will be shown to user by his role
@@ -60,7 +67,7 @@ function choice_options_list(user: UserType, openCatalog: boolean,
         case UserType.Editor:
             options_list = [leaders, projects, statistics, catalog, settings]
             break
-        case UserType.Junior:
+        case UserType.Intern:
             options_list = [leaders, projects, statistics, catalog]
             break
         case UserType.Guest:
@@ -75,19 +82,16 @@ function choice_options_list(user: UserType, openCatalog: boolean,
 }
 
 export default function NavigationMenu(props: UserTypeProps) : JSX.Element {
-    const drawerWidth: number = 200
-    const { t } = useTranslation('translation', { keyPrefix: "translation.page_names" })
-    const [open, setOpen] = React.useState(false)
-    let menu: JSX.Element[] = choice_options_list(props.user, open, setOpen, t)
+    let menu: JSX.Element[] = ChoiceOptionsList(props.user)
 
     return (
         <Box
-            sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-            >
+            sx={{ flexShrink: { sm: 0 } }}
+            position="fixed">
             <Drawer
                 variant="permanent"
                 open={true}
-                sx={{'& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth } }}
+                sx={{'& .MuiDrawer-paper': { boxSizing: 'border-box', width: props.width } }}
                 >
                 <List>
                     {menu}
