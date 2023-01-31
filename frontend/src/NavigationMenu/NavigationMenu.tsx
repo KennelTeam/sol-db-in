@@ -12,7 +12,7 @@ const MenuButton = (text: string, path: string, t : TFunction, padding=2) : JSX.
         style={{ color: "inherit", textDecoration: "none" }}
         disablePadding
         >
-        <ListItemButton sx={{ pl: padding}} selected={useLocation().pathname === path}>
+        <ListItemButton sx={{ pl: padding}} selected={useLocation().pathname.startsWith(path)}>
                 <ListItemText primary={t(text)}/>
         </ListItemButton>
     </ListItem>
@@ -57,7 +57,7 @@ function ChoiceOptionsList(user: UserType) : JSX.Element[] {
     const settings: JSX.Element = MenuButton("settings", "/settings", t)
     const users: JSX.Element = MenuButton("users", "/users", t)
     const catalog: JSX.Element = DropDownList("catalog", ["tags", "questionnaire", "options"],
-                                                        ["/tags", "/", "/"])
+                                                        ["/tags", "/questionnaire", "/options"])
 
     let options_list : JSX.Element[]
     switch (user) { // this switch choices pages that will be shown to user by his role

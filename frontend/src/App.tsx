@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import Catalog from "./Catalog";
 import Leader from "./Leader";
 import LeadersList from "./LeadersList";
@@ -9,6 +9,8 @@ import ProjectsList from "./ProjectsList";
 import Settings from "./Settings";
 import Statistics from "./Statistics";
 import Tags from "./Tags";
+import Questionnaire from "./Questionnaire";
+import Options from "./Options";
 import { UserType } from "./types/global.d";
 import Users from "./Users";
 import { Box, Container } from "@mui/material";
@@ -41,6 +43,8 @@ function App() {
           <Route path='/settings' element={<Settings />}/>
           <Route path='/statistics' element={<Statistics />}/>
           <Route path='/tags' element={<Tags />}/>
+          <Route path='/questionnaire' element={<Questionnaire />}/>
+          <Route path='/options' element={<Options />}/>
           <Route path='/users' element={<Users />}/>
           </Routes>
         </Container>
