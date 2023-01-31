@@ -2,10 +2,10 @@
 #  All rights reserved.
 from backend.constants import MAX_NAME_SIZE
 from . import db
-from .editable_mixin import EditableMixin
+from .form import Form
 
 
-class Leader(EditableMixin, db.Model):
+class Leader(Form, db.Model):
     __tablename__ = 'leaders'
     first_name = db.Column('first_name', db.Text(MAX_NAME_SIZE))
     last_name = db.Column('last_name', db.Text(MAX_NAME_SIZE))

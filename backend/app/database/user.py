@@ -2,13 +2,13 @@
 #  All rights reserved.
 from backend.constants import MAX_LOGIN_SIZE, MAX_FULLNAME_SIZE, MAX_COMMENT_SIZE, SALT_SIZE
 from . import db
-from .editable_mixin import EditableMixin
+from .editable import Editable
 from sqlalchemy.dialects.mysql import VARCHAR
 import random
 import string
 import hashlib
 from enum import Enum
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 
 class Role(Enum):
@@ -19,17 +19,17 @@ class Role(Enum):
     ADMIN = 4
 
 
-class User(EditableMixin, db.Model):
+class User(Editable, db.Model):
     __tablename__ = 'users'
-    login = db.Column('login', VARCHAR(MAX_LOGIN_SIZE), unique=True)
-    name = db.Column('name', db.Text(MAX_FULLNAME_SIZE))
-    comment = db.Column('comment', db.Text(MAX_COMMENT_SIZE))
+    _login = db.Column('login', VARCHAR(MAX_LOGIN_SIZE), unique=True)
+    _name = db.Column('name', db.Text(MAX_FULLNAME_SIZE))
+    _comment = db.Column('comment', db.Text(MAX_COMMENT_SIZE))
 
     # expected to use SHA-512
-    password_hash = db.Column('password_hash', db.Text(512 // 8))
+    _password_hash = db.Column('password', db.Text(512 // 8))
 
-    password_salt = db.Column('password_salt', db.Text(SALT_SIZE))
-    role = db.Column('role', db.Enum(Role))
+    _password_salt = db.Column('password_salt', db.Text(SALT_SIZE))
+    _role = db.Column('role', db.Enum(Role))
 
     current_ip: str = ""
 
@@ -38,29 +38,92 @@ class User(EditableMixin, db.Model):
         alphabet: str = string.ascii_letters + string.digits
         return "".join(random.choices(alphabet, k=SALT_SIZE))
 
-    @staticmethod
-    def _generate_password_hash(password: str, salt: str) -> str:
-        password += salt
+    def _generate_password_hash(self, password: str) -> str:
+        password += self._password_salt
         return hashlib.sha512(password.encode('utf-8')).hexdigest()
 
     def __init__(self, login: str, name: str, comment: str, password: str, role: Role) -> None:
+        super(Editable).__init__()
         self.login = login
         self.name = name
         self.comment = comment
-        self.password_salt = User._generate_salt()
-        self.password_hash = User._generate_password_hash(password, self.password_salt)
+        self._password_salt = User._generate_salt()
+        self.password = password
         self.role = role
-        super(EditableMixin).__init__(self.__dict__)
 
     def check_password(self, password) -> bool:
-        return self.password_hash == User._generate_password_hash(password, self.password_salt)
+        return self._password_hash == self._generate_password_hash(password)
 
     def to_json(self) -> Dict[str, Any]:
-        return self.__dict__
+        return super(Editable).to_json() | {
+            'login': self.login,
+            'name': self.name,
+            'comment': self.comment,
+            'role': self.role
+        }
+
+    @property
+    def login(self) -> str:
+        return self._login
+
+    @login.setter
+    @Editable.on_edit
+    def login(self, new_login: str) -> None:
+        self._login = new_login
+
+    # We do not actually store password, so accessing it returns nothing
+    # TODO: maybe it's better to raise an exception here
+    @property
+    def password(self) -> str:
+        return ""
+
+    # so in the actions database instead of storing passwords we store password_hashes in the password column
+    # so for user it shows that the password was changed (when the hash was changed),
+    # but it ensures security
+    @password.setter
+    @Editable.on_edit
+    def password(self, new_password: str) -> str:
+        self._password_hash = self._generate_password_hash(new_password)
+        return self.password_hash
+
+    @property
+    def password_hash(self) -> str:
+        return self._password_hash
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    @Editable.on_edit
+    def name(self, new_name: str) -> None:
+        self.name = new_name
+
+    @property
+    def comment(self) -> str:
+        return self._comment
+
+    @comment.setter
+    @Editable.on_edit
+    def comment(self, new_comment: str) -> None:
+        self._comment = new_comment
+
+    @property
+    def role(self) -> Role:
+        return self._role
+
+    @role.setter
+    @Editable.on_edit
+    def role(self, new_role: Role) -> None:
+        self._role = new_role
 
     @staticmethod
     def get_by_login(login: str) -> 'User':
         return User.query.filter_by(login=login).first()
+
+    @staticmethod
+    def get_all_users() -> List['User']:
+        return User.query.all()
 
     @staticmethod
     def auth(login: str, password: str) -> Role:

@@ -1,25 +1,29 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
+from typing import final
 
-MODE = "dev"
-PORT = 5000
-NUM_THREADS = 50
-DB_ENGINE = "mysql"
-DB_CHARSET = "utf8mb4"
-MAX_LANGUAGES_COUNT = 8
-MAX_LOGIN_SIZE = 32
-MAX_FULLNAME_SIZE = 256
-MAX_NAME_SIZE = 64
-MAX_PROJECT_NAME_SIZE = 512
-MAX_TAG_SIZE = 256
-MAX_COMMENT_SIZE = 512
-MAX_BLOCK_NAME_SIZE = 64
-MAX_QUESTION_TEXT_SIZE = 256
-MAX_ANSWER_BLOCK_NAME = 128
-MAX_ANSWER_OPTION_SIZE = 128
-MAX_SHORT_ANSWER_OPTION_SIZE = 32
-MAX_SHEET_TITLE_SIZE = 16
-MAX_ANSWER_SIZE = 2048
-MAX_TOPONYM_SIZE = 128
-SALT_SIZE = 32
-MAX_TEXT_SIZE = 4096
+
+MODE: final(str) = "dev"
+PORT: final(int) = 5000
+NUM_THREADS: final(int) = 50
+DB_ENGINE: final(str) = "mysql"
+DB_CHARSET: final(str) = "utf8mb4"
+MAX_LANGUAGES_COUNT: final(int) = 8
+MAX_LOGIN_SIZE: final(int) = 32
+MAX_FULLNAME_SIZE: final(int) = 256
+MAX_NAME_SIZE: final(int) = 64
+MAX_PROJECT_NAME_SIZE: final(int) = 512
+MAX_TAG_SIZE: final(int) = 256
+MAX_COMMENT_SIZE: final(int) = 512
+MAX_BLOCK_NAME_SIZE: final(int) = 64
+MAX_QUESTION_TEXT_SIZE: final(int) = 256
+MAX_ANSWER_BLOCK_NAME: final(int) = 128
+MAX_ANSWER_OPTION_SIZE: final(int) = 128
+MAX_SHORT_ANSWER_OPTION_SIZE: final(int) = 32
+MAX_SHEET_TITLE_SIZE: final(int) = 16
+MAX_ANSWER_SIZE: final(int) = 2048
+MAX_TOPONYM_SIZE: final(int) = 128
+SALT_SIZE: final(int) = 32
+MAX_TEXT_SIZE: final(int) = 4096
+INT_MIN: final(int) = -0xffffffffffffffff
+INT_MAX: final(int) = -INT_MIN
