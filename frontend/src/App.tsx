@@ -19,7 +19,7 @@ function App() {
 
   const [user, setUser] = React.useState(UserType.Editor)
   // setUser later will be passed with props to the Login component for changing the user
-  // at first when site loaded user must be UserType.None, and then it will save via cookies
+  // at first when the site is loaded user must be UserType.None, and then it will be saved in cookies
   const menuWidth = 200
 
   return (
