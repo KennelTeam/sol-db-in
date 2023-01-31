@@ -38,8 +38,8 @@ function DropDownList(text: string, itemsNames: string[], itemsPaths: string[]) 
                     {open ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
             </ListItem>
-            <Collapse in={open} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
+            <Collapse in={open} unmountOnExit>
+                <List disablePadding>
                     {items}
                 </List>
             </Collapse>
@@ -86,7 +86,6 @@ export default function NavigationMenu(props: UserTypeProps) : JSX.Element {
 
     return (
         <Box
-            sx={{ flexShrink: { sm: 0 } }}
             position="fixed">
             <Drawer
                 variant="permanent"

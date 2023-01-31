@@ -11,13 +11,13 @@ import Statistics from "./Statistics";
 import Tags from "./Tags";
 import { UserType } from "./types/global.d";
 import Users from "./Users";
-import { Box } from "@mui/material";
+import { Box, Container } from "@mui/material";
 import { Stack } from "@mui/system";
 import React from "react";
 
 function App() {
 
-  const [user, setUser] = React.useState(UserType.Editor)
+  const [user, setUser] = React.useState(UserType.Admin)
   // setUser later will be passed with props to the Login component for changing the user
   // at first when the site is loaded user must be UserType.None, and then it will be saved in cookies
   const menuWidth = 200
@@ -26,11 +26,11 @@ function App() {
     <BrowserRouter>
       <Stack direction="row" alignItems="stretch" spacing={0}>
         { user !== UserType.None && // it makes NavigationMenu shown only when user isn't None
-          <Box  sx={{ width: { sm: menuWidth }, flexShrink: { sm: 0 } }}>
+          <Box  sx={{ width: menuWidth}}>
             <NavigationMenu user={user} width={menuWidth}/>
           </Box>
         }
-        <Box>
+        <Container>
           <Routes>
           <Route path='/catalog' element={<Catalog />}/>
           <Route path='/leader/:id' element={<Leader />}/>
@@ -43,7 +43,7 @@ function App() {
           <Route path='/tags' element={<Tags />}/>
           <Route path='/users' element={<Users />}/>
           </Routes>
-        </Box>
+        </Container>
       </Stack>
     </BrowserRouter>
   );
