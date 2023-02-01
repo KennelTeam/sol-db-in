@@ -1,7 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 from backend.constants import MAX_QUESTION_TEXT_SIZE, MAX_LANGUAGES_COUNT, MAX_COMMENT_SIZE
-from . import db
+from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from enum import Enum
 from typing import Dict, Any, List
@@ -9,6 +9,7 @@ import json
 from .formatting_settings import FormattingSettings
 from .privacy_settings import PrivacySettings
 from .relation_settings import RelationSettings
+from .answer import Answer
 
 
 class Type(Enum):
@@ -24,20 +25,19 @@ class Type(Enum):
     RELATION = 10
 
 
-class Question(Editable, db.Model):
+class Question(Editable, FlaskApp().db.Model):
     __tablename__ = 'questions'
-    _text = db.Column('text', db.Text(MAX_QUESTION_TEXT_SIZE * MAX_LANGUAGES_COUNT))
-    _question_type = db.Column('question_type', db.Enum(Type))
-    _comment = db.Column('comment', db.Text(MAX_COMMENT_SIZE * MAX_LANGUAGES_COUNT))
-    _answer_block_id = db.Column('answer_block_id', db.ForeignKey('answer_blocks.id'), nullable=True)
-    _tag_type_id = db.Column('tag_type_id', db.ForeignKey('tag_types.id'), nullable=True)
-    _show_on_main_page = db.Column('show_on_main_page', db.Boolean)
-    _formatting_settings = db.Column('formatting_settings', db.ForeignKey('formatting_settings.id'))
-    _privacy_settings = db.Column('privacy_settings', db.ForeignKey('privacy_settings.id'))
-    _relation_settings = db.Column('relation_settings', db.ForeignKey('relation_settings.id'), nullable=True)
+    _text = FlaskApp().db.Column('text', FlaskApp().db.Text(MAX_QUESTION_TEXT_SIZE * MAX_LANGUAGES_COUNT))
+    _question_type = FlaskApp().db.Column('question_type', FlaskApp().db.Enum(Type))
+    _comment = FlaskApp().db.Column('comment', FlaskApp().db.Text(MAX_COMMENT_SIZE * MAX_LANGUAGES_COUNT))
+    _answer_block_id = FlaskApp().db.Column('answer_block_id', FlaskApp().db.ForeignKey('answer_blocks.id'), nullable=True)
+    _tag_type_id = FlaskApp().db.Column('tag_type_id', FlaskApp().db.ForeignKey('tag_types.id'), nullable=True)
+    _formatting_settings = FlaskApp().db.Column('formatting_settings', FlaskApp().db.ForeignKey('formatting_settings.id'))
+    _privacy_settings = FlaskApp().db.Column('privacy_settings', FlaskApp().db.ForeignKey('privacy_settings.id'))
+    _relation_settings = FlaskApp().db.Column('relation_settings', FlaskApp().db.ForeignKey('relation_settings.id'), nullable=True)
 
     def __init__(self, texts: Dict[str, str], question_type: Type, comment: Dict[str, str], answer_block_id: int,
-                 tag_type_id: int, show_on_main_page: bool):
+                 tag_type_id: int):
 
         super(Editable).__init__()
         self.text = texts
@@ -45,7 +45,6 @@ class Question(Editable, db.Model):
         self.comment = comment
         self.answer_block_id = answer_block_id
         self.tag_type_id = tag_type_id
-        self.show_on_main_page = show_on_main_page
 
     @staticmethod
     def get_by_id(id: int) -> 'Question':
@@ -66,17 +65,23 @@ class Question(Editable, db.Model):
     def get_by_text(text: str) -> 'Question':
         return Question.query.filter(Question.text.like(f"%{text}%")).all()
 
-    def to_json(self) -> Dict[str, Any]:
-        return super(Editable).to_json() | {
+    def to_json(self, with_answers=False, leader_id: int = None, project_id: int = None) -> Dict[str, Any]:
+        result = super(Editable).to_json() | {
             'text': self.text,
             'question_type': self.question_type,
             'comment': self.comment,
             'answer_block_id': self.answer_block_id,
-            'show_on_main_page': self.show_on_main_page,
             'formatting_settings': self.formatting_settings,
             'privacy_settings': self.privacy_settings,
             'relation_settings': self.relation_settings
         }
+        if with_answers:
+            answers = Answer.filter(self.id, leader_id=leader_id, project_id=project_id)
+            jsons = [answer.to_json() for answer in answers]
+            result.update({
+                'answers': sorted(jsons, key=lambda x: x['table_row'])
+            })
+        return result
 
     @property
     def formatting_settings(self) -> FormattingSettings:
@@ -154,11 +159,3 @@ class Question(Editable, db.Model):
     def tag_type_id(self, new_id: int) -> None:
         self._tag_type_id = new_id
 
-    @property
-    def show_on_main_page(self) -> bool:
-        return self._show_on_main_page
-
-    @show_on_main_page.setter
-    @Editable.on_edit
-    def show_on_main_page(self, value: bool) -> None:
-        self._show_on_main_page = value

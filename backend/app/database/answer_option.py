@@ -1,17 +1,17 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-from . import db
+from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from backend.constants import MAX_ANSWER_OPTION_SIZE, MAX_LANGUAGES_COUNT, MAX_SHORT_ANSWER_OPTION_SIZE
 from typing import Dict, Any, List
 import json
 
 
-class AnswerOption(Editable, db.Model):
+class AnswerOption(Editable, FlaskApp().db.Model):
     __tablename__ = 'answer_options'
-    _name = db.Column('name', db.Text(MAX_ANSWER_OPTION_SIZE * MAX_LANGUAGES_COUNT))
-    _short_name = db.Column('short_name', db.Text(MAX_SHORT_ANSWER_OPTION_SIZE * MAX_LANGUAGES_COUNT))
-    _answer_block_id = db.Column('answer_block_id', db.ForeignKey('answer_blocks.id'))
+    _name = FlaskApp().db.Column('name', FlaskApp().db.Text(MAX_ANSWER_OPTION_SIZE * MAX_LANGUAGES_COUNT))
+    _short_name = FlaskApp().db.Column('short_name', FlaskApp().db.Text(MAX_SHORT_ANSWER_OPTION_SIZE * MAX_LANGUAGES_COUNT))
+    _answer_block_id = FlaskApp().db.Column('answer_block_id', FlaskApp().db.ForeignKey('answer_blocks.id'))
 
     def __init__(self, name: Dict[str, str], short_name: Dict[str, str], answer_block_id: int):
         super(Editable).__init__()

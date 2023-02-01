@@ -1,6 +1,6 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
-from . import db
+from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from enum import Enum
 
@@ -11,11 +11,11 @@ class AccessType(Enum):
     CAN_EDIT = 3
 
 
-class PrivacySettings(Editable, db.Model):
+class PrivacySettings(Editable, FlaskApp().db.Model):
     __tablename__ = 'privacy_settings'
-    _editor_access = db.Column('editor_access', db.Enum(AccessType))
-    _intern_access = db.Column('intern_access', db.Enum(AccessType))
-    _guest_access = db.Column('guest_access', db.Enum(AccessType))
+    _editor_access = FlaskApp().db.Column('editor_access', FlaskApp().db.Enum(AccessType))
+    _intern_access = FlaskApp().db.Column('intern_access', FlaskApp().db.Enum(AccessType))
+    _guest_access = FlaskApp().db.Column('guest_access', FlaskApp().db.Enum(AccessType))
 
     def __init__(self, editor_access: AccessType, intern_access: AccessType, guest_access: AccessType) -> None:
         super(Editable).__init__()

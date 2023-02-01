@@ -10,7 +10,7 @@ from typing import Any
 from enum import Enum
 from backend.constants import INT_MIN, INT_MAX
 from datetime import datetime
-from . import db
+from backend.app.flask_app import FlaskApp
 
 
 class EditableValueHolder(ValueHolder, Editable):
@@ -23,7 +23,7 @@ class EditableValueHolder(ValueHolder, Editable):
         super(ValueHolder).value = value
 
     @staticmethod
-    def filter_by_value(table: db.Model, exact_value: Any = None, substring: str = None,
+    def filter_by_value(table: FlaskApp().db.Model, exact_value: Any = None, substring: str = None,
                         min_value: Any = None, max_value: Any = None) -> sqlalchemy.orm.Query:
         if exact_value is not None:
             return EditableValueHolder.filter_exact_value(table, exact_value)
@@ -32,7 +32,7 @@ class EditableValueHolder(ValueHolder, Editable):
         return EditableValueHolder.filter_range(table, min_value, max_value)
 
     @staticmethod
-    def filter_exact_value(table: db.Model, exact_value: Any) -> sqlalchemy.orm.Query:
+    def filter_exact_value(table: FlaskApp().db.Model, exact_value: Any) -> sqlalchemy.orm.Query:
         if exact_value is int or exact_value is Enum:
             return table.query.filter(table.value_int == exact_value)
         if exact_value is str:
@@ -42,7 +42,7 @@ class EditableValueHolder(ValueHolder, Editable):
         return table.query.filter(table.value_datetime == exact_value)
 
     @staticmethod
-    def filter_range(table: db.Model, min_value: Any, max_value: Any) -> sqlalchemy.orm.Query:
+    def filter_range(table: FlaskApp().db.Model, min_value: Any, max_value: Any) -> sqlalchemy.orm.Query:
         if min_value is int or max_value is int:
             if min_value is None:
                 min_value = INT_MIN
@@ -56,5 +56,5 @@ class EditableValueHolder(ValueHolder, Editable):
         return table.query.filter(table.value_datetime <= max_value).filter(table.value_datetime >= min_value)
 
     @staticmethod
-    def filter_substring(table: db.Model, substr: str) -> sqlalchemy.orm.Query:
+    def filter_substring(table: FlaskApp().db.Model, substr: str) -> sqlalchemy.orm.Query:
         return table.query.filter(table.value_text.like(f"%{substr}%"))

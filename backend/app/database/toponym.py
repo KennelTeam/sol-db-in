@@ -1,15 +1,15 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-from . import db
+from backend.app.flask_app import FlaskApp
 from backend.constants import MAX_TOPONYM_SIZE
 from typing import List, Dict, Any
 
 
-class Toponym(db.Model):
+class Toponym(FlaskApp().db.Model):
     __tablename__ = 'toponyms'
-    id = db.Column('id', db.Integer, primary_key=True, unique=True)
-    name = db.Column('name', db.Text(MAX_TOPONYM_SIZE))
-    parent_id = db.Column('parent_id', db.ForeignKey('toponyms.id'), nullable=True, default=None)
+    id = FlaskApp().db.Column('id', FlaskApp().db.Integer, primary_key=True, unique=True)
+    name = FlaskApp().db.Column('name', FlaskApp().db.Text(MAX_TOPONYM_SIZE))
+    parent_id = FlaskApp().db.Column('parent_id', FlaskApp().db.ForeignKey('toponyms.id'), nullable=True, default=None)
 
     @staticmethod
     def get_by_name(name: str) -> 'Toponym':

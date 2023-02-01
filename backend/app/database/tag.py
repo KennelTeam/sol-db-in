@@ -1,17 +1,17 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 from backend.constants import MAX_TAG_SIZE, MAX_LANGUAGES_COUNT
-from . import db
+from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from typing import List, Dict, Any
 import json
 
 
-class Tag(Editable, db.Model):
+class Tag(Editable, FlaskApp().db.Model):
     __tablename__ = 'tags'
-    _text = db.Column('text', db.Text(MAX_TAG_SIZE * MAX_LANGUAGES_COUNT))
-    _type_id = db.Column('type_id', db.ForeignKey('tag_types.id'))
-    _parent_id = db.Column('parent_id', db.ForeignKey('tags.id'), nullable=True)
+    _text = FlaskApp().db.Column('text', FlaskApp().db.Text(MAX_TAG_SIZE * MAX_LANGUAGES_COUNT))
+    _type_id = FlaskApp().db.Column('type_id', FlaskApp().db.ForeignKey('tag_types.id'))
+    _parent_id = FlaskApp().db.Column('parent_id', FlaskApp().db.ForeignKey('tags.id'), nullable=True)
 
     def __init__(self, text: Dict[str, str], type_id: int, parent_id: int = None) -> None:
         super(Editable).__init__()

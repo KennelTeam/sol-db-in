@@ -1,6 +1,6 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
-from . import db
+from backend.app.flask_app import FlaskApp
 from backend.constants import MAX_TEXT_SIZE
 from typing import Any
 from enum import Enum
@@ -8,10 +8,10 @@ from datetime import datetime
 
 
 class ValueHolder:
-    value_int = db.Column('value_int', db.Integer, nullable=True)
-    value_text = db.Column('value_text', db.Text(MAX_TEXT_SIZE), nullable=True)
-    value_datetime = db.Column('value_datetime', db.DateTime, nullable=True)
-    value_bool = db.Column('value_bool', db.Boolean, nullable=True)
+    value_int = FlaskApp().db.Column('value_int', FlaskApp().db.Integer, nullable=True)
+    value_text = FlaskApp().db.Column('value_text', FlaskApp().db.Text(MAX_TEXT_SIZE), nullable=True)
+    value_datetime = FlaskApp().db.Column('value_datetime', FlaskApp().db.DateTime, nullable=True)
+    value_bool = FlaskApp().db.Column('value_bool', FlaskApp().db.Boolean, nullable=True)
 
     @property
     def value(self) -> Any:

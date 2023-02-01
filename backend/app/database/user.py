@@ -1,7 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 from backend.constants import MAX_LOGIN_SIZE, MAX_FULLNAME_SIZE, MAX_COMMENT_SIZE, SALT_SIZE
-from . import db
+from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from sqlalchemy.dialects.mysql import VARCHAR
 import random
@@ -19,17 +19,17 @@ class Role(Enum):
     ADMIN = 4
 
 
-class User(Editable, db.Model):
+class User(Editable, FlaskApp().db.Model):
     __tablename__ = 'users'
-    _login = db.Column('login', VARCHAR(MAX_LOGIN_SIZE), unique=True)
-    _name = db.Column('name', db.Text(MAX_FULLNAME_SIZE))
-    _comment = db.Column('comment', db.Text(MAX_COMMENT_SIZE))
+    _login = FlaskApp().db.Column('login', VARCHAR(MAX_LOGIN_SIZE), unique=True)
+    _name = FlaskApp().db.Column('name', FlaskApp().db.Text(MAX_FULLNAME_SIZE))
+    _comment = FlaskApp().db.Column('comment', FlaskApp().db.Text(MAX_COMMENT_SIZE))
 
     # expected to use SHA-512
-    _password_hash = db.Column('password', db.Text(512 // 8))
+    _password_hash = FlaskApp().db.Column('password', FlaskApp().db.Text(512 // 8))
 
-    _password_salt = db.Column('password_salt', db.Text(SALT_SIZE))
-    _role = db.Column('role', db.Enum(Role))
+    _password_salt = FlaskApp().db.Column('password_salt', FlaskApp().db.Text(SALT_SIZE))
+    _role = FlaskApp().db.Column('role', FlaskApp().db.Enum(Role))
 
     current_ip: str = ""
 

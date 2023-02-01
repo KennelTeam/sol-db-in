@@ -1,6 +1,6 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-from . import db
+from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from typing import Dict, Any
 from .visualization_type import VisualizationType
@@ -9,19 +9,19 @@ from .form_type import FormType
 from sqlalchemy import or_
 
 
-class RelationSettings(Editable, db.Model):
+class RelationSettings(Editable, FlaskApp().db.Model):
     __tablename__ = 'relation_settings'
 
-    _relation_type = db.Column('relation_type', db.Enum(RelationType))
+    _relation_type = FlaskApp().db.Column('relation_type', FlaskApp().db.Enum(RelationType))
 
-    _related_visualization_type = db.Column('related_visualization_type', db.Enum(VisualizationType), nullable=True)
-    _related_visualization_sorting = db.Column('related_visualization_sorting', db.Integer, nullable=True)
+    _related_visualization_type = FlaskApp().db.Column('related_visualization_type', FlaskApp().db.Enum(VisualizationType), nullable=True)
+    _related_visualization_sorting = FlaskApp().db.Column('related_visualization_sorting', FlaskApp().db.Integer, nullable=True)
 
-    _export_forward_relation = db.Column('export_forward_relation', db.Boolean)
-    _export_inverse_relation = db.Column('export_inverse_relation', db.Boolean)
+    _export_forward_relation = FlaskApp().db.Column('export_forward_relation', FlaskApp().db.Boolean)
+    _export_inverse_relation = FlaskApp().db.Column('export_inverse_relation', FlaskApp().db.Boolean)
 
-    _forward_relation_sheet_name = db.Column('forward_relation_sheet_name', db.Boolean, nullable=True)
-    _inverse_relation_sheet_name = db.Column('inverse_relation_sheet_name', db.Boolean, nullable=True)
+    _forward_relation_sheet_name = FlaskApp().db.Column('forward_relation_sheet_name', FlaskApp().db.Boolean, nullable=True)
+    _inverse_relation_sheet_name = FlaskApp().db.Column('inverse_relation_sheet_name', FlaskApp().db.Boolean, nullable=True)
 
     def __init__(self, relation_type: RelationType,
                  related_visualization_type: VisualizationType, related_visualization_sorting: int = 0,

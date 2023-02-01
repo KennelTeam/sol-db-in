@@ -1,18 +1,17 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-from . import db
+from backend.app.flask_app import FlaskApp
 from .editable import Editable
-from typing import Set, List, Tuple
+from typing import Set, List, Tuple, Dict, Any
 from .question import Question
+from .answer import Answer
 from .formatting_settings import FormattingSettings
-
-# List of column questions and list of row questions
-FixedTable_T = Tuple[List[Question], List[Question]]
+JSON = Dict[str, Any]
 
 
-class FixedTable(Editable, db.Model):
+class FixedTable(Editable, FlaskApp().db.Model):
     __tablename__ = 'fixed_tables'
-    _block_sorting = db.Column('block_sorting', db.Integer)
+    _block_sorting = FlaskApp().db.Column('block_sorting', FlaskApp().db.Integer)
 
     def __init__(self, block_sorting: int) -> None:
         super(Editable).__init__()
@@ -31,7 +30,13 @@ class FixedTable(Editable, db.Model):
     def get_by_ids(ids: Set[int]) -> List['FixedTable']:
         return FixedTable.query.filter(FixedTable.id.in_(ids)).all()
 
-    def get_questions(self) -> FixedTable_T:
+    def get_questions(self, with_answers=False, leader_id: int = None, project_id: int = None) -> JSON:
+        if not with_answers:
+            return self._get_only_questions()
+        else:
+            return self._get_questions_with_answers(leader_id, project_id)
+
+    def _get_only_questions(self) -> JSON:
         formattings = FormattingSettings.get_from_fixed_table(self.id)
         ids = [item.id for item in formattings]
         formattings_indexed = {item.id: item for item in formattings}
@@ -50,4 +55,20 @@ class FixedTable(Editable, db.Model):
         rows = list(filter(lambda q: get_row(q) is not None, questions))
         columns.sort(key=get_column)
         rows.sort(key=get_row)
-        return columns, rows
+        return {
+            'columns': [q.to_json() for q in columns],
+            'rows': [q.to_json() for q in rows]
+        }
+
+    def _get_questions_with_answers(self, leader_id: int = None, project_id: int = None) -> JSON:
+        questions = self._get_only_questions()
+        columns = questions['columns']
+        rows = questions['rows']
+        answers = [[None for c in columns] for r in rows]
+        for i, r in enumerate(rows):
+            for j, c in enumerate(columns):
+                options = Answer.filter(c.id, row_question_id=r.id, leader_id=leader_id, project_id=project_id)
+                answers[i][j] = None if len(options) == 0 else options[0]
+        return questions | {
+            'answers': answers
+        }

@@ -1,6 +1,6 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-from . import db
+from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from backend.constants import MAX_ANSWER_BLOCK_NAME, MAX_LANGUAGES_COUNT
 import json
@@ -8,9 +8,9 @@ from typing import Dict, Any, List
 from .answer_option import AnswerOption
 
 
-class AnswerBlock(Editable, db.Model):
+class AnswerBlock(Editable, FlaskApp().db.Model):
     __tablename__ = 'answer_blocks'
-    _name = db.Column('name', db.Text(MAX_ANSWER_BLOCK_NAME * MAX_LANGUAGES_COUNT))
+    _name = FlaskApp().db.Column('name', FlaskApp().db.Text(MAX_ANSWER_BLOCK_NAME * MAX_LANGUAGES_COUNT))
 
     def __init__(self, name: Dict[str, str]):
         super(Editable).__init__()

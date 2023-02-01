@@ -1,15 +1,15 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-from . import db
+from backend.app.flask_app import FlaskApp
 from datetime import datetime
 from typing import Dict, Any
 from .action import Action
 
 
 class Editable:
-    id = db.Column('id', db.Integer, unique=True, primary_key=True)
-    create_timestamp = db.Column('create_timestamp', db.DateTime)
-    _deleted = db.Column('deleted', db.Boolean)
+    id = FlaskApp().db.Column('id', FlaskApp().db.Integer, unique=True, primary_key=True)
+    create_timestamp = FlaskApp().db.Column('create_timestamp', FlaskApp().db.DateTime)
+    _deleted = FlaskApp().db.Column('deleted', FlaskApp().db.Boolean)
 
     def __init__(self) -> None:
         self.create_timestamp = datetime.utcnow()
@@ -22,12 +22,12 @@ class Editable:
     @deleted.setter
     def deleted(self, value: bool):
         self.edit('deleted', value, self.__dict__['__tablename__'])  # so strange method of getting the tablename
-        # because it is not in editable, but supposed to be in derived classes (which are db.Models)
+        # because it is not in editable, but supposed to be in derived classes (which are FlaskApp().db.Models)
         self._deleted = value
 
     def edit(self, column_id: str, value: Any, table_id: str = "") -> None:
         act = Action(table_id, column_id, self.id, value)
-        db.session.add(act)
+        FlaskApp().db.session.add(act)
 
     def to_json(self) -> Dict[str, Any]:
         return {

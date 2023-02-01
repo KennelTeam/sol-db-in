@@ -1,15 +1,15 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-from . import db
+from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from backend.constants import MAX_TAG_SIZE, MAX_LANGUAGES_COUNT
 from .tag import Tag
 from typing import List, Dict, Any
 
 
-class TagType(Editable, db.Model):
+class TagType(Editable, FlaskApp().db.Model):
     __tablename__ = 'tag_types'
-    _text = db.Column('text', db.Text(MAX_TAG_SIZE * MAX_LANGUAGES_COUNT))
+    _text = FlaskApp().db.Column('text', FlaskApp().db.Text(MAX_TAG_SIZE * MAX_LANGUAGES_COUNT))
 
     def __init__(self, text: str) -> None:
         super(Editable).__init__()

@@ -2,7 +2,7 @@
 #  All rights reserved
 from typing import Dict, Any
 
-from . import db
+from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from enum import Enum
 
@@ -14,7 +14,7 @@ class FormState(Enum):
 
 
 class Form(Editable):
-    _state = db.Column('state', db.Enum(FormState))
+    _state = FlaskApp().db.Column('state', FlaskApp().db.Enum(FormState))
 
     def __init__(self, state=FormState.PLANNED):
         super(Editable).__init__()

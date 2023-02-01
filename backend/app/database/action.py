@@ -2,7 +2,7 @@
 #  All rights reserved
 import datetime
 
-from . import db
+from backend.app.flask_app import FlaskApp
 from sqlalchemy.dialects.mysql import VARCHAR
 from typing import Any, List
 from datetime import datetime
@@ -11,15 +11,15 @@ from .timestamp_range import TimestampRange
 from .value_holder import ValueHolder
 
 
-class Action(ValueHolder, db.Model):
+class Action(ValueHolder, FlaskApp().db.Model):
     __tablename__ = 'actions'
-    id = db.Column('id', primary_key=True, unique=True)
-    user_id = db.Column('user_id', db.ForeignKey('users.id'))
-    table_id = db.Column('table_id', VARCHAR(64))
-    column_id = db.Column('column_id', VARCHAR(64))
-    row_id = db.Column('row_id', db.Integer)
-    ip = db.Column('ip', VARCHAR(64))
-    timestamp = db.Column('timestamp', db.DateTime)
+    id = FlaskApp().db.Column('id', primary_key=True, unique=True)
+    user_id = FlaskApp().db.Column('user_id', FlaskApp().db.ForeignKey('users.id'))
+    table_id = FlaskApp().db.Column('table_id', VARCHAR(64))
+    column_id = FlaskApp().db.Column('column_id', VARCHAR(64))
+    row_id = FlaskApp().db.Column('row_id', FlaskApp().db.Integer)
+    ip = FlaskApp().db.Column('ip', VARCHAR(64))
+    timestamp = FlaskApp().db.Column('timestamp', FlaskApp().db.DateTime)
 
     def __init__(self, table_id: str, column_id: str, row_id: str, value: Any) -> None:
         self.user_id = current_user.id

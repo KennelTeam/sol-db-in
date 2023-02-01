@@ -2,27 +2,31 @@
 #  All rights reserved.
 import sqlalchemy.orm
 from typing import List
-from . import db
+from backend.app.flask_app import FlaskApp
 from .editable import Editable
 
 
-class FormattingSettings(Editable, db.Model):
+class FormattingSettings(Editable, FlaskApp().db.Model):
     __tablename__ = 'formatting_settings'
 
-    _block_sorting = db.Column('block_sorting', db.Integer)
-    _table_column = db.Column('table_column', db.Integer, nullable=True)
-    _table_row = db.Column('table_row', db.Integer, nullable=True)
-    _block_id = db.Column('block_id', db.ForeignKey('question_blocks.id'), nullable=True, default=None)
-    _table_id = db.Column('table_id', db.ForeignKey('question_tables.id'), nullable=True, default=None)
-    _fixed_table_id = db.Column('fixed_table_id', db.ForeignKey('fixed_tables.id'), nullable=True, default=None)
+    _block_sorting = FlaskApp().db.Column('block_sorting', FlaskApp().db.Integer)
+    _table_column = FlaskApp().db.Column('table_column', FlaskApp().db.Integer, nullable=True)
+    _table_row = FlaskApp().db.Column('table_row', FlaskApp().db.Integer, nullable=True)
+    _show_on_main_page = FlaskApp().db.Column('show_on_main_page', FlaskApp().db.Boolean)
+    _block_id = FlaskApp().db.Column('block_id', FlaskApp().db.ForeignKey('question_blocks.id'), nullable=True,
+                                     default=None)
+    _table_id = FlaskApp().db.Column('table_id', FlaskApp().db.ForeignKey('question_tables.id'), nullable=True,
+                                     default=None)
+    _fixed_table_id = FlaskApp().db.Column('fixed_table_id', FlaskApp().db.ForeignKey('fixed_tables.id'), nullable=True,
+                                           default=None)
 
     def __init__(self, block_sorting: int, block_id: int, table_row: int = 0, table_id: int = None,
-                 table_column: int = None, fixed_table_id: int = None):
-
+                 table_column: int = None, show_on_main_page: bool = False, fixed_table_id: int = None):
         super(Editable).__init__()
         self.block_sorting = block_sorting
         self.table_row = table_row
         self.table_column = table_column
+        self.show_on_main_page = show_on_main_page
 
         self._block_id = block_id
         self._table_id = table_id
@@ -45,8 +49,11 @@ class FormattingSettings(Editable, db.Model):
         return FormattingSettings.query.filter_by(_fixed_table_id=fixed_table_id).all()
 
     @staticmethod
-    def filter_only_free_questions(query: sqlalchemy.orm.Query) -> List['FormattingSettings']:
-        return query.filter(FormattingSettings.table_id is None).filter(FormattingSettings._fixed_table_id is None).all()
+    def filter_only_free_questions(query: sqlalchemy.orm.Query, short_form: bool = False) -> List['FormattingSettings']:
+        if short_form:
+            query = query.filter(FormattingSettings._show_on_main_page is True)
+        return query.filter(FormattingSettings.table_id is None) \
+            .filter(FormattingSettings._fixed_table_id is None).all()
 
     @staticmethod
     def filter_only_table_questions(query: sqlalchemy.orm.Query) -> List['FormattingSettings']:
@@ -55,6 +62,15 @@ class FormattingSettings(Editable, db.Model):
     @staticmethod
     def filter_only_fixed_table(query: sqlalchemy.orm.Query) -> List['FormattingSettings']:
         return query.filter(FormattingSettings._fixed_table_id is not None).all()
+
+    @property
+    def show_on_main_page(self) -> bool:
+        return self._show_on_main_page
+
+    @show_on_main_page.setter
+    @Editable.on_edit
+    def show_on_main_page(self, value: bool) -> None:
+        self._show_on_main_page = value
 
     @property
     def block_id(self) -> int:
