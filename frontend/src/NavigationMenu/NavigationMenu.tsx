@@ -1,11 +1,15 @@
 import { List, ListItem, ListItemButton, ListItemText, Box, Drawer, Collapse } from '@mui/material'
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import { UserType, UserTypeProps } from '../types/global.d'
+import { MENU_WIDTH, UserType } from '../types/global.d'
 import { useTranslation } from 'react-i18next'
 import { TFunction } from 'i18next'
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+
+interface UserTypeProps { // props interface used by NavigationMenu for sending user role
+    user: UserType
+}
 
 const MenuButton = (text: string, path: string, t : TFunction, padding=2) : JSX.Element => (
     <ListItem component={Link} to={path}
@@ -90,7 +94,7 @@ export default function NavigationMenu(props: UserTypeProps) : JSX.Element {
             <Drawer
                 variant="permanent"
                 open={true}
-                sx={{'& .MuiDrawer-paper': { boxSizing: 'border-box', width: props.width } }}
+                sx={{'& .MuiDrawer-paper': { boxSizing: 'border-box', width: MENU_WIDTH } }}
                 >
                 <List>
                     {menu}

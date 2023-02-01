@@ -7,9 +7,6 @@ enum UserType {
     None
 }
 
-interface UserTypeProps { // props interface used by NavigationMenu for sending user role
-    user: UserType
-    width: number
-}
+const MENU_WIDTH = 200
 
-export {UserType, UserTypeProps}
+export { UserType, MENU_WIDTH }
