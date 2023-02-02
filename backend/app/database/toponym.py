@@ -12,6 +12,10 @@ class Toponym(FlaskApp().db.Model):
     parent_id = FlaskApp().db.Column('parent_id', FlaskApp().db.ForeignKey('toponyms.id'), nullable=True, default=None)
 
     @staticmethod
+    def get_all() -> List['Toponym']:
+        return Toponym.query.all()
+
+    @staticmethod
     def get_by_name(name: str) -> 'Toponym':
         return Toponym.query.filter_by(name=name).first()
 

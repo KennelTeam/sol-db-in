@@ -5,9 +5,10 @@ from backend.app.flask_app import FlaskApp
 from .form import Form
 from .editable import Editable
 from sqlalchemy.dialects.mysql import VARCHAR
-from typing import Dict, Any
+from typing import Dict, Any, Set, List
 from .question_block import QuestionBlock
 from .form_type import FormType
+from .answer import Answer
 
 
 class Project(Form, FlaskApp().db.Model):
@@ -26,6 +27,19 @@ class Project(Form, FlaskApp().db.Model):
                 block.get_questions(with_answers=True, form_id=self.id, short_form=short_form) for block in form
             ]
         }
+
+    @staticmethod
+    def filter(name_substr: str, question_id: int, exact_value: Any = None, min_value: Any = None,
+               max_value: Any = None, substring: str = None, row_question_id: int = None) -> Set[int]:
+
+        name_pattern = f"%{name_substr}%"
+        name_condition = Project._name.like(name_pattern)
+        return Form._filter_ids(Project, FormType.PROJECT, name_condition,
+                                question_id, exact_value, min_value, max_value, substring, row_question_id)
+
+    @staticmethod
+    def get_by_ids(ids: Set[int]) -> List['Project']:
+        return Project.query.filter(Project.id.in_(ids)).all()
 
     @property
     def name(self) -> str:

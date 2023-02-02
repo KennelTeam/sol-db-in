@@ -16,6 +16,10 @@ class AnswerBlock(Editable, FlaskApp().db.Model):
         super(Editable).__init__()
         self.name = name
 
+    @staticmethod
+    def get_by_id(id: int) -> 'AnswerBlock':
+        return AnswerBlock.query.filter_by(id=id).first()
+
     @property
     def name(self) -> Dict[str, str]:
         return json.loads(self._name)

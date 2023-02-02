@@ -9,7 +9,6 @@ from .question_table import QuestionTable
 from .fixed_table import FixedTable
 from .question import Question
 from .formatting_settings import FormattingSettings
-from .form import Form
 import json
 
 Table = TypeVar('Table', bound=FlaskApp().db.Model)

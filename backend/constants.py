@@ -27,3 +27,5 @@ SALT_SIZE: final(int) = 32
 MAX_TEXT_SIZE: final(int) = 4096
 INT_MIN: final(int) = -0xffffffffffffffff
 INT_MAX: final(int) = -INT_MIN
+SOURCE_QUESTION_ID: final(int) = -1
+ANSWER_ROW_QUESTION_ID: final(int) = -2

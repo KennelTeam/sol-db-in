@@ -3,7 +3,7 @@
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from backend.constants import MAX_ANSWER_OPTION_SIZE, MAX_LANGUAGES_COUNT, MAX_SHORT_ANSWER_OPTION_SIZE
-from typing import Dict, Any, List
+from typing import Dict, List
 import json
 
 

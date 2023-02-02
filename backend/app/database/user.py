@@ -72,7 +72,7 @@ class User(Editable, FlaskApp().db.Model):
         self._login = new_login
 
     # We do not actually store password, so accessing it returns nothing
-    # TODO: maybe it's better to raise an exception here
+    # IDEA: maybe it's better to raise an exception here
     @property
     def password(self) -> str:
         return ""

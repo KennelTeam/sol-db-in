@@ -1,28 +1,17 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-from backend.constants import MAX_QUESTION_TEXT_SIZE, MAX_LANGUAGES_COUNT, MAX_COMMENT_SIZE
+from backend.constants import MAX_QUESTION_TEXT_SIZE, MAX_LANGUAGES_COUNT, MAX_COMMENT_SIZE, \
+    SOURCE_QUESTION_ID, ANSWER_ROW_QUESTION_ID
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from enum import Enum
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 import json
 from .formatting_settings import FormattingSettings
 from .privacy_settings import PrivacySettings
 from .relation_settings import RelationSettings
 from .answer import Answer
-
-
-class Type(Enum):
-    DATE = 1
-    USER = 2
-    LONG_TEXT = 3
-    SHORT_TEXT = 4
-    MULTIPLE_CHOICE = 5
-    CHECKBOX = 6
-    LOCATION = 7
-    NUMBER = 8
-    BOOLEAN = 9
-    RELATION = 10
+from .question_type import Type
 
 
 class Question(Editable, FlaskApp().db.Model):
@@ -45,6 +34,43 @@ class Question(Editable, FlaskApp().db.Model):
         self.comment = comment
         self.answer_block_id = answer_block_id
         self.tag_type_id = tag_type_id
+
+    def prepare_my_table(self, inverse_relation=False):
+        if self.question_type is not Type.RELATION:
+            raise Exception("Could not prepare a table for non-relational question")
+        if not inverse_relation and not self.relation_settings.export_forward_relation:
+            return []
+        if inverse_relation and not self.relation_settings.export_inverse_relation:
+            return []
+        if self.formatting_settings.table_id is None:
+            return [{str(self.id): item.to_json()} for item in Answer.filter(question_id=self.id)]
+
+        formattings = FormattingSettings.get_from_question_table(self.formatting_settings.table_id)
+        format_ids = [formatting.id for formatting in formattings]
+        my_table = Question.query.filter(Question._formatting_settings.in_(format_ids)).all()
+        result = Question._order_answers(my_table)
+
+        return {
+            'questions': [item.to_json() for item in my_table],
+            'answers': result
+        }
+
+    @staticmethod
+    def _order_answers(my_table: List['Question']) -> Dict[Tuple[int, int], Dict[str, Dict[str, Any]]]:
+        result = {}
+        for question in my_table:
+            answers = Answer.filter(question_id=question.id)
+            for answer in answers:
+                # TODO: replace answer.leader_id with choice of two options
+                key = (answer.table_row, answer.leader_id)
+                if key not in result.keys():
+                    result[key] = {}
+                result[key][str(answer.question_id)] = answer.to_json()
+
+        for key in result.keys():
+            result[key][SOURCE_QUESTION_ID] = key[1]
+            result[key][ANSWER_ROW_QUESTION_ID] = key[0]
+        return result
 
     @staticmethod
     def get_by_id(id: int) -> 'Question':

@@ -5,6 +5,14 @@ import sqlalchemy.orm
 from backend.app.flask_app import FlaskApp
 from .editable_value_holder import EditableValueHolder
 from typing import Any, List, Dict
+from .form_type import FormType
+from .question_type import Type
+from enum import Enum
+
+
+class ExtremumType(Enum):
+    MINIMUM = 1
+    MAXIMUM = 2
 
 
 class Answer(EditableValueHolder, FlaskApp().db.Model):
@@ -34,6 +42,17 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             'row_question_id': self.row_question_id,
             'value': self.value
         }
+
+    @staticmethod
+    def get_extremum(question_id: int, question_type: Type, extremum: ExtremumType):
+        if question_type == Type.NUMBER:
+            sorting = Answer.value_int.desc() if extremum == ExtremumType.MINIMUM else Answer.value_int.asc()
+        else:
+            sorting = Answer.value_datetime.desc() if extremum == ExtremumType.MINIMUM else Answer.value_datetime.asc()
+        item = Answer.query.filter_by(question_id=question_id).order_by(sorting).first()
+        if item is None:
+            return None
+        return item.value_datetime if question_type == Type.DATE else item.value_int
 
     @property
     def row_question_id(self):
@@ -73,6 +92,26 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
                project_id: int = None, exact_value: Any = None, min_value: Any = None,
                max_value: Any = None, substring: str = None) -> List['Answer']:
 
+        return Answer._filter_query(question_id, row_question_id, leader_id, project_id,
+                                   exact_value, min_value, max_value, substring).all()
+
+    @staticmethod
+    def get_distinct_filtered(question_id: int, form_type: FormType, exact_value: Any, min_value: Any,
+                              max_value: Any, substring: str, row_question_id: int) -> List[int]:
+
+        query = Answer.filter_query(question_id, row_question_id=row_question_id, exact_value=exact_value,
+                                    min_value=min_value, max_value=max_value, substring=substring)
+        if form_type is FormType.LEADER:
+            answers = query.with_entities(Answer._leader_id).distinct(Answer._leader_id).all()
+        else:
+            answers = query.with_entities(Answer._project_id).distinct(Answer._project_id).all()
+        return [item.id for item in answers]
+
+    @staticmethod
+    def _filter_query(question_id: int = None, row_question_id: int = None, leader_id: int = None,
+                      project_id: int = None, exact_value: Any = None, min_value: Any = None,
+                      max_value: Any = None, substring: str = None) -> sqlalchemy.orm.Query:
+
         query = EditableValueHolder.filter_by_value(Answer, exact_value=exact_value, min_value=min_value,
                                                     max_value=max_value, substring=substring)
         if question_id is not None:
@@ -83,4 +122,4 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             query = query.filter_by(_leader_id=leader_id)
         if project_id is not None:
             query = query.filter_by(_project_id=project_id)
-        return query.all()
+        return query

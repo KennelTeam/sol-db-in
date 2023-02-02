@@ -2,7 +2,7 @@
 #  All rights reserved.
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
-from typing import Set, List, Tuple, Dict, Any
+from typing import Set, List, Dict, Any
 from .question import Question
 from .answer import Answer
 from .formatting_settings import FormattingSettings
@@ -33,8 +33,7 @@ class FixedTable(Editable, FlaskApp().db.Model):
     def get_questions(self, with_answers=False, leader_id: int = None, project_id: int = None) -> JSON:
         if not with_answers:
             return self._get_only_questions()
-        else:
-            return self._get_questions_with_answers(leader_id, project_id)
+        return self._get_questions_with_answers(leader_id, project_id)
 
     def _get_only_questions(self) -> JSON:
         formattings = FormattingSettings.get_from_fixed_table(self.id)

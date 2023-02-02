@@ -2,5 +2,4 @@
 #  All rights reserved.
 
 from . import routes
-from .flask_app import app_instance, api_instance
-
+from .flask_app import FlaskApp
