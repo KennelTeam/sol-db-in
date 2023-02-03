@@ -1,3 +1,5 @@
+#!/bin/bash
+
 venv/bin/python3 -m pytype --config backend/pytype.config
 result1=$?
 

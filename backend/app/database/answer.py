@@ -1,11 +1,9 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 import sqlalchemy.orm
-
 from backend.app.flask_app import FlaskApp
 from .editable_value_holder import EditableValueHolder
 from typing import Any, List, Dict
-from .form_type import FormType
 from .question_type import Type
 from enum import Enum
 
@@ -20,14 +18,12 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
     _table_row = FlaskApp().db.Column('table_row', FlaskApp().db.Integer, nullable=True)
     _row_question_id = FlaskApp().db.Column('table_column', FlaskApp().db.ForeignKey('questions.id'), nullable=True)
     _question_id = FlaskApp().db.Column('question_id', FlaskApp().db.ForeignKey('questions.id'))
-    _leader_id = FlaskApp().db.Column('leader_id', FlaskApp().db.ForeignKey('leaders.id'), nullable=True)
-    _project_id = FlaskApp().db.Column('project_id', FlaskApp().db.ForeignKey('projects.id'), nullable=True)
+    _form_id = FlaskApp().db.Column('form_id', FlaskApp().db.Integer, nullable=False)
 
-    def __init__(self, table_row: int, question_id: int, leader_id: int, project_id: int,
+    def __init__(self, table_row: int, question_id: int, form_id: int,
                  row_question_id: int, value: Any) -> None:
         super(EditableValueHolder).__init__()
-        self._leader_id = leader_id
-        self._project_id = project_id
+        self._form_id = form_id
         self._question_id = question_id
         self._table_row = table_row
         self._row_question_id = row_question_id
@@ -35,13 +31,22 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
 
     def to_json(self) -> Dict[str, Any]:
         return {
-            'leader_id': self.leader_id,
-            'project_id': self.project_id,
+            'form_id': self.form_id,
             'question_id': self.question_id,
             'table_row': self.table_row if self.table_row is not None else 0,
             'row_question_id': self.row_question_id,
             'value': self.value
         }
+
+    @staticmethod
+    def query_question_grouped_by_forms(question_id: int) -> sqlalchemy.orm.Query:
+        return Answer.query.filter_by(question_id=question_id).group_by(Answer._form_id).with_entities(Answer._form_id)
+
+    @staticmethod
+    def count_with_condition(ids: List[int], condition) -> int:
+        query = Answer.query.filter(condition)
+        query = query.filter(Answer._form_id.in_(ids)).distinct(Answer._form_id)
+        return query.count()
 
     @staticmethod
     def get_extremum(question_id: int, question_type: Type, extremum: ExtremumType):
@@ -67,20 +72,16 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
         return self._question_id
 
     @property
-    def leader_id(self) -> int:
-        return self._leader_id
-
-    @property
-    def project_id(self) -> int:
-        return self._project_id
+    def form_id(self) -> int:
+        return self._form_id
 
     @staticmethod
     def count_leaders_answers(leader_id: int, question_id: int) -> int:
-        return Answer.count_distinct_answers(Answer.query.filter_by(_leader_id=leader_id), question_id)
+        return Answer.count_distinct_answers(Answer.query.filter_by(_form_id=leader_id), question_id)
 
     @staticmethod
     def count_projects_answers(project_id: int, question_id: int) -> int:
-        return Answer.count_distinct_answers(Answer.query.filter_by(_project_id=project_id), question_id)
+        return Answer.count_distinct_answers(Answer.query.filter_by(_form_id=project_id), question_id)
 
     @staticmethod
     def count_distinct_answers(query: sqlalchemy.orm.Query, question_id: int):
@@ -88,28 +89,26 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
         return len(query.distinct().all())
 
     @staticmethod
-    def filter(question_id: int = None, row_question_id: int = None, leader_id: int = None,
-               project_id: int = None, exact_value: Any = None, min_value: Any = None,
+    def filter(question_id: int = None, row_question_id: int = None, form_id: int = None,
+               exact_value: Any = None, min_value: Any = None,
                max_value: Any = None, substring: str = None) -> List['Answer']:
 
-        return Answer._filter_query(question_id, row_question_id, leader_id, project_id,
-                                   exact_value, min_value, max_value, substring).all()
+        return Answer._filter_query(question_id, row_question_id, form_id,
+                                    exact_value, min_value, max_value, substring).all()
 
     @staticmethod
-    def get_distinct_filtered(question_id: int, form_type: FormType, exact_value: Any, min_value: Any,
+    def get_distinct_filtered(question_id: int, exact_value: Any, min_value: Any,
                               max_value: Any, substring: str, row_question_id: int) -> List[int]:
 
         query = Answer.filter_query(question_id, row_question_id=row_question_id, exact_value=exact_value,
                                     min_value=min_value, max_value=max_value, substring=substring)
-        if form_type is FormType.LEADER:
-            answers = query.with_entities(Answer._leader_id).distinct(Answer._leader_id).all()
-        else:
-            answers = query.with_entities(Answer._project_id).distinct(Answer._project_id).all()
+
+        answers = query.with_entities(Answer._form_id).distinct(Answer._form_id).all()
         return [item.id for item in answers]
 
     @staticmethod
-    def _filter_query(question_id: int = None, row_question_id: int = None, leader_id: int = None,
-                      project_id: int = None, exact_value: Any = None, min_value: Any = None,
+    def _filter_query(question_id: int = None, row_question_id: int = None, form_id: int = None,
+                      exact_value: Any = None, min_value: Any = None,
                       max_value: Any = None, substring: str = None) -> sqlalchemy.orm.Query:
 
         query = EditableValueHolder.filter_by_value(Answer, exact_value=exact_value, min_value=min_value,
@@ -118,8 +117,6 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             query = query.filter_by(_question_id=question_id)
         if row_question_id is not None:
             query = query.filter_by(_row_question_id=row_question_id)
-        if leader_id is not None:
-            query = query.filter_by(_leader_id=leader_id)
-        if project_id is not None:
-            query = query.filter_by(_project_id=project_id)
+        if form_id is not None:
+            query = query.filter_by(_form_id=form_id)
         return query

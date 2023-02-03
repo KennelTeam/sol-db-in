@@ -63,9 +63,6 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
         return sorted(blocks, key=lambda x: x.sorting)
 
     def get_questions(self, with_answers=False, form_id: int = None, short_form: bool = False) -> List[Any]:
-        leader_id = form_id if self.form == FormType.LEADER else None
-        project_id = form_id if self.form == FormType.PROJECT else None
-
         free_questions: List[Tuple[Dict[str, Any], int]] = [(
             {
                 'type': 'question',
@@ -75,13 +72,13 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
         table_questions: List[Tuple[Dict[str, Any], int]] = [(
             {
                 'type': 'table_question',
-                'value': item.get_questions(with_answers, leader_id, project_id)
+                'value': item.get_questions(with_answers, form_id)
             }, item.block_sorting) for item in self._get_table_questions()]
 
         fixed_table_questions: List[Tuple[Dict[str, Any], int]] = [(
             {
                 'type': 'fixed_table_question',
-                'value': item.get_questions(with_answers, leader_id, project_id)
+                'value': item.get_questions(with_answers, form_id)
             }, item.block_sorting) for item in self._get_fixed_table_questions()]
 
         total: List[Tuple[Dict[str, Any], int]] = free_questions + table_questions + fixed_table_questions

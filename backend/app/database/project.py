@@ -8,7 +8,6 @@ from sqlalchemy.dialects.mysql import VARCHAR
 from typing import Dict, Any, Set, List
 from .question_block import QuestionBlock
 from .form_type import FormType
-from .answer import Answer
 
 
 class Project(Form, FlaskApp().db.Model):
@@ -34,7 +33,7 @@ class Project(Form, FlaskApp().db.Model):
 
         name_pattern = f"%{name_substr}%"
         name_condition = Project._name.like(name_pattern)
-        return Form._filter_ids(Project, FormType.PROJECT, name_condition,
+        return Form._filter_ids(Project, name_condition,
                                 question_id, exact_value, min_value, max_value, substring, row_question_id)
 
     @staticmethod

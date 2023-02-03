@@ -4,7 +4,6 @@ from backend.constants import MAX_QUESTION_TEXT_SIZE, MAX_LANGUAGES_COUNT, MAX_C
     SOURCE_QUESTION_ID, ANSWER_ROW_QUESTION_ID
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
-from enum import Enum
 from typing import Dict, Any, List, Tuple
 import json
 from .formatting_settings import FormattingSettings
@@ -61,8 +60,7 @@ class Question(Editable, FlaskApp().db.Model):
         for question in my_table:
             answers = Answer.filter(question_id=question.id)
             for answer in answers:
-                # TODO: replace answer.leader_id with choice of two options
-                key = (answer.table_row, answer.leader_id)
+                key = (answer.table_row, answer.form_id)
                 if key not in result.keys():
                     result[key] = {}
                 result[key][str(answer.question_id)] = answer.to_json()
@@ -91,7 +89,7 @@ class Question(Editable, FlaskApp().db.Model):
     def get_by_text(text: str) -> 'Question':
         return Question.query.filter(Question.text.like(f"%{text}%")).all()
 
-    def to_json(self, with_answers=False, leader_id: int = None, project_id: int = None) -> Dict[str, Any]:
+    def to_json(self, with_answers=False, form_id: int = None) -> Dict[str, Any]:
         result = super(Editable).to_json() | {
             'text': self.text,
             'question_type': self.question_type,
@@ -102,7 +100,7 @@ class Question(Editable, FlaskApp().db.Model):
             'relation_settings': self.relation_settings
         }
         if with_answers:
-            answers = Answer.filter(self.id, leader_id=leader_id, project_id=project_id)
+            answers = Answer.filter(self.id, form_id=form_id)
             jsons = [answer.to_json() for answer in answers]
             result.update({
                 'answers': sorted(jsons, key=lambda x: x['table_row'])

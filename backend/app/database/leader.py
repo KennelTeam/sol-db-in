@@ -2,12 +2,11 @@
 #  All rights reserved.
 from backend.constants import MAX_NAME_SIZE
 from backend.app.flask_app import FlaskApp
-from .form import Form, FormState
+from .form import Form
 from .editable import Editable
 from typing import Any, Dict, Set, List
 from .question_block import QuestionBlock
 from .form_type import FormType
-from .question import Question, Type
 
 
 class Leader(Form, FlaskApp().db.Model):
@@ -43,16 +42,8 @@ class Leader(Form, FlaskApp().db.Model):
 
         name_condition = FlaskApp().db.or_(Leader._last_name.like(name_pattern), name_condition)
 
-        return Form._filter_ids(Leader, FormType.LEADER, name_condition,
+        return Form._filter_ids(Leader, name_condition,
                                 question_id, exact_value, min_value, max_value, substring, row_question_id)
-
-    @staticmethod
-    def get_statistics(question_id: int) -> Dict[str, Any]:
-        question = Question.get_by_id(question_id)
-        if question.question_type in {Type.RELATION, Type.LONG_TEXT, Type.SHORT_TEXT}:
-            return {}
-
-
 
     @staticmethod
     def get_by_ids(ids: Set[int]) -> List['Leader']:

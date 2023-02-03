@@ -29,3 +29,5 @@ INT_MIN: final(int) = -0xffffffffffffffff
 INT_MAX: final(int) = -INT_MIN
 SOURCE_QUESTION_ID: final(int) = -1
 ANSWER_ROW_QUESTION_ID: final(int) = -2
+DATE_FORMAT: final(str) = "%Y-%m-%d"
+DATETIME_FORMAT: final(str) = DATE_FORMAT + " %H:%M:%S"

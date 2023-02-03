@@ -30,10 +30,10 @@ class FixedTable(Editable, FlaskApp().db.Model):
     def get_by_ids(ids: Set[int]) -> List['FixedTable']:
         return FixedTable.query.filter(FixedTable.id.in_(ids)).all()
 
-    def get_questions(self, with_answers=False, leader_id: int = None, project_id: int = None) -> JSON:
+    def get_questions(self, with_answers=False, form_id: int = None) -> JSON:
         if not with_answers:
             return self._get_only_questions()
-        return self._get_questions_with_answers(leader_id, project_id)
+        return self._get_questions_with_answers(form_id)
 
     def _get_only_questions(self) -> JSON:
         formattings = FormattingSettings.get_from_fixed_table(self.id)
@@ -59,14 +59,14 @@ class FixedTable(Editable, FlaskApp().db.Model):
             'rows': [q.to_json() for q in rows]
         }
 
-    def _get_questions_with_answers(self, leader_id: int = None, project_id: int = None) -> JSON:
+    def _get_questions_with_answers(self, form_id: int = None) -> JSON:
         questions = self._get_only_questions()
         columns = questions['columns']
         rows = questions['rows']
-        answers = [[None for c in columns] for r in rows]
+        answers = [[None for _ in columns] for _ in rows]
         for i, r in enumerate(rows):
             for j, c in enumerate(columns):
-                options = Answer.filter(c.id, row_question_id=r.id, leader_id=leader_id, project_id=project_id)
+                options = Answer.filter(c.id, row_question_id=r.id, form_id=form_id)
                 answers[i][j] = None if len(options) == 0 else options[0]
         return questions | {
             'answers': answers
