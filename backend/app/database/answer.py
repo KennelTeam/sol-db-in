@@ -4,7 +4,7 @@ import sqlalchemy.orm
 from backend.app.flask_app import FlaskApp
 from .editable_value_holder import EditableValueHolder
 from typing import Any, List, Dict
-from .question_type import Type
+from .question_type import QuestionType
 from enum import Enum
 
 
@@ -40,24 +40,25 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
 
     @staticmethod
     def query_question_grouped_by_forms(question_id: int) -> sqlalchemy.orm.Query:
-        return Answer.query.filter_by(question_id=question_id).group_by(Answer._form_id).with_entities(Answer._form_id)
+        return FlaskApp().request(Answer).filter_by(question_id=question_id)\
+            .group_by(Answer._form_id).with_entities(Answer._form_id)
 
     @staticmethod
     def count_with_condition(ids: List[int], condition) -> int:
-        query = Answer.query.filter(condition)
+        query = FlaskApp().request(Answer).filter(condition)
         query = query.filter(Answer._form_id.in_(ids)).distinct(Answer._form_id)
         return query.count()
 
     @staticmethod
-    def get_extremum(question_id: int, question_type: Type, extremum: ExtremumType):
-        if question_type == Type.NUMBER:
+    def get_extremum(question_id: int, question_type: QuestionType, extremum: ExtremumType):
+        if question_type == QuestionType.NUMBER:
             sorting = Answer.value_int.desc() if extremum == ExtremumType.MINIMUM else Answer.value_int.asc()
         else:
             sorting = Answer.value_datetime.desc() if extremum == ExtremumType.MINIMUM else Answer.value_datetime.asc()
-        item = Answer.query.filter_by(question_id=question_id).order_by(sorting).first()
+        item = FlaskApp().request(Answer).filter_by(question_id=question_id).order_by(sorting).first()
         if item is None:
             return None
-        return item.value_datetime if question_type == Type.DATE else item.value_int
+        return item.value_datetime if question_type == QuestionType.DATE else item.value_int
 
     @property
     def row_question_id(self):
@@ -77,11 +78,11 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
 
     @staticmethod
     def count_leaders_answers(leader_id: int, question_id: int) -> int:
-        return Answer.count_distinct_answers(Answer.query.filter_by(_form_id=leader_id), question_id)
+        return Answer.count_distinct_answers(FlaskApp().request(Answer).filter_by(_form_id=leader_id), question_id)
 
     @staticmethod
     def count_projects_answers(project_id: int, question_id: int) -> int:
-        return Answer.count_distinct_answers(Answer.query.filter_by(_form_id=project_id), question_id)
+        return Answer.count_distinct_answers(FlaskApp().request(Answer).filter_by(_form_id=project_id), question_id)
 
     @staticmethod
     def count_distinct_answers(query: sqlalchemy.orm.Query, question_id: int):

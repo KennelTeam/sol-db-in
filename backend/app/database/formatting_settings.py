@@ -35,19 +35,19 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_by_id(id: int) -> 'FormattingSettings':
-        return FormattingSettings.query.filter_by(id=id).first()
+        return FlaskApp().request(FormattingSettings).filter_by(id=id).first()
 
     @staticmethod
     def query_from_block(block_id: int) -> sqlalchemy.orm.Query:
-        return FormattingSettings.query.filter_by(_block_id=block_id)
+        return FlaskApp().request(FormattingSettings).filter_by(_block_id=block_id)
 
     @staticmethod
     def get_from_question_table(question_table_id: int) -> List['FormattingSettings']:
-        return FormattingSettings.query.filter_by(_table_id=question_table_id).all()
+        return FlaskApp().request(FormattingSettings).filter_by(_table_id=question_table_id).all()
 
     @staticmethod
     def get_from_fixed_table(fixed_table_id: int) -> List['FormattingSettings']:
-        return FormattingSettings.query.filter_by(_fixed_table_id=fixed_table_id).all()
+        return FlaskApp().request(FormattingSettings).filter_by(_fixed_table_id=fixed_table_id).all()
 
     @staticmethod
     def filter_only_free_questions(query: sqlalchemy.orm.Query, short_form: bool = False) -> List['FormattingSettings']:

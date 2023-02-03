@@ -18,7 +18,7 @@ class AnswerBlock(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_by_id(id: int) -> 'AnswerBlock':
-        return AnswerBlock.query.filter_by(id=id).first()
+        return FlaskApp().request(AnswerBlock).filter_by(id=id).first()
 
     @property
     def name(self) -> Dict[str, str]:
@@ -39,5 +39,5 @@ class AnswerBlock(Editable, FlaskApp().db.Model):
     @staticmethod
     def get_all_blocks() -> List[Dict[str, Any]]:
         return [
-            block.to_json() for block in AnswerBlock.query.all()
+            block.to_json() for block in FlaskApp().request(AnswerBlock).all()
         ]

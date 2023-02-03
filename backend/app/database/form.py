@@ -1,14 +1,14 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 from datetime import datetime, timedelta
-from typing import Dict, Any, Set, List
+from typing import Dict, Any, Set, List, Type
 import sqlalchemy.orm
 from sqlalchemy import and_, func
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from .answer import Answer, ExtremumType
 from enum import Enum
-from .question import Question, Type
+from .question import Question, QuestionType
 from .toponym import Toponym
 from .user import User
 from .answer_option import AnswerOption
@@ -47,12 +47,12 @@ class Form(Editable):
         return set(item.form_id for item in query.all())
 
     @staticmethod
-    def _filter_ids(table: FlaskApp().db.Table, name_condition: sqlalchemy.orm.Query,
+    def _filter_ids(table: Type[FlaskApp().db.Model], name_condition,
                     question_id: int, exact_value: Any, min_value: Any,
                     max_value: Any, substring: str, row_question_id: int
                     ) -> Set[int]:
 
-        name_search = table.query.filter(name_condition)
+        name_search = FlaskApp().request(table).filter(name_condition)
 
         ids = Answer.get_distinct_filtered(question_id, exact_value, min_value, max_value, substring, row_question_id)
         query = name_search.filter(table.id.in_(ids))
@@ -66,7 +66,7 @@ class Form(Editable):
         self._state = new_state
 
     @staticmethod
-    def _prepare_statistics(table: FlaskApp().db.Table, question_id: int,
+    def _prepare_statistics(table: Type[FlaskApp().db.Model], question_id: int,
                             min_value: int | datetime = None, max_value: int | datetime = None,
                             step: int | datetime = None):
 
@@ -75,10 +75,10 @@ class Form(Editable):
 
         result = {}
         for state in FormState:
-            forms = table.query.with_entities(table.id)
+            forms = FlaskApp().request(table).with_entities(table.id)
             # It's not an encapsulation violation because the table is derived from Form, so actually it's the access
             # of Form's field _state
-            forms = forms.filter_by(table._state == state)  # pylint: disable=protected-access
+            forms = forms.filter_by(_state=state)
             ids = [form.id for form in forms.all()]
             result[state.name] = {}
             for condition in filters:
@@ -90,7 +90,7 @@ class Form(Editable):
     def _get_statistics_filters(question: Question, min_value: int | datetime = None, max_value: int | datetime = None,
                                 step: int = None) -> List[Dict[str, Any]]:
 
-        if question.question_type in {Type.DATE, Type.NUMBER}:
+        if question.question_type in {QuestionType.DATE, QuestionType.NUMBER}:
             if min_value is None:
                 min_value = Answer.get_extremum(question.id, question.question_type, ExtremumType.MINIMUM)
             if max_value is None:
@@ -99,17 +99,17 @@ class Form(Editable):
                 raise Exception(f"step is not passed as argument while it's required for {question.question_type.name}")
             if min_value is None:
                 return []
-            if question.question_type == Type.DATE:
+            if question.question_type == QuestionType.DATE:
                 return Form._prepare_date(min_value, max_value, step)
             return Form._prepare_number(min_value, max_value, step)
-        if question.question_type in {Type.CHECKBOX, Type.MULTIPLE_CHOICE}:
+        if question.question_type in {QuestionType.CHECKBOX, QuestionType.MULTIPLE_CHOICE}:
             return Form._prepare_choice_answer(question)
         preparation_function = {
-            Type.USER: Form._prepare_user,
-            Type.LOCATION: Form._prepare_location,
-            Type.BOOLEAN: Form._prepare_boolean,
-            Type.SHORT_TEXT: lambda: [],
-            Type.LONG_TEXT: lambda: []
+            QuestionType.USER: Form._prepare_user,
+            QuestionType.LOCATION: Form._prepare_location,
+            QuestionType.BOOLEAN: Form._prepare_boolean,
+            QuestionType.SHORT_TEXT: lambda: [],
+            QuestionType.LONG_TEXT: lambda: []
         }
 
         return preparation_function[question.question_type]()

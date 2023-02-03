@@ -30,7 +30,7 @@ class QuestionTable(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_by_ids(ids: Set[int]) -> List['QuestionTable']:
-        return QuestionTable.query.filter(QuestionTable.id.in_(ids)).all()
+        return FlaskApp().request(QuestionTable).filter(QuestionTable.id.in_(ids)).all()
 
     def get_questions(self, with_answers=False, form_id: int = None) -> List[Dict[str, Any]]:
         formats = FormattingSettings.get_from_question_table(self.id)

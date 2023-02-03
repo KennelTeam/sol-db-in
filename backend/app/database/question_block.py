@@ -59,7 +59,7 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_form(form: FormType) -> List['QuestionBlock']:
-        blocks = QuestionBlock.query.filter_by(_form=form).all()
+        blocks = FlaskApp().request(QuestionBlock).filter_by(_form=form).all()
         return sorted(blocks, key=lambda x: x.sorting)
 
     def get_questions(self, with_answers=False, form_id: int = None, short_form: bool = False) -> List[Any]:

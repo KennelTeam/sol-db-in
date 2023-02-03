@@ -10,7 +10,9 @@ import json
 class AnswerOption(Editable, FlaskApp().db.Model):
     __tablename__ = 'answer_options'
     _name = FlaskApp().db.Column('name', FlaskApp().db.Text(MAX_ANSWER_OPTION_SIZE * MAX_LANGUAGES_COUNT))
-    _short_name = FlaskApp().db.Column('short_name', FlaskApp().db.Text(MAX_SHORT_ANSWER_OPTION_SIZE * MAX_LANGUAGES_COUNT))
+    _short_name = FlaskApp().db.Column('short_name',
+                                       FlaskApp().db.Text(MAX_SHORT_ANSWER_OPTION_SIZE * MAX_LANGUAGES_COUNT))
+
     _answer_block_id = FlaskApp().db.Column('answer_block_id', FlaskApp().db.ForeignKey('answer_blocks.id'))
 
     def __init__(self, name: Dict[str, str], short_name: Dict[str, str], answer_block_id: int):
@@ -21,7 +23,7 @@ class AnswerOption(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_all_from_block(block_id: int) -> List['AnswerOption']:
-        return AnswerOption.query.filter_by(_answer_block_id=block_id).all()
+        return FlaskApp().request(AnswerOption).filter_by(_answer_block_id=block_id).all()
 
     @property
     def answer_block_id(self) -> int:

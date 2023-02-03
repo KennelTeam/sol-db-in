@@ -13,11 +13,11 @@ class Toponym(FlaskApp().db.Model):
 
     @staticmethod
     def get_all() -> List['Toponym']:
-        return Toponym.query.all()
+        return FlaskApp().request(Toponym).all()
 
     @staticmethod
     def get_by_name(name: str) -> 'Toponym':
-        return Toponym.query.filter_by(name=name).first()
+        return FlaskApp().request(Toponym).filter_by(name=name).first()
 
     def __init__(self, name: str, parent_name: str) -> None:
         parent = Toponym.get_by_name(parent_name)
@@ -34,11 +34,11 @@ class Toponym(FlaskApp().db.Model):
 
         # not sure about correctness of this check: int NULL value might be 0 - IDK
         while current is not None:
-            node = Toponym.query.filter_by(id=current)
+            node = FlaskApp().request(Toponym).filter_by(id=current)
             result.append(node)
             current = node.parent_id
         return result
 
     @staticmethod
     def search_by_name(name_substring: str) -> List['Toponym']:
-        return Toponym.query.filter(Toponym.name.like(f"%{name_substring}%")).all()
+        return FlaskApp().request(Toponym).filter(Toponym.name.like(f"%{name_substring}%")).all()

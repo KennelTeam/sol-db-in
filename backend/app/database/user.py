@@ -119,11 +119,11 @@ class User(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_by_login(login: str) -> 'User':
-        return User.query.filter_by(login=login).first()
+        return FlaskApp().request(User).filter_by(login=login).first()
 
     @staticmethod
     def get_all_users() -> List['User']:
-        return User.query.all()
+        return FlaskApp().request(User).all()
 
     @staticmethod
     def auth(login: str, password: str) -> Role:

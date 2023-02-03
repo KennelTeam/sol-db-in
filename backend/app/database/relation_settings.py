@@ -14,14 +14,18 @@ class RelationSettings(Editable, FlaskApp().db.Model):
 
     _relation_type = FlaskApp().db.Column('relation_type', FlaskApp().db.Enum(RelationType))
 
-    _related_visualization_type = FlaskApp().db.Column('related_visualization_type', FlaskApp().db.Enum(VisualizationType), nullable=True)
-    _related_visualization_sorting = FlaskApp().db.Column('related_visualization_sorting', FlaskApp().db.Integer, nullable=True)
+    _related_visualization_type = FlaskApp().db.Column('related_visualization_type',
+                                                       FlaskApp().db.Enum(VisualizationType), nullable=True)
+    _related_visualization_sorting = FlaskApp().db.Column('related_visualization_sorting',
+                                                          FlaskApp().db.Integer, nullable=True)
 
     _export_forward_relation = FlaskApp().db.Column('export_forward_relation', FlaskApp().db.Boolean)
     _export_inverse_relation = FlaskApp().db.Column('export_inverse_relation', FlaskApp().db.Boolean)
 
-    _forward_relation_sheet_name = FlaskApp().db.Column('forward_relation_sheet_name', FlaskApp().db.Boolean, nullable=True)
-    _inverse_relation_sheet_name = FlaskApp().db.Column('inverse_relation_sheet_name', FlaskApp().db.Boolean, nullable=True)
+    _forward_relation_sheet_name = FlaskApp().db.Column('forward_relation_sheet_name',
+                                                        FlaskApp().db.Boolean, nullable=True)
+    _inverse_relation_sheet_name = FlaskApp().db.Column('inverse_relation_sheet_name',
+                                                        FlaskApp().db.Boolean, nullable=True)
 
     def __init__(self, relation_type: RelationType,
                  related_visualization_type: VisualizationType, related_visualization_sorting: int = 0,
@@ -51,11 +55,11 @@ class RelationSettings(Editable, FlaskApp().db.Model):
     @staticmethod
     def get_foreign_to_show_query(form: FormType):
         if form == FormType.LEADER:
-            query = RelationSettings.query.filter(
+            query = FlaskApp().request(RelationSettings).filter(
                     or_(RelationSettings._relation_type == RelationType.LEADER_TO_LEADER,
                         RelationSettings._relation_type == RelationType.PROJECT_TO_LEADER))
         else:
-            query = RelationSettings.query.filter(
+            query = FlaskApp().request(RelationSettings).filter(
                 or_(RelationSettings._relation_type == RelationType.LEADER_TO_PROJECT,
                     RelationSettings._relation_type == RelationType.PROJECT_TO_PROJECT))
         return query.filter(RelationSettings._related_visualization_type != VisualizationType.NOTHING).with_entities(
@@ -64,7 +68,7 @@ class RelationSettings(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_by_id(id: int):
-        return RelationSettings.query.filter_by(id=id).first()
+        return FlaskApp().request(RelationSettings).filter_by(id=id).first()
 
     @property
     def relation_type(self) -> RelationType:

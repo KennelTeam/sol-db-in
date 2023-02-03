@@ -1,11 +1,12 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
-from flask import Flask
+from sqlalchemy.orm import Query
+from flask import Flask, g
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from cheroot.wsgi import Server, PathInfoDispatcher
 from backend.auxiliary.singleton import Singleton
-from backend.constants import DB_ENGINE, MODE, DB_CHARSET, PORT, NUM_THREADS
+from backend.constants import DB_ENGINE, MODE, DB_CHARSET, PORT, NUM_THREADS, REQUEST_CONTEXT_USE_DELETED_ITEMS
 import os
 
 
@@ -43,6 +44,15 @@ class FlaskApp(metaclass=Singleton):
             print("Database initialized")
         print("init finished")
 
+    # Request query from editable table
+    # I thought to place it in the Editable class, but then realized that calls will be like:
+    # TableClassName.request(TableClassName).filter(...)... - very strange
+    # Calls like FlaskApp().request(TableClassName).filter(...)... - seems more understandable
+    def request(self, table) -> Query:
+        if g.get(REQUEST_CONTEXT_USE_DELETED_ITEMS, None):
+            return table.query
+        return table.query.filter_by(_deleted=False)
+
     def run_dev_server(self) -> None:
         self.app.run(host='0.0.0.0', port=PORT, debug=True)
 
@@ -67,11 +77,17 @@ class FlaskApp(metaclass=Singleton):
     def db(self) -> SQLAlchemy:
         return self._db
 
-    # This is needed for creating route decorator since python bans calls inside a decorator like:
-    # @FlaskApp().app.route(...)
-    # ----------^----------- this call raises a syntax error
-    # So as a kind of dirty hack I created this static method
-    # IDEA for future: maybe it's better to make all the properties above static methods instead
-    @staticmethod
-    def route(*args, **kwargs):
-        return FlaskApp().app.route(*args, **kwargs)
+    def use_deleted_items_in_this_request(self):
+        if 'dev_variables' not in g:
+            g.dev_variables = {}
+        g.dev_variables[REQUEST_CONTEXT_USE_DELETED_ITEMS] = True
+
+
+# https://stackoverflow.com/questions/22256862/flask-how-to-store-and-retrieve-a-value-bound-to-the-request
+@FlaskApp().app.after_request
+def pre_request_callbacks(response):
+    # clear the dev variables associated with current request
+    values = g.get('dev_variables', {})
+    values.clear()
+
+    return response

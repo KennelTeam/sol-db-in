@@ -4,6 +4,6 @@
 from .flask_app import FlaskApp
 
 
-@FlaskApp.route("/", methods=['GET'])
+@FlaskApp().app.route("/", methods=['GET'])
 def hello_world():
     return 'Hello World!'

@@ -38,9 +38,9 @@ class TagType(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_all_names() -> List['TagType']:
-        return TagType.query.all()
+        return FlaskApp().request(TagType).all()
 
     @staticmethod
     def get_all_tag_blocks() -> List[Dict[str, List[Dict[str, Any]]]]:
-        blocks = TagType.query.all()
+        blocks = FlaskApp().request(TagType).all()
         return [block.get_forest() for block in blocks]

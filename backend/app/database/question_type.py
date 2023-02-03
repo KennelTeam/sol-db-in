@@ -3,7 +3,7 @@
 from enum import Enum
 
 
-class Type(Enum):
+class QuestionType(Enum):
     DATE = 1
     USER = 2
     LONG_TEXT = 3

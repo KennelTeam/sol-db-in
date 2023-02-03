@@ -46,7 +46,7 @@ class Tag(Editable, FlaskApp().db.Model):
 
     @property
     def children(self) -> List['Tag']:
-        return Tag.query.filter_by(_parent_id=self.id).all()
+        return FlaskApp().request(Tag).filter_by(_parent_id=self.id).all()
 
     def build_tree(self) -> Dict[str, Any]:
         result = self.to_json()
@@ -57,11 +57,11 @@ class Tag(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_all_of_type(type_id: int) -> List['Tag']:
-        return Tag.query.filter_by(_type_id=type_id).all()
+        return FlaskApp().request(Tag).filter_by(_type_id=type_id).all()
 
     @staticmethod
     def get_roots_of_type(type_id: int) -> List['Tag']:
-        return Tag.query.filter_by(_type_id=type_id).filter_by(_parent_id=None).all()
+        return FlaskApp().request(Tag).filter_by(_type_id=type_id).filter_by(_parent_id=None).all()
 
     def get_ancestors(self) -> List['Tag']:
         result = [self]
@@ -69,7 +69,7 @@ class Tag(Editable, FlaskApp().db.Model):
 
         # not sure about correctness of this check: int NULL value might be 0 - IDK
         while current is not None:
-            node = Tag.query.filter_by(id=current)
+            node = FlaskApp().request(Tag).filter_by(id=current)
             result.append(node)
             current = node.parent_id
         return result

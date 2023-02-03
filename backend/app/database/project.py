@@ -38,7 +38,7 @@ class Project(Form, FlaskApp().db.Model):
 
     @staticmethod
     def get_by_ids(ids: Set[int]) -> List['Project']:
-        return Project.query.filter(Project.id.in_(ids)).all()
+        return FlaskApp().request(Project).filter(Project.id.in_(ids)).all()
 
     @property
     def name(self) -> str:

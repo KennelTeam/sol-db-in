@@ -47,7 +47,7 @@ class Leader(Form, FlaskApp().db.Model):
 
     @staticmethod
     def get_by_ids(ids: Set[int]) -> List['Leader']:
-        return Leader.query.filter(Leader.id.in_(ids)).all()
+        return FlaskApp().request(Leader).filter(Leader.id.in_(ids)).all()
 
     @property
     def first_name(self) -> str:

@@ -25,7 +25,7 @@ class PrivacySettings(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_by_id(id: int):
-        return PrivacySettings.query.filter_by(id=id).first()
+        return FlaskApp().request(PrivacySettings).filter_by(id=id).first()
 
     @property
     def editor_access(self) -> AccessType:
