@@ -1,11 +1,12 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 from backend.constants import MAX_PROJECT_NAME_SIZE
+from sqlalchemy.dialects.mysql import VARCHAR
+from typing import Any, Set, List
 from backend.app.flask_app import FlaskApp
+from backend.auxiliary import JSON
 from .form import Form
 from .editable import Editable
-from sqlalchemy.dialects.mysql import VARCHAR
-from typing import Dict, Any, Set, List
 from .question_block import QuestionBlock
 from .form_type import FormType
 
@@ -18,7 +19,7 @@ class Project(Form, FlaskApp().db.Model):
         super(Form, self).__init__()
         self.name = name
 
-    def to_json(self, short_form: bool = False) -> Dict[str, Any]:
+    def to_json(self, short_form: bool = False) -> JSON:
         form = QuestionBlock.get_form(FormType.PROJECT)
         return super(Form).to_json() | {
             'name': self.name,

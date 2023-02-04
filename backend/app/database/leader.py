@@ -1,12 +1,13 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-from backend.constants import MAX_NAME_SIZE
-from backend.app.flask_app import FlaskApp
+from typing import Any, Set, List
 from .form import Form
 from .editable import Editable
-from typing import Any, Dict, Set, List
 from .question_block import QuestionBlock
 from .form_type import FormType
+from backend.constants import MAX_NAME_SIZE
+from backend.app.flask_app import FlaskApp
+from backend.auxiliary import JSON
 
 
 class Leader(Form, FlaskApp().db.Model):
@@ -21,7 +22,7 @@ class Leader(Form, FlaskApp().db.Model):
         self.last_name = last_name
         self.middle_name = middle_name
 
-    def to_json(self, short_form: bool = False) -> Dict[str, Any]:
+    def to_json(self, short_form: bool = False) -> JSON:
         form = QuestionBlock.get_form(FormType.LEADER)
         return super(Form).to_json() | {
             'first_name': self.first_name,

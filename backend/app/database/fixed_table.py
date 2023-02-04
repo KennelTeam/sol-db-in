@@ -1,12 +1,13 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-from backend.app.flask_app import FlaskApp
-from .editable import Editable
-from typing import Set, List, Dict, Any
+
+from typing import Set, List
 from .question import Question
 from .answer import Answer
 from .formatting_settings import FormattingSettings
-JSON = Dict[str, Any]
+from backend.app.flask_app import FlaskApp
+from .editable import Editable
+from backend.auxiliary import JSON
 
 
 class FixedTable(Editable, FlaskApp().db.Model):

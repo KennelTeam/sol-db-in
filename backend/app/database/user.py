@@ -1,6 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 from backend.constants import MAX_LOGIN_SIZE, MAX_FULLNAME_SIZE, MAX_COMMENT_SIZE, SALT_SIZE
+from backend.auxiliary import JSON
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from sqlalchemy.dialects.mysql import VARCHAR
@@ -8,11 +9,10 @@ import random
 import string
 import hashlib
 from enum import Enum
-from typing import Dict, Any, List
+from typing import List
 
 
 class Role(Enum):
-    UNAUTHORIZED = 0
     GUEST = 1
     INTERN = 2
     EDITOR = 3
@@ -54,7 +54,7 @@ class User(Editable, FlaskApp().db.Model):
     def check_password(self, password) -> bool:
         return self._password_hash == self._generate_password_hash(password)
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self) -> JSON:
         return super(Editable).to_json() | {
             'login': self.login,
             'name': self.name,
@@ -129,7 +129,7 @@ class User(Editable, FlaskApp().db.Model):
     def auth(login: str, password: str) -> Role:
         user = User.get_by_login(login)
         if user is None:
-            return Role.UNAUTHORIZED
+            return None
         if not user.check_password(password):
-            return Role.UNAUTHORIZED
+            return None
         return Role(user.role)

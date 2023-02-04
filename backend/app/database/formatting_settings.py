@@ -1,9 +1,10 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-import sqlalchemy.orm
+from sqlalchemy.orm import Query
 from typing import List
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
+from backend.auxiliary import JSON
 
 
 class FormattingSettings(Editable, FlaskApp().db.Model):
@@ -33,12 +34,23 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
         self._table_id = table_id
         self._fixed_table_id = fixed_table_id
 
+    def to_json(self) -> JSON:
+        return super(Editable).to_json() | {
+            'block_sorting': self.block_sorting,
+            'table_row': self.table_row,
+            'table_column': self.table_column,
+            'show_on_main_page': self.show_on_main_page,
+            'block_id': self.block_id,
+            'table_id': self.table_id,
+            'fixed_table_id': self.fixed_table_id
+        }
+
     @staticmethod
     def get_by_id(id: int) -> 'FormattingSettings':
         return FlaskApp().request(FormattingSettings).filter_by(id=id).first()
 
     @staticmethod
-    def query_from_block(block_id: int) -> sqlalchemy.orm.Query:
+    def query_from_block(block_id: int) -> Query:
         return FlaskApp().request(FormattingSettings).filter_by(_block_id=block_id)
 
     @staticmethod
@@ -50,18 +62,18 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
         return FlaskApp().request(FormattingSettings).filter_by(_fixed_table_id=fixed_table_id).all()
 
     @staticmethod
-    def filter_only_free_questions(query: sqlalchemy.orm.Query, short_form: bool = False) -> List['FormattingSettings']:
+    def filter_only_free_questions(query: Query, short_form: bool = False) -> List['FormattingSettings']:
         if short_form:
             query = query.filter(FormattingSettings._show_on_main_page is True)
         return query.filter(FormattingSettings.table_id is None) \
             .filter(FormattingSettings._fixed_table_id is None).all()
 
     @staticmethod
-    def filter_only_table_questions(query: sqlalchemy.orm.Query) -> List['FormattingSettings']:
+    def filter_only_table_questions(query: Query) -> List['FormattingSettings']:
         return query.filter(FormattingSettings._table_id is not None).all()
 
     @staticmethod
-    def filter_only_fixed_table(query: sqlalchemy.orm.Query) -> List['FormattingSettings']:
+    def filter_only_fixed_table(query: Query) -> List['FormattingSettings']:
         return query.filter(FormattingSettings._fixed_table_id is not None).all()
 
     @property

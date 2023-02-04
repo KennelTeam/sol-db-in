@@ -1,8 +1,9 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
+from backend.constants import MAX_TAG_SIZE, MAX_LANGUAGES_COUNT
+from backend.auxiliary import JSON
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
-from backend.constants import MAX_TAG_SIZE, MAX_LANGUAGES_COUNT
 from .tag import Tag
 from typing import List, Dict, Any
 
@@ -24,13 +25,13 @@ class TagType(Editable, FlaskApp().db.Model):
     def text(self, new_text: str) -> None:
         self._text = new_text
 
-    def get_tags(self) -> List[Dict[str, Any]]:
+    def get_tags(self) -> List[JSON]:
         return [tag.to_json() for tag in Tag.get_all_of_type(self.id)]
 
-    def get_forest(self) -> List[Dict[str, Any]]:
+    def get_forest(self) -> List[JSON]:
         return [root.build_tree() for root in Tag.get_roots_of_type(self.id)]
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self) -> JSON:
         return super(Editable).to_json() | {
             'text': self.text,
             'tags': self.get_tags()
@@ -41,6 +42,6 @@ class TagType(Editable, FlaskApp().db.Model):
         return FlaskApp().request(TagType).all()
 
     @staticmethod
-    def get_all_tag_blocks() -> List[Dict[str, List[Dict[str, Any]]]]:
+    def get_all_tag_blocks() -> List[Dict[str, List[JSON]]]:
         blocks = FlaskApp().request(TagType).all()
         return [block.get_forest() for block in blocks]

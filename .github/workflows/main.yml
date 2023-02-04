@@ -7,15 +7,18 @@ jobs:
       with:
         python-version: '3.10' 
     - uses: actions/checkout@v1
+
+    - name: venv creation
+      run: python3 -m venv ./venv
+
+    - name: venv activation
+      run: . venv/bin/activate
     
     - name: preparations
-      run: python3 -m pip install -r backend/requirements.txt
+      run: pip install -r backend/requirements.txt
     
-    - name: pytype checks
-      run: python3 -m pytype --config backend/pytype.config
-      
-    - name: pylint checks
-      run: python3 -m pylint --rcfile=backend/.pylintrc backend
+    - name: checks
+      run: make all_checks
 
 on:
   pull_request:

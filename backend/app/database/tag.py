@@ -1,6 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 from backend.constants import MAX_TAG_SIZE, MAX_LANGUAGES_COUNT
+from backend.auxiliary import JSON, TranslatedText
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from typing import List, Dict, Any
@@ -13,13 +14,13 @@ class Tag(Editable, FlaskApp().db.Model):
     _type_id = FlaskApp().db.Column('type_id', FlaskApp().db.ForeignKey('tag_types.id'))
     _parent_id = FlaskApp().db.Column('parent_id', FlaskApp().db.ForeignKey('tags.id'), nullable=True)
 
-    def __init__(self, text: Dict[str, str], type_id: int, parent_id: int = None) -> None:
+    def __init__(self, text: TranslatedText, type_id: int, parent_id: int = None) -> None:
         super(Editable).__init__()
         self.text = text
         self._type_id = type_id
         self._parent_id = parent_id
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self) -> JSON:
         return super(Editable).to_json() | {
             'text': self.text,
             'type_id': self.type_id,
@@ -27,12 +28,12 @@ class Tag(Editable, FlaskApp().db.Model):
         }
 
     @property
-    def text(self) -> Dict[str, str]:
+    def text(self) -> JSON:
         return json.loads(self._text)
 
     @text.setter
     @Editable.on_edit
-    def text(self, new_text: Dict[str, str]):
+    def text(self, new_text: JSON):
         self._text = json.dumps(new_text)
         return self._text
 
@@ -48,7 +49,7 @@ class Tag(Editable, FlaskApp().db.Model):
     def children(self) -> List['Tag']:
         return FlaskApp().request(Tag).filter_by(_parent_id=self.id).all()
 
-    def build_tree(self) -> Dict[str, Any]:
+    def build_tree(self) -> JSON:
         result = self.to_json()
         result['children'] = []
         for child in self.children:

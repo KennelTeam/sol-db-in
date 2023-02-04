@@ -2,6 +2,7 @@
 #  All rights reserved.
 from backend.app.flask_app import FlaskApp
 from backend.constants import MAX_TOPONYM_SIZE
+from backend.auxiliary import JSON
 from typing import List, Dict, Any
 
 
@@ -25,8 +26,12 @@ class Toponym(FlaskApp().db.Model):
             self.name = name
             self.parent_id = parent.id
 
-    def to_json(self) -> Dict[str, Any]:
-        return self.__dict__
+    def to_json(self) -> JSON:
+        return {
+            'id': self.id,
+            'name': self.name,
+            'parent_id': self.name
+        }
 
     def get_ancestors(self) -> List['Toponym']:
         result = [self]

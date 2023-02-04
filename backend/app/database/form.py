@@ -2,17 +2,18 @@
 #  All rights reserved
 from datetime import datetime, timedelta
 from typing import Dict, Any, Set, List, Type
-import sqlalchemy.orm
-from sqlalchemy import and_, func
+from sqlalchemy import func
+import sqlalchemy
+from enum import Enum
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from .answer import Answer, ExtremumType
-from enum import Enum
 from .question import Question, QuestionType
 from .toponym import Toponym
 from .user import User
 from .answer_option import AnswerOption
 from backend.constants import DATE_FORMAT
+from backend.auxiliary import JSON
 
 
 class FormState(Enum):
@@ -28,7 +29,7 @@ class Form(Editable):
         super(Editable).__init__()
         self.state = state
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self) -> JSON:
         return super(Editable).to_json() | {
             'state': self.state
         }
@@ -41,8 +42,8 @@ class Form(Editable):
     def _filter_by_answers_count(question_id: int, min_answers_count: int, max_answers_count: int) -> Set[int]:
         query = Answer.query_question_grouped_by_forms(question_id)
         # Somehow Pylint does not see that count is a class, so it's not a call, it's a construction of an object
-        condition = and_(func.count() >= min_answers_count,  # pylint: disable=not-callable
-                         func.count() < max_answers_count)  # pylint: disable=not-callable
+        condition = sqlalchemy.and_(func.count() >= min_answers_count,  # pylint: disable=not-callable
+                                    func.count() < max_answers_count)  # pylint: disable=not-callable
         query = query.having(condition)
         return set(item.form_id for item in query.all())
 
@@ -88,7 +89,7 @@ class Form(Editable):
 
     @staticmethod
     def _get_statistics_filters(question: Question, min_value: int | datetime = None, max_value: int | datetime = None,
-                                step: int = None) -> List[Dict[str, Any]]:
+                                step: int = None) -> List[JSON]:
 
         if question.question_type in {QuestionType.DATE, QuestionType.NUMBER}:
             if min_value is None:

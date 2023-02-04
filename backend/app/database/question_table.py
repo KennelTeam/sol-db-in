@@ -1,10 +1,11 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 from backend.app.flask_app import FlaskApp
+from backend.auxiliary import JSON
 from .editable import Editable
 from .question import Question
 from .formatting_settings import FormattingSettings
-from typing import List, Set, Dict, Any
+from typing import List, Set
 
 
 # List of column questions
@@ -32,7 +33,7 @@ class QuestionTable(Editable, FlaskApp().db.Model):
     def get_by_ids(ids: Set[int]) -> List['QuestionTable']:
         return FlaskApp().request(QuestionTable).filter(QuestionTable.id.in_(ids)).all()
 
-    def get_questions(self, with_answers=False, form_id: int = None) -> List[Dict[str, Any]]:
+    def get_questions(self, with_answers=False, form_id: int = None) -> List[JSON]:
         formats = FormattingSettings.get_from_question_table(self.id)
         ids = [item.id for item in formats]
         formats_dict = {item.id: item for item in formats}

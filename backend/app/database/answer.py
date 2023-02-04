@@ -1,11 +1,12 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-import sqlalchemy.orm
+from sqlalchemy.orm import Query
 from backend.app.flask_app import FlaskApp
 from .editable_value_holder import EditableValueHolder
-from typing import Any, List, Dict
-from .question_type import QuestionType
 from enum import Enum
+from typing import Any, List, Set
+from .question_type import QuestionType
+from backend.auxiliary import JSON
 
 
 class ExtremumType(Enum):
@@ -29,7 +30,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
         self._row_question_id = row_question_id
         self.value = value
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self) -> JSON:
         return {
             'form_id': self.form_id,
             'question_id': self.question_id,
@@ -39,7 +40,11 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
         }
 
     @staticmethod
-    def query_question_grouped_by_forms(question_id: int) -> sqlalchemy.orm.Query:
+    def query_for_question_ids(question_ids: Set[int]) -> Query:
+        return FlaskApp().request(Answer).filter(Answer._question_id.in_(question_ids))
+
+    @staticmethod
+    def query_question_grouped_by_forms(question_id: int) -> Query:
         return FlaskApp().request(Answer).filter_by(question_id=question_id)\
             .group_by(Answer._form_id).with_entities(Answer._form_id)
 
@@ -85,7 +90,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
         return Answer.count_distinct_answers(FlaskApp().request(Answer).filter_by(_form_id=project_id), question_id)
 
     @staticmethod
-    def count_distinct_answers(query: sqlalchemy.orm.Query, question_id: int):
+    def count_distinct_answers(query: Query, question_id: int):
         query = query.filter_by(_question_id=question_id).with_entities(Answer._table_row)
         return len(query.distinct().all())
 
@@ -110,7 +115,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
     @staticmethod
     def _filter_query(question_id: int = None, row_question_id: int = None, form_id: int = None,
                       exact_value: Any = None, min_value: Any = None,
-                      max_value: Any = None, substring: str = None) -> sqlalchemy.orm.Query:
+                      max_value: Any = None, substring: str = None) -> Query:
 
         query = EditableValueHolder.filter_by_value(Answer, exact_value=exact_value, min_value=min_value,
                                                     max_value=max_value, substring=substring)

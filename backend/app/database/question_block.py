@@ -1,15 +1,16 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
+from typing import Any, List, Tuple, TypeVar
+import json
 from backend.constants import MAX_BLOCK_NAME_SIZE, MAX_LANGUAGES_COUNT
+from backend.auxiliary import JSON, TranslatedText
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from .form_type import FormType
-from typing import Dict, Any, List, Tuple, TypeVar
 from .question_table import QuestionTable
 from .fixed_table import FixedTable
 from .question import Question
 from .formatting_settings import FormattingSettings
-import json
 
 Table = TypeVar('Table', bound=FlaskApp().db.Model)
 
@@ -20,13 +21,13 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
     _name = FlaskApp().db.Column('name', FlaskApp().db.Text(MAX_BLOCK_NAME_SIZE * MAX_LANGUAGES_COUNT))
     _sorting = FlaskApp().db.Column('sorting', FlaskApp().db.Integer)
 
-    def __init__(self, name: Dict[str, str], form: FormType, sorting: int = 0):
+    def __init__(self, name: TranslatedText, form: FormType, sorting: int = 0):
         super(Editable).__init__()
         self.name = name
         self._form = form
         self.sorting = sorting
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self) -> JSON:
         return super(Editable).to_json() | {
             'name': self.name,
             'form': self.form,
@@ -39,12 +40,12 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
         return self._form
 
     @property
-    def name(self) -> Dict[str, str]:
+    def name(self) -> TranslatedText:
         return json.loads(self._name)
 
     @name.setter
     @Editable.on_edit
-    def name(self, new_name: Dict[str, str]) -> str:
+    def name(self, new_name: TranslatedText) -> str:
         self._name = json.dumps(new_name)
         return self._name
 
@@ -63,25 +64,25 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
         return sorted(blocks, key=lambda x: x.sorting)
 
     def get_questions(self, with_answers=False, form_id: int = None, short_form: bool = False) -> List[Any]:
-        free_questions: List[Tuple[Dict[str, Any], int]] = [(
+        free_questions: List[Tuple[JSON, int]] = [(
             {
                 'type': 'question',
                 'value': item[0].to_json()
             }, item[1]) for item in self._get_free_questions(short_form)]
 
-        table_questions: List[Tuple[Dict[str, Any], int]] = [(
+        table_questions: List[Tuple[JSON, int]] = [(
             {
                 'type': 'table_question',
                 'value': item.get_questions(with_answers, form_id)
             }, item.block_sorting) for item in self._get_table_questions()]
 
-        fixed_table_questions: List[Tuple[Dict[str, Any], int]] = [(
+        fixed_table_questions: List[Tuple[JSON, int]] = [(
             {
                 'type': 'fixed_table_question',
                 'value': item.get_questions(with_answers, form_id)
             }, item.block_sorting) for item in self._get_fixed_table_questions()]
 
-        total: List[Tuple[Dict[str, Any], int]] = free_questions + table_questions + fixed_table_questions
+        total: List[Tuple[JSON, int]] = free_questions + table_questions + fixed_table_questions
         total.sort(key=lambda x: x[1])
         return [item[0] for item in total]
 

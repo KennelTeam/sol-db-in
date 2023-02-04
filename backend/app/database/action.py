@@ -1,19 +1,19 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 import datetime
-
 from backend.app.flask_app import FlaskApp
 from sqlalchemy.dialects.mysql import VARCHAR
 from typing import Any, List
 from datetime import datetime
 from flask_jwt_extended import current_user
+from backend.auxiliary import JSON
 from .timestamp_range import TimestampRange
 from .value_holder import ValueHolder
 
 
 class Action(ValueHolder, FlaskApp().db.Model):
     __tablename__ = 'actions'
-    id = FlaskApp().db.Column('id', primary_key=True, unique=True)
+    id = FlaskApp().db.Column('id', FlaskApp().db.Integer(), primary_key=True, unique=True)
     user_id = FlaskApp().db.Column('user_id', FlaskApp().db.ForeignKey('users.id'))
     table_id = FlaskApp().db.Column('table_id', VARCHAR(64))
     column_id = FlaskApp().db.Column('column_id', VARCHAR(64))
@@ -29,6 +29,18 @@ class Action(ValueHolder, FlaskApp().db.Model):
         self.ip = current_user.current_ip
         self.timestamp = datetime.utcnow()
         self.set(value)
+
+    def to_json(self) -> JSON:
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'table_id': self.table_id,
+            'column_id': self.column_id,
+            'row_id': self.row_id,
+            'ip': self.ip,
+            'timestamp': self.timestamp,
+            'value': self.value
+        }
 
     @staticmethod
     def filter(user_id: int = -1, timestamp_range: TimestampRange = TimestampRange(), table_id: int = -1,

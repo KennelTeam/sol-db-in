@@ -1,12 +1,13 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 from backend.app.flask_app import FlaskApp
+from backend.auxiliary import JSON
 from .editable import Editable
-from typing import Dict, Any
 from .visualization_type import VisualizationType
 from .relation_type import RelationType
 from .form_type import FormType
 from sqlalchemy import or_
+from typing import Dict, Any
 
 
 class RelationSettings(Editable, FlaskApp().db.Model):
@@ -42,7 +43,7 @@ class RelationSettings(Editable, FlaskApp().db.Model):
         self.forward_relation_sheet_name = forward_relation_sheet_name
         self.inverse_relation_sheet_name = inverse_relation_sheet_name
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self) -> JSON:
         return super(Editable).to_json() | {
             'related_visualization_type': self.related_visualization_type,
             'related_visualization_sorting': self.related_visualization_sorting,

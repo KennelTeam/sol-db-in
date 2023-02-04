@@ -1,9 +1,10 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 from backend.app.flask_app import FlaskApp
-from datetime import datetime
-from typing import Dict, Any
 from .action import Action
+from backend.auxiliary import JSON
+from datetime import datetime
+from typing import Any
 
 
 class Editable:
@@ -29,7 +30,7 @@ class Editable:
         act = Action(table_id, column_id, self.id, value)
         FlaskApp().db.session.add(act)
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self) -> JSON:
         return {
             'id': self.id,
             'create_timestamp': self.create_timestamp,

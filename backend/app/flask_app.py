@@ -1,5 +1,6 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
+import os
 from sqlalchemy.orm import Query
 from flask import Flask, g
 from flask_restful import Api
@@ -7,7 +8,6 @@ from flask_sqlalchemy import SQLAlchemy
 from cheroot.wsgi import Server, PathInfoDispatcher
 from backend.auxiliary.singleton import Singleton
 from backend.constants import DB_ENGINE, MODE, DB_CHARSET, PORT, NUM_THREADS, REQUEST_CONTEXT_USE_DELETED_ITEMS
-import os
 
 
 class FlaskApp(metaclass=Singleton):
@@ -47,7 +47,7 @@ class FlaskApp(metaclass=Singleton):
     # Request query from editable table
     # I thought to place it in the Editable class, but then realized that calls will be like:
     # TableClassName.request(TableClassName).filter(...)... - very strange
-    # Calls like FlaskApp().request(TableClassName).filter(...)... - seems more understandable
+    # Calls like FlaskApp().request(TableClassName).filter(...)... - seem more understandable
     def request(self, table) -> Query:
         if g.get(REQUEST_CONTEXT_USE_DELETED_ITEMS, None):
             return table.query
@@ -81,6 +81,12 @@ class FlaskApp(metaclass=Singleton):
         if 'dev_variables' not in g:
             g.dev_variables = {}
         g.dev_variables[REQUEST_CONTEXT_USE_DELETED_ITEMS] = True
+
+    def add_database_item(self, item):
+        return self.db.session.add(item)
+
+    def flush_to_database(self):
+        return self.db.session.commit()
 
 
 # https://stackoverflow.com/questions/22256862/flask-how-to-store-and-retrieve-a-value-bound-to-the-request

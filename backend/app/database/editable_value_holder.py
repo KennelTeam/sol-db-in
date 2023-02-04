@@ -1,16 +1,14 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 import datetime
-
-import sqlalchemy.orm
-
-from .value_holder import ValueHolder
-from .editable import Editable
+from sqlalchemy.orm import Query
 from typing import Any, Type
 from enum import Enum
-from backend.constants import INT_MIN, INT_MAX
 from datetime import datetime
+from backend.constants import INT_MIN, INT_MAX
 from backend.app.flask_app import FlaskApp
+from .value_holder import ValueHolder
+from .editable import Editable
 
 
 class EditableValueHolder(ValueHolder, Editable):
@@ -24,7 +22,7 @@ class EditableValueHolder(ValueHolder, Editable):
 
     @staticmethod
     def filter_by_value(table: Type[FlaskApp().db.Model], exact_value: Any = None, substring: str = None,
-                        min_value: Any = None, max_value: Any = None) -> sqlalchemy.orm.Query:
+                        min_value: Any = None, max_value: Any = None) -> Query:
         if exact_value is not None:
             return EditableValueHolder.filter_exact_value(table, exact_value)
         if substring is not None:
@@ -32,7 +30,7 @@ class EditableValueHolder(ValueHolder, Editable):
         return EditableValueHolder.filter_range(table, min_value, max_value)
 
     @staticmethod
-    def filter_exact_value(table: Type[FlaskApp().db.Model], exact_value: Any) -> sqlalchemy.orm.Query:
+    def filter_exact_value(table: Type[FlaskApp().db.Model], exact_value: Any) -> Query:
         if exact_value is int or exact_value is Enum:
             return FlaskApp().request(table).filter(table.value_int == exact_value)
         if exact_value is str:
@@ -42,7 +40,7 @@ class EditableValueHolder(ValueHolder, Editable):
         return FlaskApp().request(table).filter(table.value_datetime == exact_value)
 
     @staticmethod
-    def filter_range(table: Type[FlaskApp().db.Model], min_value: Any, max_value: Any) -> sqlalchemy.orm.Query:
+    def filter_range(table: Type[FlaskApp().db.Model], min_value: Any, max_value: Any) -> Query:
         if min_value is int or max_value is int:
             if min_value is None:
                 min_value = INT_MIN
@@ -53,8 +51,9 @@ class EditableValueHolder(ValueHolder, Editable):
             min_value = datetime.min
         if max_value is None:
             max_value = datetime.max
-        return FlaskApp().request(table).filter(table.value_datetime <= max_value).filter(table.value_datetime >= min_value)
+        return FlaskApp().request(table).filter(table.value_datetime <= max_value)\
+            .filter(table.value_datetime >= min_value)
 
     @staticmethod
-    def filter_substring(table: Type[FlaskApp().db.Model], substr: str) -> sqlalchemy.orm.Query:
+    def filter_substring(table: Type[FlaskApp().db.Model], substr: str) -> Query:
         return FlaskApp().request(table).filter(table.value_text.like(f"%{substr}%"))

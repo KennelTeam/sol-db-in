@@ -1,11 +1,13 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-from backend.constants import MAX_QUESTION_TEXT_SIZE, MAX_LANGUAGES_COUNT, MAX_COMMENT_SIZE, \
-    SOURCE_QUESTION_ID, ANSWER_ROW_QUESTION_ID
-from backend.app.flask_app import FlaskApp
-from .editable import Editable
+from sqlalchemy.orm import Query
 from typing import Dict, Any, List, Tuple
 import json
+from backend.constants import MAX_QUESTION_TEXT_SIZE, MAX_LANGUAGES_COUNT, MAX_COMMENT_SIZE, \
+    SOURCE_QUESTION_ID, ANSWER_ROW_QUESTION_ID
+from backend.auxiliary import JSON, TranslatedText
+from backend.app.flask_app import FlaskApp
+from .editable import Editable
 from .formatting_settings import FormattingSettings
 from .privacy_settings import PrivacySettings
 from .relation_settings import RelationSettings
@@ -24,8 +26,8 @@ class Question(Editable, FlaskApp().db.Model):
     _privacy_settings = FlaskApp().db.Column('privacy_settings', FlaskApp().db.ForeignKey('privacy_settings.id'))
     _relation_settings = FlaskApp().db.Column('relation_settings', FlaskApp().db.ForeignKey('relation_settings.id'), nullable=True)
 
-    def __init__(self, texts: Dict[str, str], question_type: QuestionType, comment: Dict[str, str], answer_block_id: int,
-                 tag_type_id: int):
+    def __init__(self, texts: TranslatedText, question_type: QuestionType, comment: TranslatedText,
+                 answer_block_id: int, tag_type_id: int):
 
         super(Editable).__init__()
         self.text = texts
@@ -34,7 +36,7 @@ class Question(Editable, FlaskApp().db.Model):
         self.answer_block_id = answer_block_id
         self.tag_type_id = tag_type_id
 
-    def prepare_my_table(self, inverse_relation=False):
+    def prepare_my_table(self, inverse_relation=False) -> List[JSON] | JSON:
         if self.question_type is not QuestionType.RELATION:
             raise Exception("Could not prepare a table for non-relational question")
         if not inverse_relation and not self.relation_settings.export_forward_relation:
@@ -55,7 +57,11 @@ class Question(Editable, FlaskApp().db.Model):
         }
 
     @staticmethod
-    def _order_answers(my_table: List['Question']) -> Dict[Tuple[int, int], Dict[str, Dict[str, Any]]]:
+    def filter_by_answer_block(answer_block_id: int) -> Query:
+        return FlaskApp().request(Question).filter_by(_answer_block_id=answer_block_id)
+
+    @staticmethod
+    def _order_answers(my_table: List['Question']) -> Dict[Tuple[int, int], Dict[str, JSON]]:
         result = {}
         for question in my_table:
             answers = Answer.filter(question_id=question.id)
@@ -89,7 +95,7 @@ class Question(Editable, FlaskApp().db.Model):
     def get_by_text(text: str) -> List['Question']:
         return FlaskApp().request(Question).filter(Question.text.like(f"%{text}%")).all()
 
-    def to_json(self, with_answers=False, form_id: int = None) -> Dict[str, Any]:
+    def to_json(self, with_answers=False, form_id: int = None) -> JSON:
         result = super(Editable).to_json() | {
             'text': self.text,
             'question_type': self.question_type,
@@ -142,12 +148,12 @@ class Question(Editable, FlaskApp().db.Model):
         return self._relation_settings
 
     @property
-    def text(self) -> Dict[str, str]:
+    def text(self) -> TranslatedText:
         return json.loads(self._text)
 
     @text.setter
     @Editable.on_edit
-    def text(self, new_texts: Dict[str, str]) -> str:
+    def text(self, new_texts: TranslatedText) -> str:
         self._text = json.dumps(new_texts)
         return self._text
 
@@ -156,12 +162,12 @@ class Question(Editable, FlaskApp().db.Model):
         return self._question_type
 
     @property
-    def comment(self) -> Dict[str, str]:
+    def comment(self) -> TranslatedText:
         return json.loads(self._comment)
 
     @comment.setter
     @Editable.on_edit
-    def comment(self, new_comments: Dict[str, str]) -> str:
+    def comment(self, new_comments: TranslatedText) -> str:
         self._comment = json.dumps(new_comments)
         return self._comment
 
