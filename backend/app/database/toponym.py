@@ -14,23 +14,23 @@ class Toponym(FlaskApp().db.Model):
 
     @staticmethod
     def get_all() -> List['Toponym']:
-        return FlaskApp().request(Toponym).all()
+        return Toponym.query.all()
 
     @staticmethod
     def get_by_name(name: str) -> 'Toponym':
-        return FlaskApp().request(Toponym).filter_by(name=name).first()
+        return Toponym.query.filter_by(name=name).first()
 
-    def __init__(self, name: str, parent_name: str) -> None:
+    def __init__(self, name: str, parent_name: str = None) -> None:
         parent = Toponym.get_by_name(parent_name)
-        if parent is not  None:
-            self.name = name
+        if parent is not None:
             self.parent_id = parent.id
+        self.name = name
 
     def to_json(self) -> JSON:
         return {
             'id': self.id,
             'name': self.name,
-            'parent_id': self.name
+            'parent_id': self.parent_id
         }
 
     def get_ancestors(self) -> List['Toponym']:
@@ -39,11 +39,11 @@ class Toponym(FlaskApp().db.Model):
 
         # not sure about correctness of this check: int NULL value might be 0 - IDK
         while current is not None:
-            node = FlaskApp().request(Toponym).filter_by(id=current)
+            node = Toponym.query.filter_by(id=current).first()
             result.append(node)
             current = node.parent_id
         return result
 
     @staticmethod
     def search_by_name(name_substring: str) -> List['Toponym']:
-        return FlaskApp().request(Toponym).filter(Toponym.name.like(f"%{name_substring}%")).all()
+        return Toponym.query.filter(Toponym.name.like(f"%{name_substring}%")).all()

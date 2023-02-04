@@ -17,11 +17,11 @@ class TagToAnswer(FlaskApp().db.Model):
 
     @staticmethod
     def count_tag_usage(tag_id: int) -> int:
-        return FlaskApp().request(TagToAnswer).filter_by(_tag_id=tag_id).count()
+        return TagToAnswer.query.filter_by(_tag_id=tag_id).count()
 
     @staticmethod
     def add_tag(tag_id: int, answer_id: int) -> 'TagToAnswer':
-        item = FlaskApp().request(TagToAnswer).filter(_tag_id=tag_id, _answer_id=answer_id).first()
+        item = TagToAnswer.query.filter(_tag_id=tag_id, _answer_id=answer_id).first()
         if item is None:
             item = TagToAnswer(tag_id, answer_id)
             FlaskApp().add_database_item(item)
@@ -30,7 +30,7 @@ class TagToAnswer(FlaskApp().db.Model):
 
     @staticmethod
     def remove_tag(tag_id: int, answer_id: int):
-        FlaskApp().request(TagToAnswer).filter_by(_tag_id=tag_id, _answer_id=answer_id).delete()
+        TagToAnswer.query.filter_by(_tag_id=tag_id, _answer_id=answer_id).delete()
 
     @property
     def tag_id(self):
