@@ -13,7 +13,4 @@ run:
 	python3 -m backend
 
 push: all_checks
-	git add -u
-	read -p "Enter the commit message: " commit_message; \
-	git commit -m $commit_message
 	git push

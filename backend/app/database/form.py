@@ -1,7 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 from datetime import datetime, timedelta
-from typing import Dict, Any, Set, List, Type
+from typing import Any, Set, List, Type
 from sqlalchemy import func
 import sqlalchemy
 from enum import Enum
@@ -13,7 +13,7 @@ from .toponym import Toponym
 from .user import User
 from .answer_option import AnswerOption
 from backend.constants import DATE_FORMAT
-from backend.auxiliary import JSON
+from backend.auxiliary import JSON, LogicException
 
 
 class FormState(Enum):
@@ -97,7 +97,9 @@ class Form(Editable):
             if max_value is None:
                 max_value = Answer.get_extremum(question.id, question.question_type, ExtremumType.MAXIMUM)
             if step is None:
-                raise Exception(f"step is not passed as argument while it's required for {question.question_type.name}")
+                raise LogicException(
+                    f"step is not passed as argument while it's required for {question.question_type.name}"
+                )
             if min_value is None:
                 return []
             if question.question_type == QuestionType.DATE:

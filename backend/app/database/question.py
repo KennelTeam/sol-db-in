@@ -1,11 +1,11 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 from sqlalchemy.orm import Query
-from typing import Dict, Any, List, Tuple
+from typing import Dict, List, Tuple
 import json
 from backend.constants import MAX_QUESTION_TEXT_SIZE, MAX_LANGUAGES_COUNT, MAX_COMMENT_SIZE, \
     SOURCE_QUESTION_ID, ANSWER_ROW_QUESTION_ID
-from backend.auxiliary import JSON, TranslatedText
+from backend.auxiliary import JSON, TranslatedText, LogicException
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from .formatting_settings import FormattingSettings
@@ -20,11 +20,16 @@ class Question(Editable, FlaskApp().db.Model):
     _text = FlaskApp().db.Column('text', FlaskApp().db.Text(MAX_QUESTION_TEXT_SIZE * MAX_LANGUAGES_COUNT))
     _question_type = FlaskApp().db.Column('question_type', FlaskApp().db.Enum(QuestionType))
     _comment = FlaskApp().db.Column('comment', FlaskApp().db.Text(MAX_COMMENT_SIZE * MAX_LANGUAGES_COUNT))
-    _answer_block_id = FlaskApp().db.Column('answer_block_id', FlaskApp().db.ForeignKey('answer_blocks.id'), nullable=True)
+    _answer_block_id = FlaskApp().db.Column('answer_block_id',
+                                            FlaskApp().db.ForeignKey('answer_blocks.id'), nullable=True)
+
     _tag_type_id = FlaskApp().db.Column('tag_type_id', FlaskApp().db.ForeignKey('tag_types.id'), nullable=True)
-    _formatting_settings = FlaskApp().db.Column('formatting_settings', FlaskApp().db.ForeignKey('formatting_settings.id'))
+    _formatting_settings = FlaskApp().db.Column('formatting_settings',
+                                                FlaskApp().db.ForeignKey('formatting_settings.id'))
+
     _privacy_settings = FlaskApp().db.Column('privacy_settings', FlaskApp().db.ForeignKey('privacy_settings.id'))
-    _relation_settings = FlaskApp().db.Column('relation_settings', FlaskApp().db.ForeignKey('relation_settings.id'), nullable=True)
+    _relation_settings = FlaskApp().db.Column('relation_settings',
+                                              FlaskApp().db.ForeignKey('relation_settings.id'), nullable=True)
 
     def __init__(self, texts: TranslatedText, question_type: QuestionType, comment: TranslatedText,
                  answer_block_id: int, tag_type_id: int):
@@ -38,7 +43,7 @@ class Question(Editable, FlaskApp().db.Model):
 
     def prepare_my_table(self, inverse_relation=False) -> List[JSON] | JSON:
         if self.question_type is not QuestionType.RELATION:
-            raise Exception("Could not prepare a table for non-relational question")
+            raise LogicException("Could not prepare a table for non-relational question")
         if not inverse_relation and not self.relation_settings.export_forward_relation:
             return []
         if inverse_relation and not self.relation_settings.export_inverse_relation:
@@ -143,7 +148,7 @@ class Question(Editable, FlaskApp().db.Model):
     @Editable.on_edit
     def relation_settings(self, new_relation_settings: RelationSettings) -> int:
         if self.question_type != QuestionType.RELATION:
-            raise Exception("Trying to set a relation settings to non-relational question!")
+            raise LogicException("Trying to set a relation settings to non-relational question!")
         self._relation_settings = new_relation_settings.id
         return self._relation_settings
 

@@ -2,3 +2,4 @@
 #  All rights reserved
 from .types import *
 from .singleton import Singleton
+from .logic_exception import LogicException
