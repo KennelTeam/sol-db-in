@@ -73,7 +73,7 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
         return query.filter(FormattingSettings._table_id is not None).all()
 
     @staticmethod
-    def filter_only_fixed_table(query: Query) -> List['FormattingSettings']:
+    def filter_only_fixed_table_questions(query: Query) -> List['FormattingSettings']:
         return query.filter(FormattingSettings._fixed_table_id is not None).all()
 
     @property

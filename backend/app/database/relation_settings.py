@@ -7,7 +7,6 @@ from .visualization_type import VisualizationType
 from .relation_type import RelationType
 from .form_type import FormType
 from sqlalchemy import or_
-from typing import Dict, Any
 
 
 class RelationSettings(Editable, FlaskApp().db.Model):

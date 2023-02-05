@@ -22,11 +22,11 @@ class Editable:
 
     @deleted.setter
     def deleted(self, value: bool):
-        self.edit('deleted', value, self.__dict__['__tablename__'])  # so strange method of getting the tablename
+        self._edit('deleted', value, self.__dict__['__tablename__'])  # so strange method of getting the tablename
         # because it is not in editable, but supposed to be in derived classes (which are FlaskApp().db.Models)
         self._deleted = value
 
-    def edit(self, column_id: str, value: Any, table_id: str = "") -> None:
+    def _edit(self, column_id: str, value: Any, table_id: str = "") -> None:
         act = Action(table_id, column_id, self.id, value)
         FlaskApp().db.session.add(act)
 
@@ -46,7 +46,7 @@ class Editable:
         def wrapper(self, value):
             result = func(self, value)
             if result is None:
-                self.edit(func.__name__, value, self.__tablename__)
+                self._edit(func.__name__, value, self.__tablename__)  # pylint: disable=protected-access
             else:
-                self.edit(func.__name__, result, self.__tablename__)
+                self._edit(func.__name__, result, self.__tablename__)  # pylint: disable=protected-access
         return wrapper

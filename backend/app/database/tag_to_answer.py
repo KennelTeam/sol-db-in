@@ -1,6 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 from backend.app.flask_app import FlaskApp
+from typing import List
 
 
 # I decided not to use Editable base class, because it's too easy to add and delete tags to answers
@@ -18,6 +19,12 @@ class TagToAnswer(FlaskApp().db.Model):
     @staticmethod
     def count_tag_usage(tag_id: int) -> int:
         return TagToAnswer.query.filter_by(_tag_id=tag_id).count()
+
+    @staticmethod
+    def get_answers_tag_ids(answer_id: int) -> List[int]:
+        tag_ids = TagToAnswer.query.filter_by(_answer_id=answer_id)
+        tag_ids = tag_ids.with_entities(TagToAnswer._tag_id)
+        return [item.tag_id for item in tag_ids.all()]
 
     @staticmethod
     def add_tag(tag_id: int, answer_id: int) -> 'TagToAnswer':

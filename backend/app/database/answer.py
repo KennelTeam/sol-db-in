@@ -17,12 +17,12 @@ class ExtremumType(Enum):
 class Answer(EditableValueHolder, FlaskApp().db.Model):
     __tablename__ = 'answers'
     _table_row = FlaskApp().db.Column('table_row', FlaskApp().db.Integer, nullable=True)
-    _row_question_id = FlaskApp().db.Column('table_column', FlaskApp().db.ForeignKey('questions.id'), nullable=True)
+    _row_question_id = FlaskApp().db.Column('row_question_id', FlaskApp().db.ForeignKey('questions.id'), nullable=True)
     _question_id = FlaskApp().db.Column('question_id', FlaskApp().db.ForeignKey('questions.id'))
-    _form_id = FlaskApp().db.Column('form_id', FlaskApp().db.Integer, nullable=False)
+    _form_id = FlaskApp().db.Column('form_id', FlaskApp().db.ForeignKey('forms.id'), nullable=False)
 
-    def __init__(self, table_row: int, question_id: int, form_id: int,
-                 row_question_id: int, value: Any) -> None:
+    def __init__(self, question_id: int, form_id: int,
+                 value: Any, table_row: int, row_question_id: int) -> None:
         super(EditableValueHolder).__init__()
         self._form_id = form_id
         self._question_id = question_id
@@ -65,34 +65,14 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             return None
         return item.value_datetime if question_type == QuestionType.DATE else item.value_int
 
-    @property
-    def row_question_id(self):
-        return self._row_question_id
-
-    @property
-    def table_row(self) -> int:
-        return self._table_row
-
-    @property
-    def question_id(self) -> int:
-        return self._question_id
-
-    @property
-    def form_id(self) -> int:
-        return self._form_id
-
     @staticmethod
-    def count_leaders_answers(leader_id: int, question_id: int) -> int:
-        return Answer.count_distinct_answers(FlaskApp().request(Answer).filter_by(_form_id=leader_id), question_id)
-
-    @staticmethod
-    def count_projects_answers(project_id: int, question_id: int) -> int:
-        return Answer.count_distinct_answers(FlaskApp().request(Answer).filter_by(_form_id=project_id), question_id)
+    def count_forms_answers(form_id: int, question_id: int) -> int:
+        return Answer.count_distinct_answers(FlaskApp().request(Answer).filter_by(_form_id=form_id), question_id)
 
     @staticmethod
     def count_distinct_answers(query: Query, question_id: int):
         query = query.filter_by(_question_id=question_id).with_entities(Answer._table_row)
-        return len(query.distinct().all())
+        return query.distinct().count()
 
     @staticmethod
     def filter(question_id: int = None, row_question_id: int = None, form_id: int = None,
@@ -110,7 +90,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
                                     min_value=min_value, max_value=max_value, substring=substring)
 
         answers = query.with_entities(Answer._form_id).distinct(Answer._form_id).all()
-        return [item.id for item in answers]
+        return [item.form_id for item in answers]
 
     @staticmethod
     def _filter_query(question_id: int = None, row_question_id: int = None, form_id: int = None,
@@ -126,3 +106,19 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
         if form_id is not None:
             query = query.filter_by(_form_id=form_id)
         return query
+
+    @property
+    def row_question_id(self):
+        return self._row_question_id
+
+    @property
+    def table_row(self) -> int:
+        return self._table_row
+
+    @property
+    def question_id(self) -> int:
+        return self._question_id
+
+    @property
+    def form_id(self) -> int:
+        return self._form_id

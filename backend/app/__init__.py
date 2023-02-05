@@ -3,6 +3,6 @@
 
 from . import routes
 from .flask_app import FlaskApp
-from .database.tables import *
+import backend.app.database
 
 FlaskApp().init_database()

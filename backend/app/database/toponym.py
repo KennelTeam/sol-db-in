@@ -3,7 +3,7 @@
 from backend.app.flask_app import FlaskApp
 from backend.constants import MAX_TOPONYM_SIZE
 from backend.auxiliary import JSON
-from typing import List, Dict, Any
+from typing import List
 
 
 class Toponym(FlaskApp().db.Model):

@@ -1,6 +1,6 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-from typing import Any, List, Tuple, TypeVar
+from typing import List, Tuple, TypeVar
 import json
 from backend.constants import MAX_BLOCK_NAME_SIZE, MAX_LANGUAGES_COUNT
 from backend.auxiliary import JSON, TranslatedText
@@ -63,7 +63,7 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
         blocks = FlaskApp().request(QuestionBlock).filter_by(_form=form).all()
         return sorted(blocks, key=lambda x: x.sorting)
 
-    def get_questions(self, with_answers=False, form_id: int = None, short_form: bool = False) -> List[Any]:
+    def get_questions(self, with_answers=False, form_id: int = None, short_form: bool = False) -> List[JSON]:
         free_questions: List[Tuple[JSON, int]] = [(
             {
                 'type': 'question',
@@ -103,7 +103,7 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
         return QuestionTable.get_by_ids(table_ids)
 
     def _get_fixed_table_questions(self) -> List[FixedTable]:
-        formattings = FormattingSettings.filter_only_fixed_table(
+        formattings = FormattingSettings.filter_only_fixed_table_questions(
             FormattingSettings.query_from_block(self.id)
         )
         fixed_table_ids = set(item.fixed_table_id for item in formattings)

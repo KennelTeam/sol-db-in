@@ -1,7 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 from sqlalchemy.orm import Query
-from typing import Dict, List, Tuple
+from typing import List
 import json
 from backend.constants import MAX_QUESTION_TEXT_SIZE, MAX_LANGUAGES_COUNT, MAX_COMMENT_SIZE, \
     SOURCE_QUESTION_ID, ANSWER_ROW_QUESTION_ID
@@ -41,15 +41,18 @@ class Question(Editable, FlaskApp().db.Model):
         self.answer_block_id = answer_block_id
         self.tag_type_id = tag_type_id
 
-    def prepare_my_table(self, inverse_relation=False) -> List[JSON] | JSON:
+    def prepare_my_table(self, inverse_relation=False) -> JSON:
         if self.question_type is not QuestionType.RELATION:
             raise LogicException("Could not prepare a table for non-relational question")
         if not inverse_relation and not self.relation_settings.export_forward_relation:
-            return []
+            return None
         if inverse_relation and not self.relation_settings.export_inverse_relation:
-            return []
+            return None
         if self.formatting_settings.table_id is None:
-            return [{str(self.id): item.to_json()} for item in Answer.filter(question_id=self.id)]
+            return {
+                "questions": [self.to_json()],
+                "answers": [{str(self.id): item.to_json()} for item in Answer.filter(question_id=self.id)]
+            }
 
         formattings = FormattingSettings.get_from_question_table(self.formatting_settings.table_id)
         format_ids = [formatting.id for formatting in formattings]
@@ -64,22 +67,6 @@ class Question(Editable, FlaskApp().db.Model):
     @staticmethod
     def filter_by_answer_block(answer_block_id: int) -> Query:
         return FlaskApp().request(Question).filter_by(_answer_block_id=answer_block_id)
-
-    @staticmethod
-    def _order_answers(my_table: List['Question']) -> Dict[Tuple[int, int], Dict[str, JSON]]:
-        result = {}
-        for question in my_table:
-            answers = Answer.filter(question_id=question.id)
-            for answer in answers:
-                key = (answer.table_row, answer.form_id)
-                if key not in result.keys():
-                    result[key] = {}
-                result[key][str(answer.question_id)] = answer.to_json()
-
-        for key in result.keys():
-            result[key][SOURCE_QUESTION_ID] = key[1]
-            result[key][ANSWER_ROW_QUESTION_ID] = key[0]
-        return result
 
     @staticmethod
     def get_by_id(id: int) -> 'Question':
@@ -117,6 +104,22 @@ class Question(Editable, FlaskApp().db.Model):
                 'answers': sorted(jsons, key=lambda x: x['table_row'])
             })
         return result
+
+    @staticmethod
+    def _order_answers(my_table: List['Question']) -> List[JSON]:
+        result = {}
+        for question in my_table:
+            answers = Answer.filter(question_id=question.id)
+            for answer in answers:
+                key = (answer.table_row, answer.form_id)
+                if key not in result.keys():
+                    result[key] = {}
+                result[key][str(answer.question_id)] = answer.to_json()
+
+        for key in result.keys():
+            result[key][SOURCE_QUESTION_ID] = key[1]
+            result[key][ANSWER_ROW_QUESTION_ID] = key[0]
+        return list(result.values())
 
     @property
     def formatting_settings(self) -> FormattingSettings:

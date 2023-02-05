@@ -4,7 +4,7 @@ from backend.constants import MAX_TAG_SIZE, MAX_LANGUAGES_COUNT
 from backend.auxiliary import JSON, TranslatedText
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
-from typing import List, Dict, Any
+from typing import List
 import json
 
 
