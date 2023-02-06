@@ -1,9 +1,9 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 
-from backend.app import app
+from .flask_app import FlaskApp
 
 
-@app.route("/", methods=['GET'])
+@FlaskApp().app.route("/", methods=['GET'])
 def hello_world():
     return 'Hello World!'

@@ -1,0 +1,32 @@
+jobs:
+  backend_checks:
+    name: static backend code checks
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10' 
+    - uses: actions/checkout@v1
+
+    - name: venv creation
+      run: python3 -m venv ./venv
+
+    - name: venv activation
+      run: . venv/bin/activate
+    
+    - name: preparations
+      run: pip install -r backend/requirements.txt
+    
+    - name: checks
+      run: make all_checks
+
+on:
+  pull_request:
+    branches:
+    - develop
+    - main
+  push:
+    branches:
+    - github_settings_test
+    - backend_development
+
