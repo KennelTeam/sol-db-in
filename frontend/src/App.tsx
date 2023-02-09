@@ -17,6 +17,7 @@ import { Box, Container } from "@mui/material";
 import { Stack } from "@mui/system";
 import React from "react";
 import { MENU_WIDTH } from "./types/global.d";
+import FilterTablePage from "./FiltersTablePage";
 
 function App() {
 
@@ -45,6 +46,7 @@ function App() {
           <Route path='/questionnaire' element={<Questionnaire />}/>
           <Route path='/options' element={<Options />}/>
           <Route path='/users' element={<Users />}/>
+          <Route path='/filters' element={<FilterTablePage />}/> // route for testing FilterTablePage component
           </Routes>
         </Container>
       </Stack>
