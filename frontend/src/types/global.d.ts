@@ -7,6 +7,18 @@ enum UserType {
     None
 }
 
+enum AnswerType {
+    Number,
+    Text,
+    Checkbox,
+    List,
+    User,
+    Leader,
+    Project,
+    Date,
+    Location
+}
+
 const MENU_WIDTH = 200
 
-export { UserType, MENU_WIDTH }
+export { UserType, MENU_WIDTH, AnswerType }
