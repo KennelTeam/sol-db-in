@@ -1,0 +1,429 @@
+openapi: 3.0.0
+x-stoplight:
+  id: d7g3dioxjsqja
+info:
+  title: sol-db-in
+  description: A database API for sol-db-in website
+  termsOfService: ''
+  contact:
+    name: API Support
+    url: https://t.me/n_andrusov
+    email: andrusov.n@gmail.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.1
+servers:
+  - url: http://localhost:3000
+paths: {}
+components:
+  schemas:
+    User:
+      title: User
+      type: object
+      examples:
+        - id: 142
+          firstName: Alice
+          lastName: Smith
+          email: alice.smith@gmail.com
+          dateOfBirth: '1997-10-31'
+          emailVerified: true
+          signUpDate: '2019-08-24'
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the given user.
+          minimum: 0
+        name:
+          type: string
+        login:
+          type: string
+        comment:
+          type: string
+          example: This is a test user
+        role:
+          type: integer
+          enum:
+            - Role
+          default: 1
+          example: 2
+          minimum: 1
+          maximum: 4
+        create_timestamp:
+          type: string
+          description: Set to true if the user's email has been verified.
+          format: date-time
+        deleted:
+          type: boolean
+          format: date
+          description: The date that the user was created.
+      required:
+        - id
+        - name
+        - login
+        - comment
+        - role
+        - deleted
+    Answer:
+      title: Answer
+      x-stoplight:
+        id: yglocw513ggd1
+      type: object
+      properties:
+        id:
+          type: integer
+        form_id:
+          type: integer
+        question_id:
+          type: integer
+        table_row:
+          type: integer
+        row_question_id:
+          type: integer
+        value:
+          type:
+            - string
+            - integer
+            - boolean
+        tags:
+          type: array
+          items:
+            $ref: '#components/schemas/Tag'
+        create_timestamp:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+      required:
+        - id
+        - form_id
+        - question_id
+        - table_row
+        - row_question_id
+        - value
+        - create_timestamp
+        - deleted
+    AnswerBlock:
+      title: AnswerBlock
+      x-stoplight:
+        id: xxx4w8jrgsl5u
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          $ref: '#/components/schemas/TranslatedText'
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnswerOption'
+        create_timestamp:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+      description: A block of AnswerOptions
+    AnswerOption:
+      title: AnswerOption
+      x-stoplight:
+        id: spoj4eyn45mpo
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          $ref: '#/components/schemas/TranslatedText'
+        short_name:
+          $ref: '#/components/schemas/TranslatedText'
+        answer_block_id:
+          type: integer
+        creation_timestamp:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+      description: An option object in multiple-choice or checkbox questions
+    TranslatedText:
+      title: TranslatedText
+      x-stoplight:
+        id: dgt475bws44x0
+      type: object
+      description: >-
+        Contains different translations of one text (there might be any set of
+        languages)
+      properties:
+        ru:
+          type: string
+          description: Russian translation of the text
+        en:
+          type: string
+          description: English translation of the text
+        ba:
+          type: string
+          description: Bahasa translation of the text
+        etc...:
+          type: string
+    FormattingSettings:
+      title: FormattingSettings
+      x-stoplight:
+        id: nea9t33dk8tnx
+      type: object
+      properties:
+        id:
+          type: integer
+        block_sorting:
+          type: integer
+          description: If it's a free question. The key to sort it inside a block
+        table_row:
+          type: integer
+          description: If it's a fixed table question. Row index in a table
+        table_column:
+          type: integer
+          description: >-
+            If it's a question table or fixed table question. Column index in
+            the table
+        show_on_main_page:
+          type: boolean
+          description: >-
+            Should this question with it's answers be added to the table on the
+            main page or not?
+        block_id:
+          type: integer
+          description: Id of the question block this question is contained in
+        table_id:
+          type: integer
+          description: >-
+            If it's a question table question. Id of the table containing the
+            question
+        fixed_table_id:
+          type: integer
+          description: If it's a fixed table question. Id of the containing fixed table
+        creation_timestamp:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+      description: >-
+        Contains information for some question about how to format it and it's
+        answers on the website
+    PrivacySettings:
+      title: PrivacySettings
+      x-stoplight:
+        id: gpe957unxfrkx
+      type: object
+      description: An object with setting of privacy for some question
+      properties:
+        id:
+          type: integer
+        editor_access:
+          type: integer
+          minimum: 1
+          maximum: 3
+        guest_access:
+          type: integer
+          minimum: 1
+          maximum: 3
+        internn_access:
+          type: integer
+          minimum: 1
+          maximum: 3
+        creation_timestamp:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+    RelationSettings:
+      title: RelationSettings
+      x-stoplight:
+        id: eyubjqn4qh2sf
+      type: object
+      properties:
+        id:
+          type: integer
+        related_visualization_type:
+          type: integer
+          description: >-
+            A visualization type (how to show this table on the related object
+            page)
+        related_visualization_sorting:
+          type: integer
+          description: >-
+            Where to place the table on the page of related object (key for
+            sorting with other question blocks)
+        export_forward_relation:
+          type: boolean
+          description: Should this relation be exported to excel as an additional sheet
+        export_inverse_relation:
+          type: boolean
+          description: >-
+            Should the inverse relation be exported to excel as an additional
+            sheet
+        forward_relation_sheet_name:
+          type: string
+          description: If it should be exported in such way, how to call the sheet
+        inverse_relation_sheet_name:
+          type: string
+          description: If it should be exported in such way, how to call the sheet
+        creation_timestamp:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+      description: >-
+        If the question is a relation, it should have additional relation
+        settings
+    Question:
+      title: Question
+      x-stoplight:
+        id: x1r2y74nl5dpg
+      type: object
+      properties:
+        id:
+          type: integer
+        question_type:
+          type: integer
+          minimum: 1
+          maximum: 10
+        comment:
+          $ref: '#/components/schemas/TranslatedText'
+          description: A hint for mouse hover effect
+        answer_block_id:
+          type: integer
+          description: If it is multiple-choice or checkbox, where to get the options?
+        text:
+          $ref: '#/components/schemas/TranslatedText'
+          description: The main text of the question
+        formatting_settings:
+          $ref: '#/components/schemas/FormattingSettings'
+        privacy_settings:
+          $ref: '#/components/schemas/PrivacySettings'
+        relation_settings:
+          $ref: '#/components/schemas/RelationSettings'
+        answers:
+          type: array
+          description: >-
+            This is optional. If you request only a form, you'll get the object
+            without this field. Otherwise it will contain answers of a requested
+            leader/project
+          items:
+            $ref: '#/components/schemas/Answer'
+      required:
+        - id
+        - question_type
+        - comment
+        - answer_block_id
+        - text
+        - formatting_settings
+        - privacy_settings
+        - relation_settings
+        - answers
+    FixedTable:
+      title: FixedTable
+      x-stoplight:
+        id: yn5uhkktu323a
+      type: object
+      description: Describes a fixed table object
+      properties:
+        columns:
+          type: array
+          items:
+            $ref: '#/components/schemas/Question'
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/Question'
+        answers:
+          type: array
+          description: >-
+            This is optional. If you request only a form, the result will not
+            contain this field. Otherwise it returns a 2D array with the table
+            of answers indexed by ansers[row][column]
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Answer'
+    QuestionTable:
+      title: QuestionTable
+      x-stoplight:
+        id: ib85n35glf2ol
+      type: object
+      properties:
+        questions:
+          type: array
+          description: >-
+            If you request it with answers, each question will contain an array
+            of answers (array = column of answers)
+          items:
+            $ref: '#/components/schemas/Question'
+    QuestionBlock:
+      title: QuestionBlock
+      x-stoplight:
+        id: wjyrnmy3a2r2s
+      type: object
+      properties:
+        elements:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                example: question
+              value:
+                anyOf:
+                  - $ref: '#/components/schemas/Question'
+                  - $ref: '#/components/schemas/FixedTable'
+                  - $ref: '#/components/schemas/QuestionTable'
+                description: >-
+                  If type is 'question' it will contain a Question object. If
+                  type is 'table_question' it will contain a QuestionTable
+                  object. If type is 'fixed_table_question', it will contain a
+                  FixedTable object
+      description: Fully describes question block elements in a proper order
+    Form:
+      title: Form
+      x-stoplight:
+        id: ky9gvzzuwscpz
+      type: object
+      properties:
+        id:
+          type: integer
+        state:
+          type: integer
+          minimum: 1
+          maximum: 3
+        name:
+          type: string
+        form_type:
+          type: integer
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionBlock'
+    Tag:
+      title: Tag
+      x-stoplight:
+        id: ky9gvzzuwsspz
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          $ref: '#/components/schemas/TranslatedText'
+        type_id:
+          type: integer
+          description: ID of tag type (tag group)
+        parent_id:
+          type: integer
+          description: ID of a parent tag. If the tag is root, it's None
+    Toponym:
+      title: Toponym
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        parent_id:
+          type: integer
+  securitySchemes: {}
