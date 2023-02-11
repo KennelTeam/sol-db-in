@@ -13,7 +13,12 @@ interface Question {
     type: AnswerType
 }
 
-function SingleFilter({id, text, type} : Question) {
+interface SingleFilterProps extends Question {
+    filterIdx: number,
+    deleteFilter: (idx: number) => void
+}
+
+function SingleFilter({id, text, type, filterIdx, deleteFilter} : SingleFilterProps) {
 
     let filter: JSX.Element
 
@@ -49,13 +54,17 @@ function SingleFilter({id, text, type} : Question) {
             filter = (<Typography color="error" variant="h3">Wrong AnswerType</Typography>)
     }
 
+    const handleDelete = () => {
+        deleteFilter(filterIdx)
+    }
+
     return (
         <Stack component={Card} direction="row" spacing={2} justifyContent="space-between" alignItems="center" variant="outlined">
             <Stack direction="row" spacing={2} justifyContent="flex-start" alignItems="center" padding={1}>
                 <Typography variant="h6">{text}</Typography>
                 {filter}
             </Stack>
-            <IconButton>
+            <IconButton onClick={handleDelete}>
                 <ClearIcon color="error" fontSize="large"/>
             </IconButton>
         </Stack>
@@ -72,8 +81,15 @@ function FilterTablePage() {
         setFiltersList([...filtersList, questions.filter(question => (question.text === newQuestion))[0]])
     }
 
-    const filters = filtersList.map((question: {id: number, text: string, type: AnswerType}) => (
-        <SingleFilter {...question}/>
+    function deleteFilter(idx: number) {
+        // let newFiltersList = filtersList
+        // newFiltersList.splice(idx, 1)
+        // console.log(newFiltersList)
+        setFiltersList(filtersList.filter((value: Question, index: number) => (index !== idx)))
+    }
+
+    const filters = filtersList.map((question: Question, idx: number) => (
+        <SingleFilter {...question} filterIdx={idx} deleteFilter={deleteFilter}/>
     ))
 
     return (
