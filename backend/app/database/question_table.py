@@ -33,7 +33,7 @@ class QuestionTable(Editable, FlaskApp().db.Model):
     def get_by_ids(ids: Set[int]) -> List['QuestionTable']:
         return FlaskApp().request(QuestionTable).filter(QuestionTable.id.in_(ids)).all()
 
-    def get_questions(self, with_answers=False, form_id: int = None) -> List[JSON]:
+    def get_questions(self, with_answers=False, form_id: int = None) -> JSON:
         formats = FormattingSettings.get_from_question_table(self.id)
         ids = [item.id for item in formats]
         formats_dict = {item.id: item for item in formats}
@@ -41,5 +41,7 @@ class QuestionTable(Editable, FlaskApp().db.Model):
         results: List[Question] = Question.get_by_ids(ids)
         results_indexed = [(result, formats_dict[result.formatting_settings].row_question_id) for result in results]
         results_indexed.sort(key=lambda x: x[1])
-        return [result[0].to_json(with_answers, form_id) for result in results_indexed]
+        return {
+            "questions": [result[0].to_json(with_answers, form_id) for result in results_indexed]
+        }
 

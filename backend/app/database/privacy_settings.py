@@ -4,6 +4,8 @@ from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from enum import Enum
 
+from ...auxiliary import JSON
+
 
 class AccessType(Enum):
     CAN_NOTHING = 1
@@ -22,6 +24,13 @@ class PrivacySettings(Editable, FlaskApp().db.Model):
         self.editor_access = editor_access
         self.guest_access = guest_access
         self.intern_access = intern_access
+
+    def to_json(self) -> JSON:
+        return super(Editable).to_json() | {
+            "editor_access": self.editor_access.value,
+            "guest_access": self.guest_access.value,
+            "intern_access": self.intern_access.value
+        }
 
     @staticmethod
     def get_by_id(id: int):

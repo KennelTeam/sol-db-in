@@ -41,6 +41,7 @@ class Form(Editable, FlaskApp().db.Model):
         return super(Editable).to_json() | {
             'state': self.state,
             'name': self.name,
+            'form_type': self.form_type,
             'answers': [
                 block.get_questions(with_answers=True, form_id=self.id, short_form=short_form) for block in form
             ]
@@ -173,7 +174,7 @@ class Form(Editable, FlaskApp().db.Model):
         return [
             {
                 'name': option.text,
-                'filter': Answer.value_int.in_([option.id])
+                'filter': Answer.value_int.in_([option['id']])
             } for option in options
         ]
 
