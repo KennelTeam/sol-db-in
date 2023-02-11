@@ -157,7 +157,6 @@ export function AutocompleteChoiceFilter({variants} : {variants: string[]}) : JS
                     options={variants}
                     disableCloseOnSelect
                     multiple
-                    value={checked}
                     renderInput={(params) => (
                         <TextField
                             {...params}
