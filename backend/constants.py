@@ -32,3 +32,4 @@ ANSWER_ROW_QUESTION_ID: final(int) = -2
 DATE_FORMAT: final(str) = "%Y-%m-%d"
 DATETIME_FORMAT: final(str) = DATE_FORMAT + " %H:%M:%S"
 REQUEST_CONTEXT_USE_DELETED_ITEMS: final(str) = "use_deleted_items"
+JWT_ACCESS_TOKEN_EXPIRES: final(int) = 1

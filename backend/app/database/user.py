@@ -1,5 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
+import bcrypt
+
 from backend.constants import MAX_LOGIN_SIZE, MAX_FULLNAME_SIZE, MAX_COMMENT_SIZE, SALT_SIZE
 from backend.auxiliary import JSON
 from backend.app.flask_app import FlaskApp
@@ -24,35 +26,18 @@ class User(Editable, FlaskApp().db.Model):
     _login = FlaskApp().db.Column('login', VARCHAR(MAX_LOGIN_SIZE), unique=True)
     _name = FlaskApp().db.Column('name', FlaskApp().db.Text(MAX_FULLNAME_SIZE))
     _comment = FlaskApp().db.Column('comment', FlaskApp().db.Text(MAX_COMMENT_SIZE))
-
-    # expected to use SHA-512
     _password_hash = FlaskApp().db.Column('password', FlaskApp().db.Text(512 // 8))
-
-    _password_salt = FlaskApp().db.Column('password_salt', FlaskApp().db.Text(SALT_SIZE))
     _role = FlaskApp().db.Column('role', FlaskApp().db.Enum(Role))
 
     current_ip: str = ""
-
-    @staticmethod
-    def _generate_salt() -> str:
-        alphabet: str = string.ascii_letters + string.digits
-        return "".join(random.choices(alphabet, k=SALT_SIZE))
-
-    def _generate_password_hash(self, password: str) -> str:
-        password += self._password_salt
-        return hashlib.sha512(password.encode('utf-8')).hexdigest()
 
     def __init__(self, login: str, name: str, comment: str, password: str, role: Role) -> None:
         super(Editable).__init__()
         self.login = login
         self.name = name
         self.comment = comment
-        self._password_salt = User._generate_salt()
         self.password = password
         self.role = role
-
-    def check_password(self, password) -> bool:
-        return self._password_hash == self._generate_password_hash(password)
 
     def to_json(self) -> JSON:
         return super(Editable).to_json() | {
@@ -83,7 +68,7 @@ class User(Editable, FlaskApp().db.Model):
     @password.setter
     @Editable.on_edit
     def password(self, new_password: str) -> str:
-        self._password_hash = self._generate_password_hash(new_password)
+        self._password_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
         return self.password_hash
 
     @property
@@ -117,6 +102,10 @@ class User(Editable, FlaskApp().db.Model):
     def role(self, new_role: Role) -> None:
         self._role = new_role
 
+    def save_to_db(self):
+        FlaskApp().db.session.add(self)
+        FlaskApp().db.session.commit()
+
     @staticmethod
     def get_by_login(login: str) -> 'User':
         return FlaskApp().request(User).filter_by(login=login).first()
@@ -128,8 +117,6 @@ class User(Editable, FlaskApp().db.Model):
     @staticmethod
     def auth(login: str, password: str) -> Role:
         user = User.get_by_login(login)
-        if user is None:
+        if not user or not bcrypt.checkpw(password.encode(), user.password_hash.encode()):
             return None
-        if not user.check_password(password):
-            return None
-        return Role(user.role)
+        return user.role
