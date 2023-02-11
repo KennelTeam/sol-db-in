@@ -8,12 +8,21 @@ import dayjs, { Dayjs } from "dayjs";
 import OutlinedInput from '@material-ui/core/OutlinedInput'
 import { InputLabel, FormControl, Checkbox, ListItemText, Autocomplete, Box } from "@mui/material";
 
-export function ListChoice({options, defaultIdx}: {options: string[], defaultIdx: number}) {
+interface ListChoiceInterface {
+    options: string[],
+    defaultIdx: number,
+    returnValue?: React.Dispatch<string>
+}
+
+export function ListChoice({options, defaultIdx, returnValue} : ListChoiceInterface) {
     // makes Select element (drop-down list) with default value options[defaultIdx]
     const [curValue, setValue] = useState(options[defaultIdx])
 
     const handleChange = (event: SelectChangeEvent<string>, child: ReactNode) : void => {
         setValue(event.target.value)
+        if (returnValue !== undefined) {
+            returnValue(event.target.value)
+        }
     }
 
     return (

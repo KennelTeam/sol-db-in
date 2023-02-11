@@ -1,11 +1,19 @@
 import { Box, Stack } from "@mui/system";
 import { Card, Typography, IconButton, } from "@mui/material";
 import { AnswerType } from "../types/global.d"
-import ClearIcon from '@material-ui/icons/Clear';
+import ClearIcon from '@material-ui/icons/Clear'
+import AddIcon from '@material-ui/icons/Add'
 import * as Test from './_testFunctions'
 import * as Filters from './TypedFilters'
+import { useState } from "react";
 
-function SingleFilter({id, text, type} : {id: number, text: string, type: AnswerType}) {
+interface Question {
+    id: number,
+    text: string,
+    type: AnswerType
+}
+
+function SingleFilter({id, text, type} : Question) {
 
     let filter: JSX.Element
 
@@ -57,14 +65,29 @@ function SingleFilter({id, text, type} : {id: number, text: string, type: Answer
 function FilterTablePage() {
 
     const questions = Test._getFilterableQuestionsList()
+    const [filtersList, setFiltersList] = useState<Question[]>([])
+    const [newQuestion, setNewQuestion] = useState(questions[0].text)
 
-    const filters = questions.map((question: {id: number, text: string, type: AnswerType}) => (
+    const handleAdd = () => {
+        setFiltersList([...filtersList, questions.filter(question => (question.text === newQuestion))[0]])
+    }
+
+    const filters = filtersList.map((question: {id: number, text: string, type: AnswerType}) => (
         <SingleFilter {...question}/>
     ))
 
     return (
         <Stack direction="column" spacing={1} >
             {filters}
+            <Stack direction="row" spacing={1} >
+                <Filters.ListChoice options={questions.map(question => question.text)}
+                    defaultIdx={0}
+                    returnValue={setNewQuestion}
+                    />
+                <IconButton onClick={handleAdd}>
+                    <AddIcon htmlColor="green" fontSize="large"/>
+                </IconButton>
+            </Stack>
         </Stack>
     )
 }
