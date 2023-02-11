@@ -90,7 +90,7 @@ class Question(Editable, FlaskApp().db.Model):
     def to_json(self, with_answers=False, form_id: int = None) -> JSON:
         result = super(Editable).to_json() | {
             'text': self.text,
-            'question_type': self.question_type,
+            'question_type': self.question_type.name,
             'comment': self.comment,
             'answer_block_id': self.answer_block_id,
             'formatting_settings': self.formatting_settings.to_json(),

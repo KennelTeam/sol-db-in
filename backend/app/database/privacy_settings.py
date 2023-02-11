@@ -27,9 +27,9 @@ class PrivacySettings(Editable, FlaskApp().db.Model):
 
     def to_json(self) -> JSON:
         return super(Editable).to_json() | {
-            "editor_access": self.editor_access.value,
-            "guest_access": self.guest_access.value,
-            "intern_access": self.intern_access.value
+            "editor_access": self.editor_access.name,
+            "guest_access": self.guest_access.name,
+            "intern_access": self.intern_access.name
         }
 
     @staticmethod

@@ -39,9 +39,9 @@ class Form(Editable, FlaskApp().db.Model):
     def to_json(self, short_form: bool = False) -> JSON:
         form = QuestionBlock.get_form(FormType.PROJECT)
         return super(Editable).to_json() | {
-            'state': self.state,
+            'state': self.state.name,
             'name': self.name,
-            'form_type': self.form_type,
+            'form_type': self.form_type.name,
             'answers': [
                 block.get_questions(with_answers=True, form_id=self.id, short_form=short_form) for block in form
             ]
