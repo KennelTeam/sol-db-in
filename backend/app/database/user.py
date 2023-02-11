@@ -59,7 +59,7 @@ class User(Editable, FlaskApp().db.Model):
             'login': self.login,
             'name': self.name,
             'comment': self.comment,
-            'role': self.role
+            'role': self.role.name
         }
 
     @property

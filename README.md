@@ -12,3 +12,14 @@ open a pull-request to the `develop` branch.
 For frontend we use [React styling guideline](https://github.com/airbnb/javascript/tree/master/react)
 
 You can also check out the [Backend documentation](backend/README.md)
+
+And the [API documentation](https://kennelteam.github.io/sol-db-in/)
+
+## Structure
+
+- `backend/` contains a server database and API code (Python Flask app)
+- `frontend/` contains React app (the website)
+- `swagger/` folder is an auxiliary folder with Swagger files
+- `index.html` and `swagger.yaml` are for API documentation
+- `Makefile` has some commands for running the server and checking codestyle
+- `README.md` is this file

@@ -44,7 +44,7 @@ class RelationSettings(Editable, FlaskApp().db.Model):
 
     def to_json(self) -> JSON:
         return super(Editable).to_json() | {
-            'related_visualization_type': self.related_visualization_type,
+            'related_visualization_type': self.related_visualization_type.name,
             'related_visualization_sorting': self.related_visualization_sorting,
             'export_forward_relation': self.export_forward_relation,
             'export_inverse_relation': self.export_inverse_relation,
