@@ -30,8 +30,8 @@ class AnswerOption(Editable, FlaskApp().db.Model):
         }
 
     @staticmethod
-    def get_all_from_block(block_id: int) -> List['AnswerOption']:
-        return FlaskApp().request(AnswerOption).filter_by(_answer_block_id=block_id).all()
+    def get_all_from_block(block_id: int) -> List[JSON]:
+        return [item.to_json() for item in FlaskApp().request(AnswerOption).filter_by(_answer_block_id=block_id).all()]
 
     @property
     def answer_block_id(self) -> int:

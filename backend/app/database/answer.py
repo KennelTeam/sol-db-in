@@ -31,7 +31,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
         self.value = value
 
     def to_json(self) -> JSON:
-        return {
+        return super(EditableValueHolder).to_json() | {
             'form_id': self.form_id,
             'question_id': self.question_id,
             'table_row': self.table_row if self.table_row is not None else 0,

@@ -1,0 +1,18 @@
+{
+    "title": "Здарова!!!!",
+    "description": {
+        "part1": "Хаю хай To get started, edit <1>src/App.js</1> and save to reload.",
+        "part2": "Хаю хай Switch language between english and german using buttons above."
+    },
+    "menu": {
+        "projects": "Проекты",
+        "leaders": "Лидеры",
+        "statistics": "Статистика",
+        "settings": "Настройки",
+        "users": "Настройки пользователей",
+        "tags": "Теги",
+        "catalog": "Справочники",
+        "questionnaire": "Анкета",
+        "options": "Ответы"
+    }
+}

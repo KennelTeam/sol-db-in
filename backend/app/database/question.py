@@ -90,12 +90,12 @@ class Question(Editable, FlaskApp().db.Model):
     def to_json(self, with_answers=False, form_id: int = None) -> JSON:
         result = super().to_json() | {
             'text': self.text,
-            'question_type': self.question_type,
+            'question_type': self.question_type.name,
             'comment': self.comment,
             'answer_block_id': self.answer_block_id,
-            'formatting_settings': self.formatting_settings,
-            'privacy_settings': self.privacy_settings,
-            'relation_settings': self.relation_settings
+            'formatting_settings': self.formatting_settings.to_json(),
+            'privacy_settings': self.privacy_settings.to_json(),
+            'relation_settings': self.relation_settings.to_json()
         }
         if with_answers:
             answers = Answer.filter(self.id, form_id=form_id)
