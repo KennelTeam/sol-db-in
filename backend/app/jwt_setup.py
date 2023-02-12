@@ -23,7 +23,7 @@ jwt = JWTManager(FlaskApp().app)
 @FlaskApp().app.after_request
 def refresh_expiring_jwts(response) -> Response:
     try:
-        if request.endpoint == 'login' or request.endpoint == 'logout':
+        if request.endpoint in ('login', 'logout'):
             return response
         exp_timestamp = get_jwt()["exp"]
         now = datetime.now(timezone.utc)

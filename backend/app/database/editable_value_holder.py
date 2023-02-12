@@ -12,8 +12,6 @@ from .editable import Editable
 
 
 class EditableValueHolder(ValueHolder, Editable):
-    def __init__(self):
-        super().__init__()
 
     @ValueHolder.value.setter
     @Editable.on_edit

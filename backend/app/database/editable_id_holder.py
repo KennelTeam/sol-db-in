@@ -1,6 +1,5 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
-from sqlalchemy import func
 from backend.app.flask_app import FlaskApp
 
 
