@@ -14,7 +14,7 @@ class TagType(Editable, FlaskApp().db.Model):
     _text = FlaskApp().db.Column('text', FlaskApp().db.Text(MAX_TAG_SIZE * MAX_LANGUAGES_COUNT))
 
     def __init__(self, text: TranslatedText) -> None:
-        super(Editable).__init__()
+        super().__init__()
         self.text = text
 
     @property
@@ -34,7 +34,7 @@ class TagType(Editable, FlaskApp().db.Model):
         return [root.build_tree() for root in Tag.get_roots_of_type(self.id)]
 
     def to_json(self) -> JSON:
-        return super(Editable).to_json() | {
+        return super().to_json() | {
             'text': self.text,
             'tags': self.get_forest()
         }

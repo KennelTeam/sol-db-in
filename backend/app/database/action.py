@@ -5,7 +5,7 @@ from backend.app.flask_app import FlaskApp
 from sqlalchemy.dialects.mysql import VARCHAR
 from typing import Any, List
 from datetime import datetime
-from flask_jwt_extended import current_user
+from flask_jwt_extended import current_user, jwt_required
 from backend.auxiliary import JSON
 from .timestamp_range import TimestampRange
 from .value_holder import ValueHolder
@@ -21,6 +21,7 @@ class Action(ValueHolder, FlaskApp().db.Model):
     ip = FlaskApp().db.Column('ip', VARCHAR(64))
     timestamp = FlaskApp().db.Column('timestamp', FlaskApp().db.DateTime)
 
+    @jwt_required()
     def __init__(self, table_id: str, column_id: str, row_id: str, value: Any) -> None:
         self.user_id = current_user.id
         self.table_id = table_id
@@ -28,7 +29,7 @@ class Action(ValueHolder, FlaskApp().db.Model):
         self.row_id = row_id
         self.ip = current_user.current_ip
         self.timestamp = datetime.utcnow()
-        self.set(value)
+        # self.value = value
 
     def to_json(self) -> JSON:
         return {

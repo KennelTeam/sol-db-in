@@ -6,11 +6,6 @@ from .api.Register import Register
 from .flask_app import FlaskApp
 
 
-@FlaskApp().app.route("/", methods=['GET'])
-def hello_world():
-    return 'Hello World!'
-
-
 FlaskApp().api.add_resource(Login, '/login')
 FlaskApp().api.add_resource(Register, '/register')
 FlaskApp().api.add_resource(Logout, '/logout')

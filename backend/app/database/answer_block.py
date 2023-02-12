@@ -14,7 +14,7 @@ class AnswerBlock(Editable, FlaskApp().db.Model):
     _name = FlaskApp().db.Column('name', FlaskApp().db.Text(MAX_ANSWER_BLOCK_NAME * MAX_LANGUAGES_COUNT))
 
     def __init__(self, name: TranslatedText):
-        super(Editable).__init__()
+        super().__init__()
         self.name = name
 
     @staticmethod

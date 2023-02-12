@@ -13,12 +13,12 @@ from .editable import Editable
 
 class EditableValueHolder(ValueHolder, Editable):
     def __init__(self):
-        super(Editable).__init__()
+        super().__init__()
 
     @ValueHolder.value.setter
     @Editable.on_edit
     def value(self, value: Any) -> None:
-        super(ValueHolder).value = value
+        super().value = value
 
     @staticmethod
     def filter_by_value(table: Type[FlaskApp().db.Model], exact_value: Any = None, substring: str = None,

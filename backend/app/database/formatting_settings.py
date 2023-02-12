@@ -24,7 +24,7 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
     def __init__(self, block_sorting: int, block_id: int, table_row: int = 0, table_id: int = None,
                  table_column: int = None, show_on_main_page: bool = False, fixed_table_id: int = None):
 
-        super(Editable).__init__()
+        super().__init__()
         self.block_sorting = block_sorting
         self.table_row = table_row
         self.table_column = table_column
@@ -35,7 +35,7 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
         self._fixed_table_id = fixed_table_id
 
     def to_json(self) -> JSON:
-        return super(Editable).to_json() | {
+        return super().to_json() | {
             'block_sorting': self.block_sorting,
             'table_row': self.table_row,
             'table_column': self.table_column,

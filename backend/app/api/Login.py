@@ -18,12 +18,12 @@ class Login(Resource):
         if not user:
             return jsonify(message='Wrong login or password')
 
-        user_role = user.auth(login, password)
-        if not user_role:
+        user = user.auth(login, password)
+        if not user:
             return jsonify(message='Wrong login or password')
 
-        response = jsonify(user_role)
+        user.current_ip = request.remote_addr
+        response = jsonify(role=user.role.name)
         access_token = create_access_token(identity=user)
         set_access_cookies(response, access_token)
-
         return response

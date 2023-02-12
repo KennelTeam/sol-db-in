@@ -4,7 +4,7 @@
 from .flask_app import FlaskApp
 import backend.app.database
 from . import routes
-# from . import jwt_setup
+from . import jwt_setup
 
 FlaskApp().init_database()
 

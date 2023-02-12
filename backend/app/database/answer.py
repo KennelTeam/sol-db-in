@@ -23,7 +23,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
 
     def __init__(self, question_id: int, form_id: int,
                  value: Any, table_row: int, row_question_id: int) -> None:
-        super(EditableValueHolder).__init__()
+        super().__init__()
         self._form_id = form_id
         self._question_id = question_id
         self._table_row = table_row

@@ -2,14 +2,11 @@
 #  All rights reserved.
 import bcrypt
 
-from backend.constants import MAX_LOGIN_SIZE, MAX_FULLNAME_SIZE, MAX_COMMENT_SIZE, SALT_SIZE
+from backend.constants import MAX_LOGIN_SIZE, MAX_FULLNAME_SIZE, MAX_COMMENT_SIZE
 from backend.auxiliary import JSON
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from sqlalchemy.dialects.mysql import VARCHAR
-import random
-import string
-import hashlib
 from enum import Enum
 from typing import List
 
@@ -32,7 +29,7 @@ class User(Editable, FlaskApp().db.Model):
     current_ip: str = ""
 
     def __init__(self, login: str, name: str, comment: str, password: str, role: Role) -> None:
-        super(Editable).__init__()
+        super().__init__()
         self.login = login
         self.name = name
         self.comment = comment
@@ -40,7 +37,7 @@ class User(Editable, FlaskApp().db.Model):
         self.role = role
 
     def to_json(self) -> JSON:
-        return super(Editable).to_json() | {
+        return super().to_json() | {
             'login': self.login,
             'name': self.name,
             'comment': self.comment,
@@ -82,7 +79,7 @@ class User(Editable, FlaskApp().db.Model):
     @name.setter
     @Editable.on_edit
     def name(self, new_name: str) -> None:
-        self.name = new_name
+        self._name = new_name
 
     @property
     def comment(self) -> str:
@@ -102,21 +99,21 @@ class User(Editable, FlaskApp().db.Model):
     def role(self, new_role: Role) -> None:
         self._role = new_role
 
-    def save_to_db(self):
-        FlaskApp().db.session.add(self)
-        FlaskApp().db.session.commit()
+    def save_to_db(self) -> None:
+        FlaskApp().add_database_item(self)
+        FlaskApp().flush_to_database()
 
     @staticmethod
     def get_by_login(login: str) -> 'User':
-        return FlaskApp().request(User).filter_by(login=login).first()
+        return FlaskApp().request(User).filter_by(_login=login).first()
 
     @staticmethod
     def get_all_users() -> List['User']:
         return FlaskApp().request(User).all()
 
     @staticmethod
-    def auth(login: str, password: str) -> Role:
+    def auth(login: str, password: str) -> 'User':
         user = User.get_by_login(login)
         if not user or not bcrypt.checkpw(password.encode(), user.password_hash.encode()):
             return None
-        return user.role
+        return user

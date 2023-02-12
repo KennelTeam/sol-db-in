@@ -7,7 +7,6 @@ class Logout(Resource):
 
     @staticmethod
     def post() -> Response:
-        print('logout body')
         response = jsonify(message='Logout successful')
         unset_jwt_cookies(response)
         return response

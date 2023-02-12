@@ -32,7 +32,7 @@ class RelationSettings(Editable, FlaskApp().db.Model):
                  export_forward_relation: bool = False, export_inverse_relation: bool = False,
                  forward_relation_sheet_name: str = None, inverse_relation_sheet_name: str = None) -> None:
 
-        super(Editable).__init__()
+        super().__init__()
         self._relation_type = relation_type
         self.related_visualization_type = related_visualization_type
         self.related_visualization_sorting = related_visualization_sorting
@@ -43,7 +43,7 @@ class RelationSettings(Editable, FlaskApp().db.Model):
         self.inverse_relation_sheet_name = inverse_relation_sheet_name
 
     def to_json(self) -> JSON:
-        return super(Editable).to_json() | {
+        return super().to_json() | {
             'related_visualization_type': self.related_visualization_type,
             'related_visualization_sorting': self.related_visualization_sorting,
             'export_forward_relation': self.export_forward_relation,
