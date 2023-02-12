@@ -17,13 +17,13 @@ class AnswerOption(Editable, FlaskApp().db.Model):
     _answer_block_id = FlaskApp().db.Column('answer_block_id', FlaskApp().db.ForeignKey('answer_blocks.id'))
 
     def __init__(self, name: TranslatedText, short_name: TranslatedText, answer_block_id: int):
-        super(Editable).__init__()
+        super().__init__()
         self.name = name
         self.short_name = short_name
         self._answer_block_id = answer_block_id
 
     def to_json(self) -> JSON:
-        return super(Editable).to_json() | {
+        return super().to_json() | {
             'name': self.name,
             'short_name': self.short_name,
             'answer_block_id': self._answer_block_id

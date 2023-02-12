@@ -34,7 +34,7 @@ class Question(Editable, FlaskApp().db.Model):
     def __init__(self, texts: TranslatedText, question_type: QuestionType, comment: TranslatedText,
                  answer_block_id: int, tag_type_id: int):
 
-        super(Editable).__init__()
+        super().__init__()
         self.text = texts
         self._question_type = question_type
         self.comment = comment
@@ -88,7 +88,7 @@ class Question(Editable, FlaskApp().db.Model):
         return FlaskApp().request(Question).filter(Question.text.like(f"%{text}%")).all()
 
     def to_json(self, with_answers=False, form_id: int = None) -> JSON:
-        result = super(Editable).to_json() | {
+        result = super().to_json() | {
             'text': self.text,
             'question_type': self.question_type.name,
             'comment': self.comment,

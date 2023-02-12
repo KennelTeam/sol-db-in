@@ -17,7 +17,7 @@ class QuestionTable(Editable, FlaskApp().db.Model):
     _block_sorting = FlaskApp().db.Column('block_sorting', FlaskApp().db.Integer)
 
     def __init__(self, block_sorting: int):
-        super(Editable).__init__()
+        super().__init__()
         self.block_sorting = block_sorting
 
     @property

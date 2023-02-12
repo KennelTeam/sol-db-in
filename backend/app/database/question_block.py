@@ -22,13 +22,13 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
     _sorting = FlaskApp().db.Column('sorting', FlaskApp().db.Integer)
 
     def __init__(self, name: TranslatedText, form: FormType, sorting: int = 0):
-        super(Editable).__init__()
+        super().__init__()
         self.name = name
         self._form = form
         self.sorting = sorting
 
     def to_json(self) -> JSON:
-        return super(Editable).to_json() | {
+        return super().to_json() | {
             'name': self.name,
             'form': self.form,
             'sorting': self.sorting,

@@ -20,7 +20,7 @@ class PrivacySettings(Editable, FlaskApp().db.Model):
     _guest_access = FlaskApp().db.Column('guest_access', FlaskApp().db.Enum(AccessType))
 
     def __init__(self, editor_access: AccessType, intern_access: AccessType, guest_access: AccessType) -> None:
-        super(Editable).__init__()
+        super().__init__()
         self.editor_access = editor_access
         self.guest_access = guest_access
         self.intern_access = intern_access

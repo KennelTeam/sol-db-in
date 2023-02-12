@@ -32,14 +32,14 @@ class Form(Editable, FlaskApp().db.Model):
     _form_type = FlaskApp().db.Column('form_type', FlaskApp().db.Enum(FormType))
 
     def __init__(self, form_type: FormType, state=FormState.PLANNED):
-        super(Editable).__init__()
+        super().__init__()
         self._form_type = form_type
         self.state = state
 
     def to_json(self, short_form: bool = False) -> JSON:
         form = QuestionBlock.get_form(FormType.PROJECT)
-        return super(Editable).to_json() | {
-            'state': self.state.name,
+        return super().to_json() | {
+            'state': self.state,
             'name': self.name,
             'form_type': self.form_type.name,
             'answers': [
@@ -66,7 +66,7 @@ class Form(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def prepare_statistics(question_id: int, min_value: int | datetime = None, max_value: int | datetime = None,
-                           step: int | datetime = None):
+                           step: int = None) -> JSON:
 
         question = Question.get_by_id(question_id)
         filters = Form._get_statistics_filters(question, min_value, max_value, step)

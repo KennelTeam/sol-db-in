@@ -15,13 +15,13 @@ class Tag(Editable, FlaskApp().db.Model):
     _parent_id = FlaskApp().db.Column('parent_id', FlaskApp().db.ForeignKey('tags.id'), nullable=True)
 
     def __init__(self, text: TranslatedText, type_id: int, parent_id: int = None) -> None:
-        super(Editable).__init__()
+        super().__init__()
         self.text = text
         self._type_id = type_id
         self._parent_id = parent_id
 
     def to_json(self) -> JSON:
-        return super(Editable).to_json() | {
+        return super().to_json() | {
             'text': self.text,
             'type_id': self.type_id,
             'parent_id': self.parent_id

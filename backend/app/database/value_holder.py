@@ -25,13 +25,13 @@ class ValueHolder:
     
     @value.setter
     def value(self, value: Any) -> None:
-        if value is int:
+        if type(value) == int:
             self.value_int = value
-        elif value is Enum:
+        elif type(value) == Enum:
             self.value_int = value.value
-        elif value is str:
+        elif type(value) == str:
             self.value_text = value
-        elif value is datetime:
+        elif type(value) == datetime:
             self.value_datetime = value
-        else:
+        elif type(value) == bool:
             self.value_bool = value
