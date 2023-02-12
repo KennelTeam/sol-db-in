@@ -66,7 +66,7 @@ class Form(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def prepare_statistics(question_id: int, min_value: int | datetime = None, max_value: int | datetime = None,
-                           step: int | datetime = None):
+                           step: int = None) -> JSON:
 
         question = Question.get_by_id(question_id)
         filters = Form._get_statistics_filters(question, min_value, max_value, step)

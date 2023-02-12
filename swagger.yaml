@@ -13,9 +13,404 @@ info:
   version: 1.0.1
 servers:
   - url: http://the.endpoint.will.be.later
-paths: {}
+paths:
+  /actions:
+    get:
+      description:
+        Returns a list of filtered changes in the database. If any of arguments is not passed, it does not filter by this value
+      parameters:
+        - in: body
+          name: filter
+          schema:
+            type: object
+            properties:
+              user_id:
+                type: integer
+                description: a user who made the change in DB
+              timestamp_range:
+                $ref: '#components/schemas/TimestampRange'
+              table_id:
+                type: integer
+                description: the id of the table where the change was made
+              column_id:
+                type: string
+                description: the name of the database column to search the values
+              row_id:
+                type: integer
+                description: id of the database record to change
+              value:
+                oneOf:
+                  - type: integer
+                  - type: string
+                  - type: boolean
+              ip:
+                type: string
+              question_id:
+                type: integer
+                description: if you are searching for changes in answers to concrete question, pass here the id of the question
+              max_length:
+                type: integer
+                description: maximum size of the result array
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Action'
+  /login:
+    post:
+      description:
+        Tries to log in a use
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+            properties:
+              login:
+                type: string
+              password:
+                type: string
+            required:
+              - login
+              - password
+      responses:
+        200:
+          description: Successfully logged in (JWT saved in cookies)
+        400:
+          description: Not all arguments provided
+        401:
+          description: Invalid password
+        404:
+          description: No such user
+
+  /register:
+    post:
+      description:
+        Creates a new user
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+            properties:
+              login:
+                type: string
+              name:
+                type: string
+              comment:
+                type: string
+              role:
+                type: string
+                enum:
+                  - GUEST
+                  - INTERN
+                  - EDITOR
+                  - ADMIN
+              password:
+                type: string
+            required:
+              - login
+              - name
+              - comment
+              - role
+              - password
+      responses:
+        201:
+          description: Successfully created
+        304:
+          description: User already exists
+  /logout:
+    post:
+      description:
+        Clears user's login cookies
+      responses:
+        200:
+          description: Successfull log out
+
+  /forms:
+    get:
+      description:
+        Returns a list of filtered leaders
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+            properties:
+              form_type:
+                type: string
+                enum:
+                  - LEADER
+                  - PROJECT
+              name_substr:
+                type: string
+              answer_filters:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    question_id:
+                      type: integer
+                    row_question_id:
+                      type: integer
+                      description:
+                        If it is supposed to be an answer to a fixed table question
+                    exact_value:
+                      oneOf:
+                        - type: integer
+                        - type: string
+                        - type: boolean
+                    min_value:
+                      oneOf:
+                        - type: integer
+                        - schema:
+                          type: string
+                          format: date-time
+                    max_value:
+                      oneOf:
+                        - type: integer
+                        - schema:
+                          type: string
+                          format: date-time
+                    substring:
+                      type: string
+            required:
+              - form_type
+              - question_id
+              - answer_filters
+      responses:
+        200:
+          description:
+            Successful search
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Form'
+        400:
+          description:
+            Invalid set of arguments. For example no form_type is provided or no question_id in a filter is provided.
+  /forms/{id}:
+    get:
+      description:
+        Returns a full info about a given form by it's ID
+      parameters:
+        - in: path
+          required: true
+          name: id
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Successful return
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Form'
+        404:
+          description: No form with this ID
+        400:
+          description: Invalid argument as ID
+    post:
+      description:
+        Update form info or create a new form
+      parameters:
+        - in: body
+          name: form
+          schema:
+            $ref: '#components/schemas/Form'
+      responses:
+        200:
+          description:
+            Successful update
+        403:
+          description:
+            Not enough rights to perform some of the changes
+        500:
+          description:
+            Unexpected server problem
+  /statistics:
+    get:
+      description:
+        Prepares information about answers for a given question
+      parameters:
+        - in: body
+          name: info
+          schema:
+            type: object
+            properties:
+              question_id:
+                type: integer
+              min_value:
+                oneOf:
+                  - type: integer
+                  - schema:
+                    type: string
+                    format: date-time
+              max_value:
+                oneOf:
+                  - type: integer
+                  - schema:
+                    type: string
+                    format: date-time
+              step:
+                type: integer
+                description:
+                  If the answer type is datetime, step in days should be passed
+            required:
+              - question_id
+
+      responses:
+        200:
+          description:
+            Success
+          content:
+            application/json:
+              schema:
+                type: object
+                description:
+                  It's a table with keys=columns and then subkeys=rows
+                properties:
+                  PLANNED:
+                    type: object
+                    properties:
+                      row_1:
+                        type: integer
+                      row_2:
+                        type: integer
+                      etc...:
+                        type: integer
+                  STARTED:
+                    type: object
+                    properties:
+                      row_1:
+                        type: integer
+                      row_2:
+                        type: integer
+                      etc...:
+                        type: integer
+                  FINISHED:
+                    type: object
+                    properties:
+                      row_1:
+                        type: integer
+                      row_2:
+                        type: integer
+                      etc...:
+                        type: integer
+
+  /answer_options:
+    get:
+      description:
+        Returns a list of answer option blocks
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/AnswerBlock'
+    post:
+      description:
+        Updates or creates a new answer option block
+      parameters:
+        - in: body
+          name: answer_block
+          schema:
+            $ref: '#components/schemas/AnswerBlock'
+      responses:
+        200:
+          description: Success
+        400:
+          description: Some arguments are invalid
+
+  /tags:
+    get:
+      description:
+        Returns a tree of Tags
+      parameters:
+        - in: body
+          name: filter
+          schema:
+            type: object
+            properties:
+              block_id:
+                type: integer
+                description: ID of the block tags tree should belong to. If none is passed, all tags will be returned
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tag_type:
+                      $ref: '#components/schemas/TranslatedText'
+                    tags:
+                      type: array
+                      items:
+                        $ref: '#components/schemas/Tag'
+    post:
+      description: Creates or updates a tag object
+      parameters:
+        - in: body
+          name: tag
+          schema:
+            $ref: '#components/schemas/Tag'
+      responses:
+        200:
+          description: Success
+        400:
+          description: Some of arguments are invalid
+
+  /toponyms:
+    get:
+      description: Returns a tree of toponyms
+      responses:
+        200:
+          description: A tree structured toponyms
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Toponym'
+
 components:
   schemas:
+    Action:
+      title: Action
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        table_id:
+          type: integer
+        column_id:
+          type: string
+        row_id:
+          type: integer
+        ip:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        value:
+          oneOf:
+            - type: integer
+            - type: string
+            - type: boolean
+
     User:
       title: User
       type: object
@@ -361,7 +756,7 @@ components:
         answers:
           type: array
           items:
-            $ref: '#/components/schemas/QuestionBlock'
+            $ref: '#components/schemas/QuestionBlock'
     Tag:
       title: Tag
       type: object
@@ -369,7 +764,7 @@ components:
         id:
           type: integer
         text:
-          $ref: '#/components/schemas/TranslatedText'
+          $ref: '#components/schemas/TranslatedText'
         type_id:
           type: integer
           description: ID of tag type (tag group)
@@ -386,4 +781,18 @@ components:
           type: string
         parent_id:
           type: integer
+        children:
+          type: array
+          items:
+            $ref: '#components/schemas/Toponym'
+    TimestampRange:
+      title: TimestampRange
+      type: object
+      properties:
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
   securitySchemes: {}

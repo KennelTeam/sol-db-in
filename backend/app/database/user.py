@@ -28,13 +28,13 @@ class User(Editable, FlaskApp().db.Model):
 
     current_ip: str = ""
 
-    def __init__(self, login: str, name: str, comment: str, password: str, role: Role) -> None:
+    def __init__(self, login: str, name: str, comment: str, password: str, role: str) -> None:
         super().__init__()
         self.login = login
         self.name = name
         self.comment = comment
         self.password = password
-        self.role = role
+        self.role = Role[role]
 
     def to_json(self) -> JSON:
         return super().to_json() | {
@@ -65,7 +65,7 @@ class User(Editable, FlaskApp().db.Model):
     @password.setter
     @Editable.on_edit
     def password(self, new_password: str) -> str:
-        self._password_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
+        self._password_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode('utf-8')
         return self.password_hash
 
     @property
@@ -92,12 +92,13 @@ class User(Editable, FlaskApp().db.Model):
 
     @property
     def role(self) -> Role:
-        return self._role
+        return Role(self._role)
 
     @role.setter
     @Editable.on_edit
-    def role(self, new_role: Role) -> None:
+    def role(self, new_role: Role) -> str:
         self._role = new_role
+        return self._role.name
 
     def save_to_db(self) -> None:
         FlaskApp().add_database_item(self)
