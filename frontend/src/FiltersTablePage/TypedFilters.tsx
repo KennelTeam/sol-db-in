@@ -1,12 +1,11 @@
-import { Stack } from "@mui/system";
-import { MenuItem, Card, Select, SelectChangeEvent, TextField, Typography, FormControlLabel, Button, Paper, MenuList, AutocompleteChangeReason } from "@mui/material";
+import { Stack } from "@mui/system"
+import { MenuItem, Select, SelectChangeEvent, TextField, Typography, FormControlLabel } from "@mui/material";
 import React, { ReactNode, useState} from "react";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
-import dayjs, { Dayjs } from "dayjs";
-import OutlinedInput from '@material-ui/core/OutlinedInput'
-import { InputLabel, FormControl, Checkbox, ListItemText, Autocomplete, Box } from "@mui/material";
+import dayjs, { Dayjs } from "dayjs"
+import { FormControl, Checkbox, ListItemText, Autocomplete } from "@mui/material";
 
 interface ListChoiceInterface {
     options: string[],
@@ -147,7 +146,6 @@ export function ChoiceFilter({variants} : {variants: string[]}) {
 }
 
 export function AutocompleteChoiceFilter({variants} : {variants: string[]}) : JSX.Element {
-    const checked: string[] = []
 
     return (
         <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-start">
@@ -181,6 +179,6 @@ export function CheckboxFilter() {
     }
 
     return (
-        <FormControlLabel control={<Checkbox defaultChecked/>} label={checked ? "Checked" : "Unchecked"}/>
+        <FormControlLabel control={<Checkbox defaultChecked/>} onClick={handleCheck} label={checked ? "Checked" : "Unchecked"}/>
     )
 }
