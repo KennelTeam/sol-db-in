@@ -1,11 +1,12 @@
-import { Box, Stack } from "@mui/system";
-import { Card, Typography, IconButton, } from "@mui/material";
+import { Stack } from "@mui/system";
+import { Card, Typography, IconButton, ListItem, List } from "@mui/material";
 import { AnswerType } from "../types/global.d"
 import ClearIcon from '@material-ui/icons/Clear'
 import AddIcon from '@material-ui/icons/Add'
 import * as Test from './_testFunctions'
 import * as Filters from './TypedFilters'
 import { useState } from "react";
+import LeadersTable from "./LeadersTable";
 
 interface Question {
     id: number,
@@ -59,7 +60,7 @@ function SingleFilter({id, text, type, filterIdx, deleteFilter} : SingleFilterPr
     }
 
     return (
-        <Stack component={Card} direction="row" spacing={2} justifyContent="space-between" alignItems="center" variant="outlined">
+        <Stack component={ListItem} direction="row" spacing={2} justifyContent="space-between" alignItems="center" disablePadding>
             <Stack direction="row" spacing={2} justifyContent="flex-start" alignItems="center" padding={1}>
                 <Typography variant="h6">{text}</Typography>
                 {filter}
@@ -93,17 +94,25 @@ function FilterTablePage() {
     ))
 
     return (
-        <Stack direction="column" spacing={1} >
-            {filters}
-            <Stack direction="row" spacing={1} >
-                <Filters.ListChoice options={questions.map(question => question.text)}
-                    defaultIdx={0}
-                    returnValue={setNewQuestion}
-                    />
-                <IconButton onClick={handleAdd}>
-                    <AddIcon htmlColor="green" fontSize="large"/>
-                </IconButton>
-            </Stack>
+        <Stack direction="column" spacing={1}>
+            <List disablePadding>
+                {filters}
+            </List>
+            <Card>
+                <Stack direction="row" spacing={1} padding={2} alignItems="center">
+                    <Typography variant="caption">Add filter:</Typography>
+                    <Filters.ListChoice options={questions.map(question => question.text)}
+                        defaultIdx={0}
+                        returnValue={setNewQuestion}
+                        />
+                    <IconButton onClick={handleAdd}>
+                        <AddIcon htmlColor="green" fontSize="large"/>
+                    </IconButton>
+                </Stack>
+            </Card>
+            <Card>
+                <LeadersTable/>
+            </Card>
         </Stack>
     )
 }
