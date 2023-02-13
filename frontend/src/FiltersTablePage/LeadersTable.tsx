@@ -54,7 +54,7 @@ function LeaderRow(props: leaderData) {
         <TableRow>
             <StyledTableCell align="right">{id}</StyledTableCell>
             <StyledTableCell align="left">
-                <Link to={"/leaders/" + id}>{name}</Link>
+                <Link to={"/leader/" + id}>{name}</Link>
             </StyledTableCell>
             <StyledTableCell align="left">{city}</StyledTableCell>
             <StyledTableCell align="left">{category}</StyledTableCell>
@@ -62,7 +62,7 @@ function LeaderRow(props: leaderData) {
                 <List disablePadding>
                 {projects.map((project) => (
                     <ListItem disablePadding>
-                        <Link to={"/projects/" + project.id}>{project.name}</Link>
+                        <Link to={"/project/" + project.id}>{project.name}</Link>
                     </ListItem>
                 ))}
                 </List>
