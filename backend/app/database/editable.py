@@ -10,14 +10,18 @@ from typing import Any
 
 class Editable:
     id = FlaskApp().db.Column('id', FlaskApp().db.Integer, unique=True, primary_key=True, autoincrement=False)
-    create_timestamp = FlaskApp().db.Column('create_timestamp', FlaskApp().db.DateTime)
+    _create_timestamp = FlaskApp().db.Column('create_timestamp', FlaskApp().db.DateTime)
     _deleted = FlaskApp().db.Column('deleted', FlaskApp().db.Boolean)
 
     def __init__(self) -> None:
         self.id = EditableIdHolder().id
         print(self.id)
-        self.create_timestamp = datetime.utcnow()
+        self._create_timestamp = datetime.utcnow()
         self._deleted = False
+
+    @property
+    def create_timestamp(self) -> datetime:
+        return self._create_timestamp
 
     @property
     def deleted(self):
@@ -36,7 +40,7 @@ class Editable:
     def to_json(self) -> JSON:
         return {
             'id': self.id,
-            'create_timestamp': self.create_timestamp,
+            'create_timestamp': self._create_timestamp,
             'deleted': self._deleted
         }
 

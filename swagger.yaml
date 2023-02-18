@@ -145,6 +145,11 @@ paths:
       responses:
         201:
           description: Successfully created or updated
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: ID of created or updated item
   /logout:
     post:
       tags:
@@ -160,54 +165,12 @@ paths:
       tags:
         - main
       description:
-        Returns a list of filtered leaders
+        Returns a list of filtered forms
       parameters:
         - in: body
           name: data
           schema:
-            type: object
-            properties:
-              form_type:
-                type: string
-                enum:
-                  - LEADER
-                  - PROJECT
-              name_substr:
-                type: string
-              answer_filters:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    question_id:
-                      type: integer
-                    row_question_id:
-                      type: integer
-                      description:
-                        If it is supposed to be an answer to a fixed table question
-                    exact_value:
-                      oneOf:
-                        - type: integer
-                        - type: string
-                        - type: boolean
-                    min_value:
-                      oneOf:
-                        - type: integer
-                        - schema:
-                          type: string
-                          format: date-time
-                    max_value:
-                      oneOf:
-                        - type: integer
-                        - schema:
-                          type: string
-                          format: date-time
-                    substring:
-                      type: string
-            required:
-              - form_type
-              - question_id
-              - answer_filters
+            $ref: '#components/schemas/FormFilter'
       responses:
         200:
           description:
@@ -236,12 +199,47 @@ paths:
         200:
           description:
             Successful update
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: ID of created or updated item
         403:
           description:
             Not enough rights to perform some of the changes
         500:
           description:
             Unexpected server problem
+  /forms/main_table:
+    get:
+      tags:
+        - main
+      description:
+        Returns a filtered table of form objects for the main page
+      parameters:
+        - in: body
+          name: filter
+          schema:
+            $ref: '#components/schemas/FormFilter'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    column_name:
+                      type: string
+                    values:
+                      type: array
+                      items:
+                        $ref: '#components/schemas/Answer'
+        400:
+          description: Incorrect request arguments
+
   /forms/{id}:
     get:
       tags:
@@ -365,6 +363,11 @@ paths:
       responses:
         200:
           description: Success
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Id of createdo or updated item
         400:
           description: Some arguments are invalid
   /answer_block:
@@ -387,12 +390,125 @@ paths:
       responses:
         200:
           description: Success
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Id of created or updated item
         404:
           description: No block with such id
         403:
           description: Permission denied
         400:
           description: Incorrect input format
+  /question_block:
+    post:
+      tags:
+        - form
+      description:
+        Creates or updates a question block data
+      parameters:
+        - in: body
+          name: info
+          schema:
+            type: object
+            properties:
+              form_type:
+                type: string
+                enum:
+                  - LEADER
+                  - PROJECT
+              name:
+                $ref: '#components/schemas/TranslatedText'
+              sorting:
+                type: integer
+                description: The key by which the blocks are sorted on the page
+            required:
+              - form_type
+              - name
+              - sorting
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Id of created or updated item
+        400:
+          description: Incorrect request arguments
+  /table:
+    post:
+      tags:
+        - form
+      description:
+        Creates a Fixed Table or a Question Table
+      parameters:
+        - in: body
+          name: info
+          schema:
+            type: object
+            properties:
+              block_sorting:
+                type: integer
+                description: A key by which questions are sorted inside the question block
+              type:
+                type: string
+                enum:
+                  - FIXED_TABLE
+                  - QUESTION_TABLE
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Id of created or updated item
+
+  /question:
+    get:
+      tags:
+        - form
+      description:
+        Returns a Question object by ID
+      parameters:
+        - in: body
+          name: id
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Question'
+        404:
+          description: No Question with such ID
+        400:
+          description: Incorrect request arguments
+    post:
+      tags:
+        - form
+      description: Creates or updates a question object
+      parameters:
+        - in: body
+          name: question
+          schema:
+            $ref: '#components/schemas/Question'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Id of created or updated item
+        400:
+          description: Incorrect arguments
+        403:
+          description: Not enough rights to perform the update or create
   /tags:
     get:
       tags:
@@ -436,6 +552,11 @@ paths:
       responses:
         200:
           description: Success
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Id of the created or updated item
         400:
           description: Some of arguments are invalid
   /tag_type:
@@ -458,6 +579,11 @@ paths:
       responses:
         200:
           description: Success
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Id of the created or updated item
         404:
           description: No tag type with such id
         403:
@@ -952,6 +1078,10 @@ components:
           description: If it is multiple-choice or checkbox, where to get the options?
         text:
           $ref: '#/components/schemas/TranslatedText'
+        short_text:
+          $ref: '#/components/schemas/TranslatedText'
+        related_question_id:
+          type: integer
         formatting_settings:
           $ref: '#/components/schemas/FormattingSettings'
         privacy_settings:
@@ -1100,4 +1230,51 @@ components:
         to:
           type: string
           format: date-time
+    AnswerFilter:
+      type: object
+      properties:
+        question_id:
+          type: integer
+        row_question_id:
+          type: integer
+          description:
+            If it is supposed to be an answer to a fixed table question
+        exact_value:
+          oneOf:
+            - type: integer
+            - type: string
+            - type: boolean
+        min_value:
+          oneOf:
+            - type: integer
+            - schema:
+              type: string
+              format: date-time
+        max_value:
+          oneOf:
+            - type: integer
+            - schema:
+              type: string
+              format: date-time
+        substring:
+          type: string
+
+    FormFilter:
+      type: object
+      properties:
+        form_type:
+          type: string
+          enum:
+            - LEADER
+            - PROJECT
+        name_substr:
+          type: string
+        answer_filters:
+          type: array
+          items:
+            $ref: '#components/schemas/AnswerFilter'
+      required:
+        - form_type
+        - question_id
+        - answer_filters
   securitySchemes: {}

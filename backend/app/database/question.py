@@ -18,6 +18,7 @@ from .question_type import QuestionType
 class Question(Editable, FlaskApp().db.Model):
     __tablename__ = 'questions'
     _text = FlaskApp().db.Column('text', FlaskApp().db.Text(MAX_QUESTION_TEXT_SIZE * MAX_LANGUAGES_COUNT))
+    _short_text = FlaskApp().db.Column('short_text', FlaskApp().db.Text(MAX_QUESTION_TEXT_SIZE * MAX_LANGUAGES_COUNT))
     _question_type = FlaskApp().db.Column('question_type', FlaskApp().db.Enum(QuestionType))
     _comment = FlaskApp().db.Column('comment', FlaskApp().db.Text(MAX_COMMENT_SIZE * MAX_LANGUAGES_COUNT))
     _answer_block_id = FlaskApp().db.Column('answer_block_id',
@@ -31,15 +32,19 @@ class Question(Editable, FlaskApp().db.Model):
     _relation_settings = FlaskApp().db.Column('relation_settings',
                                               FlaskApp().db.ForeignKey('relation_settings.id'), nullable=True)
 
-    def __init__(self, texts: TranslatedText, question_type: QuestionType, comment: TranslatedText,
-                 answer_block_id: int, tag_type_id: int):
+    _related_question_id = FlaskApp().db.Column('related_question_id', FlaskApp().db.Integer, nullable=True)
+
+    def __init__(self, texts: TranslatedText, short_texts: TranslatedText, question_type: QuestionType,
+                 comment: TranslatedText, answer_block_id: int, tag_type_id: int, related_question_id: int = None):
 
         super().__init__()
         self.text = texts
+        self.short_text = short_texts
         self._question_type = question_type
         self.comment = comment
         self.answer_block_id = answer_block_id
         self.tag_type_id = tag_type_id
+        self.related_question_id = related_question_id
 
     def prepare_my_table(self, inverse_relation=False) -> JSON:
         if self.question_type is not QuestionType.RELATION:
@@ -90,16 +95,19 @@ class Question(Editable, FlaskApp().db.Model):
     def to_json(self, with_answers=False, form_id: int = None) -> JSON:
         result = super().to_json() | {
             'text': self.text,
+            'short_text': self.short_text,
             'question_type': self.question_type.name,
             'comment': self.comment,
             'answer_block_id': self.answer_block_id,
             'formatting_settings': self.formatting_settings.to_json(),
             'privacy_settings': self.privacy_settings.to_json(),
-            'relation_settings': self.relation_settings.to_json()
+            'relation_settings': self.relation_settings.to_json(),
+            'related_question_id': self.related_question_id
         }
         if with_answers:
             answers = Answer.filter(self.id, form_id=form_id)
-            jsons = [answer.to_json() for answer in answers]
+            related_answers = Answer.filter(self.related_question_id, form_id=form_id)
+            jsons = [answer.to_json() for answer in answers + related_answers]
             result.update({
                 'answers': sorted(jsons, key=lambda x: x['table_row'])
             })
@@ -154,6 +162,25 @@ class Question(Editable, FlaskApp().db.Model):
             raise LogicException("Trying to set a relation settings to non-relational question!")
         self._relation_settings = new_relation_settings.id
         return self._relation_settings
+
+    @property
+    def related_question_id(self) -> int:
+        return self._related_question_id
+
+    @related_question_id.setter
+    @Editable.on_edit
+    def related_question_id(self, new_id: int):
+        self._related_question_id = new_id
+
+    @property
+    def short_text(self) -> TranslatedText:
+        return json.loads(self._short_text)
+
+    @short_text.setter
+    @Editable.on_edit
+    def short_text(self, new_texts: TranslatedText) -> str:
+        self._short_text = json.dumps(new_texts)
+        return self._short_text
 
     @property
     def text(self) -> TranslatedText:
