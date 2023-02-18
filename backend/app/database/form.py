@@ -31,10 +31,11 @@ class Form(Editable, FlaskApp().db.Model):
     _name = FlaskApp().db.Column('name', VARCHAR(MAX_NAME_SIZE), unique=True)
     _form_type = FlaskApp().db.Column('form_type', FlaskApp().db.Enum(FormType))
 
-    def __init__(self, form_type: FormType, state=FormState.PLANNED):
+    def __init__(self, form_type: FormType, name: str, state=FormState.PLANNED):
         super().__init__()
         self._form_type = form_type
         self.state = state
+        self.name = name
 
     def to_json(self, short_form: bool = False) -> JSON:
         form = QuestionBlock.get_form(FormType.PROJECT)
