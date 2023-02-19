@@ -43,5 +43,14 @@
             "comment": "Comment",
             "block-access": "Block access to the site"
         }
+    },
+    "options": {
+        "title": "Options editing",
+        "dialog": {
+            "save": "Save",
+            "cancel": "Cancel",
+            "title": "Edit translations",
+            "add": "Add \"{}\" translation"
+        }
     }
 }
