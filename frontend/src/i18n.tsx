@@ -8,6 +8,7 @@ i18nnext
   .use(I18nextBrowserLanguageDetector)
   .use(initReactI18next) // passes i18n down to react-i18next
   .init({
+    fallbackLng: 'en',
     interpolation: {
       escapeValue: false // react already safes from xss
     }
