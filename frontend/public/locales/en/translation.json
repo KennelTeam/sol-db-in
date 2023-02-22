@@ -25,6 +25,7 @@
         "leaders-per-page": "Leaders per page",
         "projects-per-page": "Projects per page",
         "leader-comment-max-length": "Comment max length on leaders interviews",
+        "change-language": "Change language",
         "save": "Save"
     },
     "users": {
