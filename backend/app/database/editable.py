@@ -1,5 +1,6 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
+from backend.auxiliary.string_dt import datetime_to_string
 from backend.app.flask_app import FlaskApp
 from .action import Action
 from .editable_id_holder import EditableIdHolder
@@ -40,7 +41,7 @@ class Editable:
     def to_json(self) -> JSON:
         return {
             'id': self.id,
-            'create_timestamp': self._create_timestamp,
+            'create_timestamp': datetime_to_string(self._create_timestamp),
             'deleted': self._deleted
         }
 

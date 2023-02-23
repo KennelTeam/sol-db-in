@@ -1,12 +1,14 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
-from . import Form, User, Toponym
+from .form import Form
+from .user import User
+from .toponym import Toponym
 from .question import Question
 from .answer import Answer
 from .answer_option import AnswerOption
 from .question_type import QuestionType
-from ...auxiliary import JSON
-from ...auxiliary.string_dt import date_to_string
+from backend.auxiliary import JSON
+from backend.auxiliary.string_dt import date_to_string
 
 
 def count_answers_with_answer_option(answer_option: AnswerOption) -> int:
@@ -21,7 +23,7 @@ def count_answers_with_answer_option(answer_option: AnswerOption) -> int:
 def prettify_answer(answer: Answer) -> JSON:
     question = Question.get_by_id(answer.question_id)
     result = answer.to_json() | {
-        'type': question.question_type
+        'type': question.question_type.name
     }
     if question.question_type == QuestionType.DATE:
         result['value'] = date_to_string(answer.value)
@@ -37,10 +39,10 @@ def prettify_answer(answer: Answer) -> JSON:
         result['ref_id'] = answer.value
     elif question.question_type == QuestionType.LOCATION:
         result['ref_id'] = answer.value
-        result['value'] = Toponym.get_by_name(answer.value)
+        result['value'] = Toponym.get_by_name(answer.value).name
     elif question.question_type in {QuestionType.MULTIPLE_CHOICE, QuestionType.CHECKBOX}:
         result['ref_id'] = answer.value
-        result['value'] = AnswerOption.get_by_id(answer.value)
+        result['value'] = AnswerOption.get_by_id(answer.value).name
     else:
         result['value'] = answer.value
     return result

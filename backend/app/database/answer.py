@@ -18,7 +18,7 @@ class ExtremumType(Enum):
 class Answer(EditableValueHolder, FlaskApp().db.Model):
     __tablename__ = 'answers'
     _table_row = FlaskApp().db.Column('table_row', FlaskApp().db.Integer, nullable=True)
-    _row_question_id = FlaskApp().db.Column('row_question_id', FlaskApp().db.ForeignKey('questions.id'), nullable=True)
+    _row_question_id = FlaskApp().db.Column('row_question_id', FlaskApp().db.Integer, nullable=True)
     _question_id = FlaskApp().db.Column('question_id', FlaskApp().db.ForeignKey('questions.id'))
     _form_id = FlaskApp().db.Column('form_id', FlaskApp().db.ForeignKey('forms.id'), nullable=False)
 
@@ -32,7 +32,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
         self.value = value
 
     def to_json(self) -> JSON:
-        return super(EditableValueHolder).to_json() | {
+        return super().to_json() | {
             'form_id': self.form_id,
             'question_id': self.question_id,
             'table_row': self.table_row if self.table_row is not None else 0,
@@ -44,7 +44,6 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
     @staticmethod
     def json_format() -> JSON:
         return {
-            'form_id': int,
             'question_id': int,
             'table_row': int,
             'row_question_id': int,

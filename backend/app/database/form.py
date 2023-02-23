@@ -7,14 +7,12 @@ import sqlalchemy
 from sqlalchemy.dialects.mysql import VARCHAR
 from enum import Enum
 from backend.app.flask_app import FlaskApp
-from .auxiliary import prettify_answer
 from .editable import Editable
 from .answer import Answer, ExtremumType
 from .question import Question, QuestionType
 from .toponym import Toponym
 from .user import User
 from .answer_option import AnswerOption
-from .question_block import QuestionBlock
 from .form_type import FormType
 from backend.constants import DATE_FORMAT, MAX_NAME_SIZE
 from backend.auxiliary import JSON, LogicException
@@ -38,9 +36,9 @@ class Form(Editable, FlaskApp().db.Model):
         self.state = state
         self.name = name
 
-    def to_json(self, short_form: bool = False) -> JSON:
+    def to_json(self) -> JSON:
         return super().to_json() | {
-            'state': self.state,
+            'state': self.state.name,
             'name': self.name,
             'form_type': self.form_type.name,
             'answers': Answer.get_form_answers(self.id)
@@ -62,6 +60,10 @@ class Form(Editable, FlaskApp().db.Model):
     @staticmethod
     def get_by_ids(ids: Set[int]) -> List['Form']:
         return FlaskApp().request(Form).filter(Form.id.in_(ids)).all()
+
+    @staticmethod
+    def get_all_ids() -> Set[int]:
+        return {item.id for item in FlaskApp().request(Form).with_entities(Form.id).all()}
 
     @staticmethod
     def prepare_statistics(question_id: int, min_value: int | datetime = None, max_value: int | datetime = None,

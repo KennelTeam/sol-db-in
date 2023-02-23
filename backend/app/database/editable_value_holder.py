@@ -16,7 +16,7 @@ class EditableValueHolder(ValueHolder, Editable):
     @ValueHolder.value.setter
     @Editable.on_edit
     def value(self, value: Any) -> None:
-        super().value = value
+        self.set_value(value)
 
     @staticmethod
     def filter_by_value(table: Type[FlaskApp().db.Model], exact_value: Any = None, substring: str = None,

@@ -1,5 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
+import json
+
 from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
@@ -12,11 +14,11 @@ from backend.app.database.tag_to_answer import TagToAnswer
 from backend.app.database.tag import Tag
 from backend.auxiliary.string_dt import string_to_datetime
 from backend.auxiliary.types import JSON
-from ..database import Question
+from backend.app.database import Question
 from backend.app.database.question import AnswerType
-from ..database.auxiliary import prettify_answer
-from ..database.question_type import QuestionType
-from ..flask_app import FlaskApp
+from backend.app.database.auxiliary import prettify_answer
+from backend.app.database.question_type import QuestionType
+from backend.app.flask_app import FlaskApp
 from backend.constants import NAME_COLUMN_NAME
 
 
@@ -31,22 +33,19 @@ class Forms(Resource):
         parser.add_argument('name_substr', type=str, location='json', required=False, default='')
 
         arguments = parser.parse_args()
-        ids = None
+        ids = Form.get_all_ids()
         for item in arguments['answer_filters']:
-            if type(item) != JSON:
+            if type(item) != dict:
                 return get_failure(HTTPErrorCode.INVALID_ARG_LOCATION, 400)
             current_ids = Forms._solve_form_filter(item, arguments['name_substr'])
             if current_ids is None:
                 return get_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
-            if ids is None:
-                ids = current_ids
-            else:
-                ids &= current_ids
+            ids &= current_ids
         forms = Form.get_by_ids(ids)
         question_ids = Question.get_only_main_page(FormType[arguments['form_type']])
 
         result = Forms._prepare_table(forms, question_ids)
-        return Response({'table': result}, 200)
+        return Response(json.dumps({'table': result}), 200)
 
     @staticmethod
     @jwt_required()
@@ -61,14 +60,13 @@ class Forms(Resource):
 
         content = parser.parse_args()
 
-        if content['form_type'] not in FormType:
+        if content['form_type'] not in FormType.__members__:
             return post_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
         form_type = FormType[content['form_type']]
 
-        if content['state'] not in FormState:
+        if content['state'] not in FormState.__members__:
             return post_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
-        form_state = FormState[content['form_state']]
-
+        form_state = FormState[content['state']]
         return Forms._update_form_data(content, form_state, form_type)
 
     @staticmethod
@@ -78,7 +76,7 @@ class Forms(Resource):
             'values': [
                 {
                     "answers": [{
-                        'type': AnswerType.REFERENCE,
+                        'type': QuestionType.RELATION.name,
                         'id': item.id,
                         'value': item.name
                     }]
@@ -107,12 +105,12 @@ class Forms(Resource):
         ans_object = {"answers": []}
         if q_type == AnswerType.FORWARD_COUNT:
             ans_object["answers"].append({
-                'type': QuestionType.NUMBER,
+                'type': QuestionType.NUMBER.name,
                 'value': Answer.count_forms_answers(form_id, question_id)
             })
         elif q_type == AnswerType.INVERSE_COUNT:
             ans_object["answers"].append({
-                'type': QuestionType.NUMBER,
+                'type': QuestionType.NUMBER.name,
                 'value': Answer.count_inverse_answers(form_id, question_id)
             })
         else:
@@ -152,12 +150,12 @@ class Forms(Resource):
         if content['id'] == -1:
             form = Form(form_type, content['name'], form_state)
             FlaskApp().add_database_item(form)
+            FlaskApp().flush_to_database()
         else:
             options = Form.get_by_ids({content['id']})
             if len(options) == 0:
                 return post_failure(HTTPErrorCode.WRONG_ID, 404)
             form = options[0]
-
         for answer in content['answers']:
             status = Forms._check_answer_object_correctness(answer)
             if status != HTTPErrorCode.SUCCESS:
@@ -172,7 +170,7 @@ class Forms(Resource):
 
     @staticmethod
     def _check_answer_object_correctness(answer: JSON) -> HTTPErrorCode:
-        if type(answer) != JSON:
+        if type(answer) != dict:
             return HTTPErrorCode.INVALID_ARG_TYPE
         if 'question_id' not in answer or 'answers' not in answer:
             return HTTPErrorCode.INVALID_ARG_TYPE
@@ -185,9 +183,8 @@ class Forms(Resource):
         check_status = check_json_format(answer, Answer.json_format())
         if check_status != HTTPErrorCode.SUCCESS:
             return check_status
-        if answer['form_id'] != form.id:
+        if 'form_id' in answer and answer['form_id'] != form.id:
             return HTTPErrorCode.CONFLICTING_ARGUMENTS
-
         if 'id' in answer and answer['id'] > 0:
             if type(answer['id']) != int:
                 return HTTPErrorCode.INVALID_ARG_TYPE
@@ -200,7 +197,7 @@ class Forms(Resource):
             current_ans.value = answer['value']
             current_ans.table_row = answer['table_row']
         else:
-            current_ans = Answer(answer['question_id'], answer['form_id'], answer['value'],
+            current_ans = Answer(answer['question_id'], form.id, answer['value'],
                                  answer['table_row'], answer['row_question_id'])
             FlaskApp().add_database_item(current_ans)
         return Forms._update_answer_tags(current_ans.id, answer['tags'])
