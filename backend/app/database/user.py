@@ -1,14 +1,15 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-import bcrypt
 
 from backend.constants import MAX_LOGIN_SIZE, MAX_FULLNAME_SIZE, MAX_COMMENT_SIZE
 from backend.auxiliary import JSON
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
+
 from sqlalchemy.dialects.mysql import VARCHAR
 from enum import Enum
 from typing import List
+import bcrypt
 
 
 class Role(Enum):
@@ -107,6 +108,10 @@ class User(Editable, FlaskApp().db.Model):
     @staticmethod
     def get_by_login(login: str) -> 'User':
         return FlaskApp().request(User).filter_by(_login=login).first()
+
+    @staticmethod
+    def get_by_id(id: int) -> 'User':
+        return FlaskApp().request(User).filter_by(id=id).first()
 
     @staticmethod
     def get_all_users() -> List['User']:

@@ -1,13 +1,16 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
+from enum import Enum
+
 from sqlalchemy.orm import Query
 from typing import List
 import json
 from backend.constants import MAX_QUESTION_TEXT_SIZE, MAX_LANGUAGES_COUNT, MAX_COMMENT_SIZE, \
-    SOURCE_QUESTION_ID, ANSWER_ROW_QUESTION_ID
+    SOURCE_QUESTION_ID, ANSWER_ROW_QUESTION_ID, MAX_SHORT_QUESTION_SIZE
 from backend.auxiliary import JSON, TranslatedText, LogicException
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
+from .form_type import FormType
 from .formatting_settings import FormattingSettings
 from .privacy_settings import PrivacySettings
 from .relation_settings import RelationSettings
@@ -15,10 +18,17 @@ from .answer import Answer
 from .question_type import QuestionType
 
 
+class AnswerType(Enum):
+    VALUE = 1
+    FORWARD_COUNT = 2
+    INVERSE_COUNT = 3
+    REFERENCE = 4
+
+
 class Question(Editable, FlaskApp().db.Model):
     __tablename__ = 'questions'
     _text = FlaskApp().db.Column('text', FlaskApp().db.Text(MAX_QUESTION_TEXT_SIZE * MAX_LANGUAGES_COUNT))
-    _short_text = FlaskApp().db.Column('short_text', FlaskApp().db.Text(MAX_QUESTION_TEXT_SIZE * MAX_LANGUAGES_COUNT))
+    _short_text = FlaskApp().db.Column('short_text', FlaskApp().db.Text(MAX_SHORT_QUESTION_SIZE * MAX_LANGUAGES_COUNT))
     _question_type = FlaskApp().db.Column('question_type', FlaskApp().db.Enum(QuestionType))
     _comment = FlaskApp().db.Column('comment', FlaskApp().db.Text(MAX_COMMENT_SIZE * MAX_LANGUAGES_COUNT))
     _answer_block_id = FlaskApp().db.Column('answer_block_id',
@@ -34,8 +44,11 @@ class Question(Editable, FlaskApp().db.Model):
 
     _related_question_id = FlaskApp().db.Column('related_question_id', FlaskApp().db.Integer, nullable=True)
 
+    _form_type = FlaskApp().db.Column('form_type', FlaskApp().db.Enum(FormType))
+
     def __init__(self, texts: TranslatedText, short_texts: TranslatedText, question_type: QuestionType,
-                 comment: TranslatedText, answer_block_id: int, tag_type_id: int, related_question_id: int = None):
+                 comment: TranslatedText, answer_block_id: int, tag_type_id: int, form_type: str,
+                 related_question_id: int = None):
 
         super().__init__()
         self.text = texts
@@ -45,6 +58,7 @@ class Question(Editable, FlaskApp().db.Model):
         self.answer_block_id = answer_block_id
         self.tag_type_id = tag_type_id
         self.related_question_id = related_question_id
+        self.form_type = FormType[form_type]
 
     def prepare_my_table(self, inverse_relation=False) -> JSON:
         if self.question_type is not QuestionType.RELATION:
@@ -89,8 +103,42 @@ class Question(Editable, FlaskApp().db.Model):
         )).all()
 
     @staticmethod
+    def get_all_with_relation_settings(relation_settings: List[int]) -> List['Question']:
+        return FlaskApp().request(Question).filter(Question._relation_settings.in_(
+            relation_settings
+        )).all()
+
+    @staticmethod
     def get_by_text(text: str) -> List['Question']:
         return FlaskApp().request(Question).filter(Question.text.like(f"%{text}%")).all()
+
+    @staticmethod
+    def get_only_main_page(form_type: FormType) -> List[JSON]:
+        formattings = FormattingSettings.get_main_page()
+        questions = Question.get_all_with_formattings(formattings)
+        counted_relations = RelationSettings.get_main_page_count_presented()
+        counted_questions_forward = Question.get_all_with_relation_settings(counted_relations[0])
+        counted_questions_inverse = Question.get_all_with_relation_settings(counted_relations[1])
+
+        def form_type_filter(q: Question) -> bool:
+            return q.form_type == form_type
+
+        questions = filter(form_type_filter, questions)
+        counted_questions_inverse = filter(form_type_filter, counted_questions_inverse)
+        counted_questions_forward = filter(form_type_filter, counted_questions_forward)
+
+        result = [{
+            'type': AnswerType.VALUE,
+            'question': item
+        } for item in questions] + [{
+            'type': AnswerType.FORWARD_COUNT,
+            'question': item
+        } for item in counted_questions_forward] + [{
+            'type': AnswerType.INVERSE_COUNT,
+            'question': item
+        } for item in counted_questions_inverse]
+
+        return result
 
     def to_json(self, with_answers=False, form_id: int = None) -> JSON:
         result = super().to_json() | {
@@ -102,7 +150,8 @@ class Question(Editable, FlaskApp().db.Model):
             'formatting_settings': self.formatting_settings.to_json(),
             'privacy_settings': self.privacy_settings.to_json(),
             'relation_settings': self.relation_settings.to_json(),
-            'related_question_id': self.related_question_id
+            'related_question_id': self.related_question_id,
+            'form_type': self.form_type
         }
         if with_answers:
             answers = Answer.filter(self.id, form_id=form_id)
@@ -128,6 +177,15 @@ class Question(Editable, FlaskApp().db.Model):
             result[key][SOURCE_QUESTION_ID] = key[1]
             result[key][ANSWER_ROW_QUESTION_ID] = key[0]
         return list(result.values())
+
+    @property
+    def form_type(self) -> FormType:
+        return self._form_type
+
+    @form_type.setter
+    @Editable.on_edit
+    def form_type(self, form_type: FormType) -> None:
+        self._form_type = form_type
 
     @property
     def formatting_settings(self) -> FormattingSettings:
@@ -223,4 +281,3 @@ class Question(Editable, FlaskApp().db.Model):
     @Editable.on_edit
     def tag_type_id(self, new_id: int) -> None:
         self._tag_type_id = new_id
-

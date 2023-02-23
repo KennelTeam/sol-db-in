@@ -23,6 +23,7 @@ MAX_SHORT_ANSWER_OPTION_SIZE: final(int) = 32
 MAX_SHEET_TITLE_SIZE: final(int) = 16
 MAX_ANSWER_SIZE: final(int) = 2048
 MAX_TOPONYM_SIZE: final(int) = 128
+MAX_SHORT_QUESTION_SIZE: final(int) = 32
 MAX_TEXT_SIZE: final(int) = 4096
 INT_MIN: final(int) = -0xffffffffffffffff
 INT_MAX: final(int) = -INT_MIN
@@ -33,3 +34,7 @@ DATETIME_FORMAT: final(str) = DATE_FORMAT + " %H:%M:%S"
 REQUEST_CONTEXT_USE_DELETED_ITEMS: final(str) = "use_deleted_items"
 JWT_ACCESS_TOKEN_EXPIRES: final(int) = 1
 JWT_REFRESH_EXPIRING_TIME: final(int) = 30
+NAME_COLUMN_NAME = {
+    'ru': 'Имя/Название',
+    'en': 'Name'
+}

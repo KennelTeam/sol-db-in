@@ -7,6 +7,7 @@ import sqlalchemy
 from sqlalchemy.dialects.mysql import VARCHAR
 from enum import Enum
 from backend.app.flask_app import FlaskApp
+from .auxiliary import prettify_answer
 from .editable import Editable
 from .answer import Answer, ExtremumType
 from .question import Question, QuestionType
@@ -38,14 +39,11 @@ class Form(Editable, FlaskApp().db.Model):
         self.name = name
 
     def to_json(self, short_form: bool = False) -> JSON:
-        form = QuestionBlock.get_form(FormType.PROJECT)
         return super().to_json() | {
             'state': self.state,
             'name': self.name,
             'form_type': self.form_type.name,
-            'answers': [
-                block.get_questions(with_answers=True, form_id=self.id, short_form=short_form) for block in form
-            ]
+            'answers': Answer.get_form_answers(self.id)
         }
 
     @staticmethod

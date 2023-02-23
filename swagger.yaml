@@ -165,7 +165,7 @@ paths:
       tags:
         - main
       description:
-        Returns a list of filtered forms
+        Returns a table to display on the main page
       parameters:
         - in: body
           name: data
@@ -173,18 +173,28 @@ paths:
             $ref: '#components/schemas/FormFilter'
       responses:
         200:
-          description:
-            Successful search
+          description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#components/schemas/AnsweredForm'
-        400:
-          description:
-            Invalid set of arguments. For example no form_type is provided or no question_id in a filter is provided.
+                  type: object
+                  properties:
+                    column_name:
+                      type: string
+                    values:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          answers:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Answer'
 
+        400:
+          description: Invalid argument
     post:
       tags:
         - main
@@ -210,35 +220,6 @@ paths:
         500:
           description:
             Unexpected server problem
-  /forms/main_table:
-    get:
-      tags:
-        - main
-      description:
-        Returns a filtered table of form objects for the main page
-      parameters:
-        - in: body
-          name: filter
-          schema:
-            $ref: '#components/schemas/FormFilter'
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    column_name:
-                      type: string
-                    values:
-                      type: array
-                      items:
-                        $ref: '#components/schemas/Answer'
-        400:
-          description: Incorrect request arguments
 
   /forms/{id}:
     get:
@@ -628,7 +609,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#components/schemas/Toponym'
+                type: object
+                properties:
+                  roots:
+                    type: array
+                    items:
+                      $ref: '#components/schemas/Toponym'
   /export/forms:
     get:
       tags:
@@ -871,6 +857,22 @@ components:
             - type: string
             - type: integer
             - type: boolean
+        type:
+          type: string
+          enum:
+            - DATE
+            - USER
+            - LONG_TEXT
+            - SHORT_TEXT
+            - MULTIPLE_CHOICE
+            - CHECKBOX
+            - LOCATION
+            - NUMBER
+            - BOOLEAN
+            - RELATION
+        ref_id:
+          type: integer
+          description: If the answer is stored as a ref, this contains the ref and value field contains the content to show. Otherwise this is an empty field
         tags:
           type: array
           items:

@@ -27,6 +27,10 @@ class Tag(Editable, FlaskApp().db.Model):
             'parent_id': self.parent_id
         }
 
+    @staticmethod
+    def get_by_id(id: int):
+        return FlaskApp().request(Tag).filter_by(id=id).first()
+
     @property
     def text(self) -> JSON:
         return json.loads(self._text)
