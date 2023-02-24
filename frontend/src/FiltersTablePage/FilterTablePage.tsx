@@ -24,7 +24,7 @@ function SingleFilter({id, text, type, filterIdx, deleteFilter} : SingleFilterPr
     let filter: JSX.Element
 
     switch (type) {
-        case AnswerType.Number :
+        case AnswerType.Number:
             filter = (<Filters.NumberFilter/>)
             break
         case AnswerType.Text :
