@@ -1,5 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
+from sqlalchemy.dialects.mysql import VARCHAR
+
 from backend.app.flask_app import FlaskApp
 from backend.constants import MAX_TOPONYM_SIZE
 from backend.auxiliary import JSON
@@ -9,7 +11,7 @@ from typing import List
 class Toponym(FlaskApp().db.Model):
     __tablename__ = 'toponyms'
     id = FlaskApp().db.Column('id', FlaskApp().db.Integer, primary_key=True, unique=True)
-    name = FlaskApp().db.Column('name', FlaskApp().db.Text(MAX_TOPONYM_SIZE))
+    name = FlaskApp().db.Column('name', VARCHAR(MAX_TOPONYM_SIZE), unique=True)
     parent_id = FlaskApp().db.Column('parent_id', FlaskApp().db.ForeignKey('toponyms.id'), nullable=True, default=None)
 
     @staticmethod
@@ -24,10 +26,8 @@ class Toponym(FlaskApp().db.Model):
     def get_by_id(id: int) -> 'Toponym':
         return Toponym.query.filter_by(id=id).first()
 
-    def __init__(self, name: str, parent_name: str = None) -> None:
-        parent = Toponym.get_by_name(parent_name)
-        if parent is not None:
-            self.parent_id = parent.id
+    def __init__(self, name: str, parent_id: int = None) -> None:
+        self.parent_id = parent_id
         self.name = name
 
     @staticmethod

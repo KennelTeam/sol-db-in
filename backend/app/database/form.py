@@ -23,6 +23,10 @@ class FormState(Enum):
     STARTED = 2
     FINISHED = 3
 
+    @staticmethod
+    def __contains__(self, item: str) -> bool:
+        return item in FormState.__members__
+
 
 class Form(Editable, FlaskApp().db.Model):
     __tablename__ = 'forms'
@@ -102,8 +106,9 @@ class Form(Editable, FlaskApp().db.Model):
 
     @state.setter
     @Editable.on_edit
-    def state(self, new_state: FormState) -> None:
+    def state(self, new_state: FormState) -> str:
         self._state = new_state
+        return self._state.name
 
     @staticmethod
     def _filter_by_answers_count(question_id: int, min_answers_count: int, max_answers_count: int) -> Set[int]:

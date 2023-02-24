@@ -3,6 +3,8 @@
 import json
 from typing import Any
 from flask_jwt_extended import current_user, jwt_required
+from flask_restful import reqparse
+
 from backend.app.flask_app import FlaskApp
 from backend.auxiliary.types import JSON
 from backend.app.database.user import Role
@@ -20,6 +22,24 @@ class HTTPErrorCode(enum.Enum):
     INVALID_ARG_FORMAT = 5
     CONFLICTING_ARGUMENTS = 6
     NOT_ENOUGH_RIGHTS = 7
+
+
+def get_class_item_by_id_request(Class) -> Response:
+    parser = reqparse.RequestParser()
+    parser.add_argument('id', type=int, location='json', required=True)
+    arguments = parser.parse_args()
+    current = Class.get_by_id(arguments['id'])
+    if current is None:
+        return get_failure(HTTPErrorCode.WRONG_ID, 404)
+    return Response(json.dumps(current.to_json()), 200)
+
+
+def create_standard_reqparser() -> reqparse.RequestParser:
+    parser = reqparse.RequestParser()
+    parser.add_argument('id', type=int, location='json', required=False, default=-1)
+    parser.add_argument('name', type=dict, location='json')
+    parser.add_argument('deleted', type=bool, location='json', required=False, default=False)
+    return parser
 
 
 @jwt_required()

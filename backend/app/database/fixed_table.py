@@ -31,6 +31,14 @@ class FixedTable(Editable, FlaskApp().db.Model):
     def get_by_ids(ids: Set[int]) -> List['FixedTable']:
         return FlaskApp().request(FixedTable).filter(FixedTable.id.in_(ids)).all()
 
+    @staticmethod
+    def get_by_id(id: int) -> 'FixedTable':
+        result = FixedTable.get_by_ids({id})
+        if len(result) == 0:
+            return None
+        else:
+            return result[0]
+
     def get_questions(self, with_answers=False, form_id: int = None) -> JSON:
         if not with_answers:
             return self._get_only_questions()

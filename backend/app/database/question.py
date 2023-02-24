@@ -184,8 +184,9 @@ class Question(Editable, FlaskApp().db.Model):
 
     @form_type.setter
     @Editable.on_edit
-    def form_type(self, form_type: FormType) -> None:
+    def form_type(self, form_type: FormType) -> str:
         self._form_type = form_type
+        return self._form_type.name
 
     @property
     def formatting_settings(self) -> FormattingSettings:

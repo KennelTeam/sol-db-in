@@ -42,8 +42,9 @@ class PrivacySettings(Editable, FlaskApp().db.Model):
 
     @editor_access.setter
     @Editable.on_edit
-    def editor_access(self, new_access: AccessType) -> None:
+    def editor_access(self, new_access: AccessType) -> str:
         self._editor_access = new_access
+        return self._editor_access.name
 
     @property
     def intern_access(self) -> AccessType:
@@ -51,8 +52,9 @@ class PrivacySettings(Editable, FlaskApp().db.Model):
 
     @intern_access.setter
     @Editable.on_edit
-    def intern_access(self, new_access: AccessType) -> None:
+    def intern_access(self, new_access: AccessType) -> str:
         self._intern_access = new_access
+        return self._intern_access.name
 
     @property
     def guest_access(self) -> AccessType:
@@ -60,5 +62,6 @@ class PrivacySettings(Editable, FlaskApp().db.Model):
 
     @guest_access.setter
     @Editable.on_edit
-    def guest_access(self, new_access: AccessType) -> None:
+    def guest_access(self, new_access: AccessType) -> str:
         self._guest_access = new_access
+        return self._guest_access.name

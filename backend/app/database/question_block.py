@@ -35,6 +35,10 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
             'questions': self.get_questions()
         }
 
+    @staticmethod
+    def get_by_id(id: int) -> 'QuestionBlock':
+        return FlaskApp().request(QuestionBlock).filter_by(id=id).first()
+
     @property
     def form(self) -> FormType:
         return self._form

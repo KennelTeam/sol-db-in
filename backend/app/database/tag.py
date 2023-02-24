@@ -28,7 +28,7 @@ class Tag(Editable, FlaskApp().db.Model):
         }
 
     @staticmethod
-    def get_by_id(id: int):
+    def get_by_id(id: int) -> 'Tag':
         return FlaskApp().request(Tag).filter_by(id=id).first()
 
     @property

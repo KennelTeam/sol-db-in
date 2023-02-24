@@ -38,3 +38,4 @@ NAME_COLUMN_NAME = {
     'ru': 'Имя/Название',
     'en': 'Name'
 }
+TOPONYMS_TABLE_URL: final(str) = "https://simplemaps.com/static/data/country-cities/id/id.json"

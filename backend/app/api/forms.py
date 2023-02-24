@@ -60,11 +60,11 @@ class Forms(Resource):
 
         content = parser.parse_args()
 
-        if content['form_type'] not in FormType.__members__:
+        if content['form_type'] not in FormType:
             return post_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
         form_type = FormType[content['form_type']]
 
-        if content['state'] not in FormState.__members__:
+        if content['state'] not in FormState:
             return post_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
         form_state = FormState[content['state']]
         return Forms._update_form_data(content, form_state, form_type)

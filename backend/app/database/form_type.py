@@ -6,3 +6,7 @@ from enum import Enum
 class FormType(Enum):
     LEADER = 0
     PROJECT = 1
+
+    @staticmethod
+    def __contains__(self, item: str) -> bool:
+        return item in FormType.__members__
