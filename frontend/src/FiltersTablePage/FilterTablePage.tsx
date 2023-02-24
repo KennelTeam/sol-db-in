@@ -6,7 +6,7 @@ import AddIcon from '@material-ui/icons/Add'
 import * as Test from './_testFunctions'
 import * as Filters from './TypedFilters'
 import { useState } from "react";
-import LeadersTable from "./LeadersTable";
+import LeadersTable from "./MainTable";
 
 interface Question {
     id: number,
