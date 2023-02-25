@@ -8,5 +8,5 @@ class FormType(Enum):
     PROJECT = 1
 
     @staticmethod
-    def __contains__(self, item: str) -> bool:
+    def __contains__(item: str) -> bool:
         return item in FormType.__members__

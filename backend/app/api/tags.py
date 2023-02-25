@@ -5,7 +5,7 @@ from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 
 from .auxiliary import HTTPErrorCode, post_failure, get_request, post_request, get_class_item_by_id_request, \
-    create_standard_reqparser
+    create_standard_reqparser, standard_text_object_update
 from backend.app.database.tag import Tag
 from backend.app.flask_app import FlaskApp
 from ..database.user import Role
@@ -31,16 +31,11 @@ class Tags(Resource):
             if Tag.get_by_id(arguments['parent_id']) is None:
                 return post_failure(HTTPErrorCode.WRONG_ID, 404)
         if arguments['id'] != -1:
-            current = Tag.get_by_id(arguments['id'])
-            if current is None:
-                return post_failure(HTTPErrorCode.WRONG_ID, 404)
-            current.text = arguments['name']
-        else:
-            if arguments['type_id'] == -1:
-                return post_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
-            current = Tag(arguments['name'], arguments['type_id'], arguments['parent_id'])
-            FlaskApp().add_database_item(current)
-        if current.deleted != arguments['deleted']:
-            current.deleted = arguments['deleted']
+            return standard_text_object_update(Tag, arguments)
+
+        if arguments['type_id'] == -1:
+            return post_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
+        current = Tag(arguments['name'], arguments['type_id'], arguments['parent_id'])
+        FlaskApp().add_database_item(current)
         FlaskApp().flush_to_database()
         return Response(current.id, 200)

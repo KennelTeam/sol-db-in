@@ -29,11 +29,10 @@ class AnswerBlockPage(Resource):
             if current is None:
                 return post_failure(HTTPErrorCode.WRONG_ID, 404)
             current.name = arguments['name']
+            current.deleted = arguments['deleted']
         else:
             current = AnswerBlock(arguments['name'])
             FlaskApp().add_database_item(current)
-        if current.deleted != arguments['deleted']:
-            current.deleted = arguments['deleted']
         FlaskApp().flush_to_database()
         return Response(current.id, 200)
 

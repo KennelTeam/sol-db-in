@@ -11,9 +11,9 @@ open a pull-request to the `develop` branch.
 
 For frontend we use [React styling guideline](https://github.com/airbnb/javascript/tree/master/react)
 
-You can also check out the [Backend documentation](backend/README.md)
-
-And the [API documentation](https://kennelteam.github.io/sol-db-in/)
+You can also check out:
+- [Backend documentation](backend/README.md)
+- [API endpoints documentation](https://kennelteam.github.io/sol-db-in/)
 
 ## Structure
 

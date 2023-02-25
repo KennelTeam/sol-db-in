@@ -1,7 +1,5 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
-import json
-
 from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
@@ -42,7 +40,6 @@ class AnswerOptionsPage(Resource):
             current = AnswerOption.get_by_id(arguments['id'])
             if current is None:
                 return post_failure(HTTPErrorCode.WRONG_ID, 404)
-        if arguments['deleted'] != current.deleted:
             current.deleted = arguments['deleted']
         FlaskApp().flush_to_database()
         return Response(current.id, 200)

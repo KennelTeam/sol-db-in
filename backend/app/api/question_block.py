@@ -22,21 +22,19 @@ class QuestionBlockPage(Resource):
         arguments = parser.parse_args()
         if arguments['form_type'] not in FormType:
             return post_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
-        else:
-            arguments['form_type'] = FormType[arguments['form_type']]
+        arguments['form_type'] = FormType[arguments['form_type']]
         if arguments['id'] != -1:
             current = QuestionBlock.get_by_id(arguments['id'])
             if current is None:
                 return post_failure(HTTPErrorCode.WRONG_ID, 404)
-            elif current.form != arguments['form_type']:
+            if current.form != arguments['form_type']:
                 return post_failure(HTTPErrorCode.CONFLICTING_ARGUMENTS, 400)
             current.name = arguments['name']
             current.sorting = arguments['sorting']
+            current.deleted = arguments['deleted']
         else:
             current = QuestionBlock(arguments['name'], arguments['form_type'], arguments['sorting'])
             FlaskApp().add_database_item(current)
-        if current.deleted != arguments['deleted']:
-            current.deleted = arguments['deleted']
         FlaskApp().flush_to_database()
         return Response(current.id, 200)
 

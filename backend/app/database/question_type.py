@@ -14,3 +14,7 @@ class QuestionType(Enum):
     NUMBER = 8
     BOOLEAN = 9
     RELATION = 10
+
+    @staticmethod
+    def __contains__(item: str) -> bool:
+        return item in QuestionType.__members__

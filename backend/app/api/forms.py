@@ -57,6 +57,7 @@ class Forms(Resource):
         parser.add_argument('name', type=str, location='json')
         parser.add_argument('form_type', type=str, location='json')
         parser.add_argument('answers', type=list, location='json')
+        parser.add_argument('deleted', type=bool, location='json', required=False, default=False)
 
         content = parser.parse_args()
 
@@ -67,7 +68,7 @@ class Forms(Resource):
         if content['state'] not in FormState:
             return post_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
         form_state = FormState[content['state']]
-        return Forms._update_form_data(content, form_state, form_type)
+        return Forms._update_form_data(content, form_state, form_type, content['deleted'])
 
     @staticmethod
     def _prepare_table(forms: List[Form], question_ids: List[JSON]) -> List[JSON]:
@@ -146,7 +147,7 @@ class Forms(Resource):
                            row_question_id=row_question_id)
 
     @staticmethod
-    def _update_form_data(content: JSON, form_state: FormState, form_type: FormType) -> Response:
+    def _update_form_data(content: JSON, form_state: FormState, form_type: FormType, deleted: bool) -> Response:
         if content['id'] == -1:
             form = Form(form_type, content['name'], form_state)
             FlaskApp().add_database_item(form)
@@ -156,6 +157,7 @@ class Forms(Resource):
             if len(options) == 0:
                 return post_failure(HTTPErrorCode.WRONG_ID, 404)
             form = options[0]
+            form.deleted = deleted
         for answer in content['answers']:
             status = Forms._check_answer_object_correctness(answer)
             if status != HTTPErrorCode.SUCCESS:

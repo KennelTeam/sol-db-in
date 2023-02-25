@@ -5,12 +5,12 @@ import json
 from tqdm import tqdm
 
 from .toponym import Toponym
-from backend.constants import TOPONYMS_TABLE_URL
+from backend.constants import TOPONYMS_TABLE_URL, TOPONYMS_REQUEST_TIMEOUT
 from backend.app.flask_app import FlaskApp
 
 
 def import_toponyms():
-    response = requests.get(TOPONYMS_TABLE_URL)
+    response = requests.get(TOPONYMS_TABLE_URL, timeout=TOPONYMS_REQUEST_TIMEOUT)
     cities = json.loads(
             response.content.decode()
         )

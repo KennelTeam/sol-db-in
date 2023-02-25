@@ -752,3 +752,8 @@ of some role to some question
 - [Role](user.py) A role of a user (ADMIN, GUEST, etc...)
 - [VisualizationType](visualization_type.py) How to show
 the rows of the question table in the other (linked) object?
+
+There is an auxiliary function [`prettify_answer(answer)`](auxiliary.py) 
+which searches for
+required references in the `Answer` object and creates a `JSON` with good
+readable answer information (not just some strange IDs) 

@@ -20,8 +20,7 @@ class FormSchema(Resource):
         form_type = parser.parse_args()['form_type']
         if form_type not in FormType:
             return get_failure(HTTPErrorCode.INVALID_ARG_TYPE, 400)
-        else:
-            form_type = FormType[form_type]
+        form_type = FormType[form_type]
 
         result = {
             'form_type': form_type.name,

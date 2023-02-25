@@ -52,12 +52,33 @@ class RelationSettings(Editable, FlaskApp().db.Model):
 
     def to_json(self) -> JSON:
         return super().to_json() | {
+            'relation_type': self.relation_type,
             'related_visualization_type': self.related_visualization_type,
             'related_visualization_sorting': self.related_visualization_sorting,
             'forward_relation_sheet_name': self.forward_relation_sheet_name,
             'inverse_relation_sheet_name': self.inverse_relation_sheet_name,
             'main_page_count_title': self.main_page_count_title,
             'inverse_main_page_count_title': self.inverse_main_page_count_title
+        }
+
+    def copy(self, other: 'RelationSettings') -> None:
+        self.related_visualization_type = other.related_visualization_type
+        self.related_visualization_sorting = other.related_visualization_sorting
+        self.main_page_count_title = other.main_page_count_title
+        self.inverse_main_page_count_title = other.inverse_main_page_count_title
+        self.forward_relation_sheet_name = other.forward_relation_sheet_name
+        self.inverse_relation_sheet_name = other.inverse_relation_sheet_name
+
+    @staticmethod
+    def json_format() -> JSON:
+        return {
+            'relation_type': RelationType,
+            'related_visualization_type': VisualizationType,
+            'related_visualization_sorting': VisualizationType,
+            'forward_relation_sheet_name': {str, None},
+            'inverse_relation_sheet_name': {str, None},
+            'main_page_count_title': {dict, None},
+            'inverse_main_page_count_title': {dict, None}
         }
 
     @staticmethod

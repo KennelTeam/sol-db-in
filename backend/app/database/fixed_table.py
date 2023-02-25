@@ -36,8 +36,7 @@ class FixedTable(Editable, FlaskApp().db.Model):
         result = FixedTable.get_by_ids({id})
         if len(result) == 0:
             return None
-        else:
-            return result[0]
+        return result[0]
 
     def get_questions(self, with_answers=False, form_id: int = None) -> JSON:
         if not with_answers:

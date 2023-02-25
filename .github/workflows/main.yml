@@ -29,4 +29,5 @@ on:
     branches:
     - github_settings_test
     - backend_development
+    - api-development
 

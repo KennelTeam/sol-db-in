@@ -42,6 +42,16 @@ def create_standard_reqparser() -> reqparse.RequestParser:
     return parser
 
 
+def standard_text_object_update(Class, arguments: JSON) -> Response:
+    current = Class.get_by_id(arguments['id'])
+    if current is None:
+        return post_failure(HTTPErrorCode.WRONG_ID, 404)
+    current.text = arguments['name']
+    current.deleted = arguments['deleted']
+    FlaskApp().flush_to_database()
+    return Response(current.id, 200)
+
+
 @jwt_required()
 def check_rights(min_access_level: Role) -> bool:
     return current_user.role.value >= min_access_level.value
@@ -81,9 +91,14 @@ def check_json_format(source: Any, json_format: JSON) -> HTTPErrorCode:
     if type(source) != dict:
         return HTTPErrorCode.INVALID_ARG_FORMAT
     for key in json_format:
+        if type(json_format[key]) == set and None in json_format[key] and key not in source:
+            continue
         if key not in source:
             return HTTPErrorCode.MISSING_ARGUMENT
-        if type(json_format[key]) != set:
+        if issubclass(json_format[key], enum.Enum):
+            if type(source[key]) != str or source[key] not in json_format[key]:
+                return HTTPErrorCode.INVALID_ARG_TYPE
+        elif type(json_format[key]) != set:
             if type(source[key]) != json_format[key]:
                 return HTTPErrorCode.INVALID_ARG_TYPE
         elif type(source[key]) not in json_format[key]:

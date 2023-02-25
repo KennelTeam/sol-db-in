@@ -46,6 +46,20 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
         }
 
     @staticmethod
+    def json_format() -> JSON:
+        return {
+            'block_sorting': int,
+            'block_id': int,
+            'show_on_main_page': bool
+        }
+
+    def copy(self, other: 'FormattingSettings') -> None:
+        self.block_sorting = other.block_sorting
+        self.table_row = other.table_row
+        self.table_column = other.table_column
+        self.show_on_main_page = other.show_on_main_page
+
+    @staticmethod
     def get_by_id(id: int) -> 'FormattingSettings':
         return FlaskApp().request(FormattingSettings).filter_by(id=id).first()
 

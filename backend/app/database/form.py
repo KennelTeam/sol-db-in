@@ -24,7 +24,7 @@ class FormState(Enum):
     FINISHED = 3
 
     @staticmethod
-    def __contains__(self, item: str) -> bool:
+    def __contains__(item: str) -> bool:
         return item in FormState.__members__
 
 
