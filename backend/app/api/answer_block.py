@@ -3,6 +3,7 @@
 from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource
+from typing import final
 
 from .auxiliary import get_request, get_class_item_by_id_request, HTTPErrorCode, post_request, post_failure, \
     create_standard_reqparser
@@ -12,6 +13,8 @@ from ..database.user import Role
 
 
 class AnswerBlockPage(Resource):
+    route: final(str) = '/answer_block'
+
     @staticmethod
     @jwt_required()
     @get_request()

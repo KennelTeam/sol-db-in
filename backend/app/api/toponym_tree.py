@@ -1,6 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 import json
+from typing import final
 
 from flask import Response
 from flask_jwt_extended import jwt_required
@@ -11,6 +12,8 @@ from backend.app.database.toponym import Toponym
 
 
 class ToponymTree(Resource):
+    route: final(str) = '/toponym_tree'
+
     @staticmethod
     @jwt_required()
     @get_request()

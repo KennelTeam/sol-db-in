@@ -1,3 +1,5 @@
+from typing import final
+
 from flask import request, jsonify, Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource
@@ -6,6 +8,7 @@ from backend.app.database import User
 
 
 class Register(Resource):
+    route: final(str) = '/register'
 
     @staticmethod
     @jwt_required()

@@ -1,5 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
+from typing import final
+
 from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
@@ -12,6 +14,8 @@ from ..database.user import Role
 
 
 class AnswerOptionsPage(Resource):
+    route: final(str) = '/answer_options'
+
     @staticmethod
     @jwt_required()
     @get_request()

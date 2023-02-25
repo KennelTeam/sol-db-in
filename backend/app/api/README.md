@@ -5,7 +5,9 @@ You can find API endpoints description [here](https://kennelteam.github.io/sol-d
 We use FlaskRESTFul for requests processing. So each endpoint is represented 
 by a class inherited from `flask_restful.Resourse`. 
 In [`backend/app/routes.py`](../../../backend/app/routes.py)
-we bind the classes with their endpoints.
+we bind the classes with their endpoints. To bind your class, you should
+add `route` field to your class and add your class to the resources list in 
+[`backend/app/routes.py`](../../../backend/app/routes.py)
 
 ## Common ideas
 We use `GET` requests for getting info and `POST` requests for 

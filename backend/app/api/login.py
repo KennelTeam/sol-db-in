@@ -1,3 +1,5 @@
+from typing import final
+
 from flask import request, jsonify, Response
 from flask_jwt_extended import create_access_token, set_access_cookies
 from flask_restful import Resource
@@ -6,6 +8,7 @@ from backend.app.database import User
 
 
 class Login(Resource):
+    route: final(str) = '/login'
 
     @staticmethod
     def post() -> Response:

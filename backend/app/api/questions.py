@@ -1,6 +1,6 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
-from typing import Tuple
+from typing import Tuple, final
 from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
@@ -17,6 +17,8 @@ from backend.auxiliary import JSON
 
 
 class Questions(Resource):
+    route: final(str) = '/question'
+
     @staticmethod
     @jwt_required()
     @get_request()
