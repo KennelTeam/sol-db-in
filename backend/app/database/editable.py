@@ -16,7 +16,6 @@ class Editable:
 
     def __init__(self) -> None:
         self.id = EditableIdHolder().id
-        print(self.id)
         self._create_timestamp = datetime.utcnow()
         self._deleted = False
 
@@ -40,7 +39,6 @@ class Editable:
         FlaskApp().db.session.add(act)
 
     def to_json(self) -> JSON:
-        print(self.id)
         return {
             'id': self.id,
             'create_timestamp': datetime_to_string(self._create_timestamp),
@@ -59,5 +57,4 @@ class Editable:
                 self._edit(func.__name__, value, self.__tablename__)  # pylint: disable=protected-access
             else:
                 self._edit(func.__name__, result, self.__tablename__)  # pylint: disable=protected-access
-            print(result)
         return wrapper

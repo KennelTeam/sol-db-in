@@ -94,7 +94,6 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
         free_questions_formattings = FormattingSettings.filter_only_free_questions(
             FormattingSettings.query_from_block(self.id)
         )
-        print(free_questions_formattings)
         # fqf = free questions formattings values
         fqf_dict = {item.id: item for item in free_questions_formattings}
         free_questions = Question.get_all_with_formattings(free_questions_formattings)

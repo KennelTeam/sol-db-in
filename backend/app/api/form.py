@@ -30,6 +30,4 @@ class FormSchema(Resource):
             'form_type': form_type.name,
             'question_blocks': [block.to_json() for block in QuestionBlock.get_form(form_type)]
         }
-        print(form_type)
-        print(result)
         return Response(json.dumps(result), 200)
