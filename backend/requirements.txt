@@ -10,3 +10,6 @@ pylint~=2.15.10
 astroid~=2.13.3
 flask_jwt_extended~=4.4.4
 bcrypt~=4.0.1
+requests~=2.28.2
+tqdm~=4.64.1
+flask-cors~=3.0.10

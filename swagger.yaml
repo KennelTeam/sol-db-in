@@ -145,6 +145,11 @@ paths:
       responses:
         201:
           description: Successfully created or updated
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: ID of created or updated item
   /logout:
     post:
       tags:
@@ -160,68 +165,36 @@ paths:
       tags:
         - main
       description:
-        Returns a list of filtered leaders
+        Returns a table to display on the main page
       parameters:
         - in: body
           name: data
           schema:
-            type: object
-            properties:
-              form_type:
-                type: string
-                enum:
-                  - LEADER
-                  - PROJECT
-              name_substr:
-                type: string
-              answer_filters:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    question_id:
-                      type: integer
-                    row_question_id:
-                      type: integer
-                      description:
-                        If it is supposed to be an answer to a fixed table question
-                    exact_value:
-                      oneOf:
-                        - type: integer
-                        - type: string
-                        - type: boolean
-                    min_value:
-                      oneOf:
-                        - type: integer
-                        - schema:
-                          type: string
-                          format: date-time
-                    max_value:
-                      oneOf:
-                        - type: integer
-                        - schema:
-                          type: string
-                          format: date-time
-                    substring:
-                      type: string
-            required:
-              - form_type
-              - question_id
-              - answer_filters
+            $ref: '#components/schemas/FormFilter'
       responses:
         200:
-          description:
-            Successful search
+          description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#components/schemas/AnsweredForm'
-        400:
-          description:
-            Invalid set of arguments. For example no form_type is provided or no question_id in a filter is provided.
+                  type: object
+                  properties:
+                    column_name:
+                      type: string
+                    values:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          answers:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Answer'
 
+        400:
+          description: Invalid argument
     post:
       tags:
         - main
@@ -236,24 +209,34 @@ paths:
         200:
           description:
             Successful update
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: ID of created or updated item
         403:
           description:
             Not enough rights to perform some of the changes
         500:
           description:
             Unexpected server problem
-  /forms/{id}:
+
+  /form_page:
     get:
       tags:
         - main
       description:
         Returns a full info about a given form by it's ID
       parameters:
-        - in: path
-          required: true
+        - in: body
           name: id
           schema:
-            type: integer
+            type: object
+            properties:
+              id:
+                type: integer
+            required:
+              - id
       responses:
         200:
           description: Successful return
@@ -341,17 +324,27 @@ paths:
     get:
       tags:
         - form
+      parameters:
+        - in: body
+          name: id
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+            required:
+              - id
       description:
-        Returns a list of answer option blocks
+        Returns an answer option
       responses:
         200:
           description: Success
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#components/schemas/AnswerBlock'
+                $ref: '#components/schemas/AnswerOption'
+        404:
+          description: Not found
     post:
       tags:
         - form
@@ -365,9 +358,53 @@ paths:
       responses:
         200:
           description: Success
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Id of createdo or updated item
         400:
           description: Some arguments are invalid
+  /all_answer_blocks:
+    get:
+      tags:
+        - form
+      description:
+        Returns a list of all answer blocks
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/AnswerBlock'
   /answer_block:
+    get:
+      tags:
+        - form
+      parameters:
+        - in: body
+          name: id
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+            required:
+              - id
+      description:
+        Returns the answer block
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/AnswerBlock'
+        404:
+          description: Not found
     post:
       tags:
         - form
@@ -384,16 +421,188 @@ paths:
               id:
                 type: integer
                 description: If you want to create an item do not provide this field
+              deleted:
+                type: boolean
+            required:
+              - name
       responses:
         200:
           description: Success
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Id of created or updated item
         404:
           description: No block with such id
         403:
           description: Permission denied
         400:
           description: Incorrect input format
+  /question_block:
+    post:
+      tags:
+        - form
+      description:
+        Creates or updates a question block data
+      parameters:
+        - in: body
+          name: info
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              form_type:
+                type: string
+                enum:
+                  - LEADER
+                  - PROJECT
+              name:
+                $ref: '#components/schemas/TranslatedText'
+              sorting:
+                type: integer
+                description: The key by which the blocks are sorted on the page
+              deleted:
+                type: boolean
+            required:
+              - form_type
+              - name
+              - sorting
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Id of created or updated item
+        400:
+          description: Incorrect request arguments
+  /table:
+    post:
+      tags:
+        - form
+      description:
+        Creates a Fixed Table or a Question Table
+      parameters:
+        - in: body
+          name: info
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              block_sorting:
+                type: integer
+                description: A key by which questions are sorted inside the question block
+              type:
+                type: string
+                enum:
+                  - FIXED_TABLE
+                  - QUESTION_TABLE
+            required:
+              - block_sorting
+              - type
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Id of created or updated item
+
+  /question:
+    get:
+      tags:
+        - form
+      description:
+        Returns a Question object by ID
+      parameters:
+        - in: body
+          name: id
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+            required:
+              - id
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Question'
+        404:
+          description: No Question with such ID
+        400:
+          description: Incorrect request arguments
+    post:
+      tags:
+        - form
+      description: Creates or updates a question object
+      parameters:
+        - in: body
+          name: question
+          schema:
+            $ref: '#components/schemas/Question'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Id of created or updated item
+        400:
+          description: Incorrect arguments
+        403:
+          description: Not enough rights to perform the update or create
   /tags:
+    get:
+      tags:
+        - form
+      description: Returns a tag by it's ID
+      parameters:
+        - in: body
+          name: id
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+            required:
+              - id
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Tag'
+    post:
+      tags:
+        - form
+      description: Creates or updates a tag object
+      parameters:
+        - in: body
+          name: tag
+          schema:
+            $ref: '#components/schemas/Tag'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Id of the created or updated item
+        400:
+          description: Some of arguments are invalid
+  /tag_type:
     get:
       tags:
         - form
@@ -405,9 +614,11 @@ paths:
           schema:
             type: object
             properties:
-              block_id:
+              id:
                 type: integer
                 description: ID of the block tags tree should belong to. If none is passed, all tags will be returned
+            required:
+              - id
       responses:
         200:
           description: Success
@@ -427,21 +638,6 @@ paths:
     post:
       tags:
         - form
-      description: Creates or updates a tag object
-      parameters:
-        - in: body
-          name: tag
-          schema:
-            $ref: '#components/schemas/Tag'
-      responses:
-        200:
-          description: Success
-        400:
-          description: Some of arguments are invalid
-  /tag_type:
-    post:
-      tags:
-        - form
       description: Update or create a new Tag Type
       parameters:
         - in: body
@@ -455,9 +651,18 @@ paths:
                 type: integer
                 description:
                   If you want to create a new item do not provide this argument
+              deleted:
+                type: boolean
+            required:
+              - name
       responses:
         200:
           description: Success
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Id of the created or updated item
         404:
           description: No tag type with such id
         403:
@@ -474,12 +679,15 @@ paths:
         - in: body
           name: FormType
           schema:
-            type: string
-            enum:
-              - LEADER
-              - PROJECT
-            description:
-              The form type
+            type: object
+            properties:
+              form_type:
+                type: string
+                enum:
+                  - LEADER
+                  - PROJECT
+            required:
+              - form_type
       responses:
         200:
           description: Success
@@ -491,7 +699,7 @@ paths:
           description: Incorrect format
         403:
           description: Permission denied
-  /toponyms:
+  /toponyms_tree:
     get:
       tags:
         - main
@@ -502,7 +710,112 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#components/schemas/Toponym'
+                type: object
+                properties:
+                  roots:
+                    type: array
+                    items:
+                      $ref: '#components/schemas/Toponym'
+  /toponym:
+    get:
+      tags:
+        - main
+      description: Returns a single toponym info. You can provide either name or ID of the toponym
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  parent_id:
+                    type: integer
+                  ancestors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        parent_id:
+                          type: integer
+        400:
+          description: Invalid arguments
+        404:
+          description: No such toponym
+    put:
+      tags:
+        - main
+      description: Update a Toponym (set a new name)
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+            required:
+              - id
+              - name
+      responses:
+        200:
+          description: Success
+        400:
+          description: Invalid arguments
+        403:
+          description: Not enough rights
+        404:
+          description: No such toponym
+    post:
+      tags:
+        - main
+      description: Create a new Toponym
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              parent_id:
+                type: integer
+            required:
+              - name
+              - parent_id
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: ID of the created item
+        400:
+          description: Invalid arguments (for example, toponym with such name already exists)
+        403:
+          description: Not enough rights
+
   /export/forms:
     get:
       tags:
@@ -745,6 +1058,22 @@ components:
             - type: string
             - type: integer
             - type: boolean
+        type:
+          type: string
+          enum:
+            - DATE
+            - USER
+            - LONG_TEXT
+            - SHORT_TEXT
+            - MULTIPLE_CHOICE
+            - CHECKBOX
+            - LOCATION
+            - NUMBER
+            - BOOLEAN
+            - RELATION
+        ref_id:
+          type: integer
+          description: If the answer is stored as a ref, this contains the ref and value field contains the content to show. Otherwise this is an empty field
         tags:
           type: array
           items:
@@ -789,6 +1118,10 @@ components:
           format: date-time
         deleted:
           type: boolean
+      required:
+        - name
+        - short_name
+        - answer_block_id
       description: An option object in multiple-choice or checkbox questions
     TranslatedText:
       title: TranslatedText
@@ -846,6 +1179,10 @@ components:
           format: date-time
         deleted:
           type: boolean
+      required:
+        - block_sorting
+        - show_on_main_page
+        - block_id
       description: >-
         Contains information for some question about how to format it and it's
         answers on the website
@@ -879,47 +1216,55 @@ components:
           format: date-time
         deleted:
           type: boolean
+      required:
+        - editor_access
+        - intern_access
+        - guest_access
     RelationSettings:
       title: RelationSettings
       type: object
       properties:
         id:
           type: integer
+        relation_type:
+          type: string
+          enum:
+            - LEADER_TO_LEADER
+            - LEADER_TO_PROJECT
+            - PROJECT_TO_LEADER
+            - PROJECT_TO_PROJECT
         related_visualization_type:
           type: string
           enum:
             - FULL
             - NAMES_ONLY
             - NOTHING
-          description: >-
-            A visualization type (how to show this table on the related object
-            page)
+          description: A visualization type (how to show this table on the related object page)
         related_visualization_sorting:
           type: integer
-          description: >-
-            Where to place the table on the page of related object (key for
-            sorting with other question blocks)
-        export_forward_relation:
-          type: boolean
-          description: Should this relation be exported to excel as an additional sheet
-        export_inverse_relation:
-          type: boolean
-          description: >-
-            Should the inverse relation be exported to excel as an additional
-            sheet
+          description: Where to place the table on the page of related object (key for sorting with other question blocks)
         forward_relation_sheet_name:
           type: string
-          description: If it should be exported in such way, how to call the sheet
+          description: If it should be exported in such way, how to call the sheet (else None is stored)
         inverse_relation_sheet_name:
           type: string
-          description: If it should be exported in such way, how to call the sheet
+          description: If it should be exported in such way, how to call the sheet (else None is stored)
+        main_page_count_title:
+          type: '#/components/schemas/TranslatedText'
+          description: If count of relations should be shown on the main page, how to call the column
+        inverse_main_page_count_title:
+          type: '#/components/schemas/TranslatedText'
+          description: The same as main_page_count_title, but for inverse relation
         creation_timestamp:
           type: string
           format: date-time
         deleted:
           type: boolean
-      description: >-
-        If the question is a relation, it should have additional relation
+      required:
+        - related_visualization_type
+        - related_visualization_sorting
+        - relation_type
+      description: If the question is a relation, it should have additional relation
         settings
     Question:
       title: Question
@@ -940,11 +1285,6 @@ components:
             - NUMBER
             - BOOLEAN
             - RELATION
-        binded_questions:
-          type: array
-          items:
-            type: integer
-            description: Id of the binded question. If the data of two questions is same (for example phone number in a recommendation and in a Leader's form), these questions are binded.
         comment:
           $ref: '#/components/schemas/TranslatedText'
         answer_block_id:
@@ -952,12 +1292,26 @@ components:
           description: If it is multiple-choice or checkbox, where to get the options?
         text:
           $ref: '#/components/schemas/TranslatedText'
+        short_text:
+          $ref: '#/components/schemas/TranslatedText'
+        related_question_id:
+          type: integer
         formatting_settings:
           $ref: '#/components/schemas/FormattingSettings'
         privacy_settings:
           $ref: '#/components/schemas/PrivacySettings'
         relation_settings:
           $ref: '#/components/schemas/RelationSettings'
+        tag_type_id:
+          type: integer
+      required:
+        - question_type
+        - comment
+        - answer_block_id
+        - text
+        - short_text
+        - formatting_settings
+        - privacy_settings
     FixedTable:
       title: FixedTable
       type: object
@@ -1049,6 +1403,13 @@ components:
             required:
               - question_id
               - answers
+        deleted:
+          type: boolean
+      required:
+        - state
+        - name
+        - form_type
+        - answers
     Form:
       title: Form
       type: object
@@ -1068,7 +1429,7 @@ components:
       properties:
         id:
           type: integer
-        text:
+        name:
           $ref: '#components/schemas/TranslatedText'
         type_id:
           type: integer
@@ -1076,6 +1437,12 @@ components:
         parent_id:
           type: integer
           description: ID of a parent tag. If the tag is root, it's None
+        deleted:
+          type: boolean
+      required:
+        - name
+        - type_id
+        - parent_id
     Toponym:
       title: Toponym
       type: object
@@ -1100,4 +1467,51 @@ components:
         to:
           type: string
           format: date-time
+    AnswerFilter:
+      type: object
+      properties:
+        question_id:
+          type: integer
+        row_question_id:
+          type: integer
+          description:
+            If it is supposed to be an answer to a fixed table question
+        exact_value:
+          oneOf:
+            - type: integer
+            - type: string
+            - type: boolean
+        min_value:
+          oneOf:
+            - type: integer
+            - schema:
+              type: string
+              format: date-time
+        max_value:
+          oneOf:
+            - type: integer
+            - schema:
+              type: string
+              format: date-time
+        substring:
+          type: string
+
+    FormFilter:
+      type: object
+      properties:
+        form_type:
+          type: string
+          enum:
+            - LEADER
+            - PROJECT
+        name_substr:
+          type: string
+        answer_filters:
+          type: array
+          items:
+            $ref: '#components/schemas/AnswerFilter'
+      required:
+        - form_type
+        - question_id
+        - answer_filters
   securitySchemes: {}

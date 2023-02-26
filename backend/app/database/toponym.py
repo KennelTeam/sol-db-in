@@ -1,5 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
+from sqlalchemy.dialects.mysql import VARCHAR
+
 from backend.app.flask_app import FlaskApp
 from backend.constants import MAX_TOPONYM_SIZE
 from backend.auxiliary import JSON
@@ -9,7 +11,7 @@ from typing import List
 class Toponym(FlaskApp().db.Model):
     __tablename__ = 'toponyms'
     id = FlaskApp().db.Column('id', FlaskApp().db.Integer, primary_key=True, unique=True)
-    name = FlaskApp().db.Column('name', FlaskApp().db.Text(MAX_TOPONYM_SIZE))
+    name = FlaskApp().db.Column('name', VARCHAR(MAX_TOPONYM_SIZE), unique=True)
     parent_id = FlaskApp().db.Column('parent_id', FlaskApp().db.ForeignKey('toponyms.id'), nullable=True, default=None)
 
     @staticmethod
@@ -20,18 +22,28 @@ class Toponym(FlaskApp().db.Model):
     def get_by_name(name: str) -> 'Toponym':
         return Toponym.query.filter_by(name=name).first()
 
-    def __init__(self, name: str, parent_name: str = None) -> None:
-        parent = Toponym.get_by_name(parent_name)
-        if parent is not None:
-            self.parent_id = parent.id
+    @staticmethod
+    def get_by_id(id: int) -> 'Toponym':
+        return Toponym.query.filter_by(id=id).first()
+
+    def __init__(self, name: str, parent_id: int = None) -> None:
+        self.parent_id = parent_id
         self.name = name
 
-    def to_json(self) -> JSON:
-        return {
+    @staticmethod
+    def get_roots() -> List['Toponym']:
+        return Toponym.query.filter_by(parent_id=None).all()
+
+    def to_json(self, with_children: bool = False) -> JSON:
+        result = {
             'id': self.id,
             'name': self.name,
             'parent_id': self.parent_id
         }
+        if with_children:
+            children = Toponym.query.filter_by(parent_id=self.id).all()
+            result['children'] = [item.to_json(with_children=True) for item in children]
+        return result
 
     def get_ancestors(self) -> List['Toponym']:
         result = [self]

@@ -30,10 +30,14 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
     def to_json(self) -> JSON:
         return super().to_json() | {
             'name': self.name,
-            'form': self.form,
+            'form': self.form.name,
             'sorting': self.sorting,
             'questions': self.get_questions()
         }
+
+    @staticmethod
+    def get_by_id(id: int) -> 'QuestionBlock':
+        return FlaskApp().request(QuestionBlock).filter_by(id=id).first()
 
     @property
     def form(self) -> FormType:
@@ -63,12 +67,12 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
         blocks = FlaskApp().request(QuestionBlock).filter_by(_form=form).all()
         return sorted(blocks, key=lambda x: x.sorting)
 
-    def get_questions(self, with_answers=False, form_id: int = None, short_form: bool = False) -> List[JSON]:
+    def get_questions(self, with_answers=False, form_id: int = None) -> List[JSON]:
         free_questions: List[Tuple[JSON, int]] = [(
             {
                 'type': 'question',
                 'value': item[0].to_json()
-            }, item[1]) for item in self._get_free_questions(short_form)]
+            }, item[1]) for item in self._get_free_questions()]
 
         table_questions: List[Tuple[JSON, int]] = [(
             {
@@ -86,14 +90,14 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
         total.sort(key=lambda x: x[1])
         return [item[0] for item in total]
 
-    def _get_free_questions(self, short_form: bool) -> List[Tuple[Question, int]]:
+    def _get_free_questions(self) -> List[Tuple[Question, int]]:
         free_questions_formattings = FormattingSettings.filter_only_free_questions(
-            FormattingSettings.query_from_block(self.id), short_form=short_form
+            FormattingSettings.query_from_block(self.id)
         )
         # fqf = free questions formattings values
         fqf_dict = {item.id: item for item in free_questions_formattings}
         free_questions = Question.get_all_with_formattings(free_questions_formattings)
-        return [(question, fqf_dict[question.formatting_settings].block_sorting) for question in free_questions]
+        return [(question, fqf_dict[question.formatting_settings.id].block_sorting) for question in free_questions]
 
     def _get_table_questions(self) -> List[QuestionTable]:
         formattings = FormattingSettings.filter_only_table_questions(

@@ -13,7 +13,6 @@ from .question import Question, QuestionType
 from .toponym import Toponym
 from .user import User
 from .answer_option import AnswerOption
-from .question_block import QuestionBlock
 from .form_type import FormType
 from backend.constants import DATE_FORMAT, MAX_NAME_SIZE
 from backend.auxiliary import JSON, LogicException
@@ -24,6 +23,10 @@ class FormState(Enum):
     STARTED = 2
     FINISHED = 3
 
+    @staticmethod
+    def items() -> Set[str]:
+        return set(FormState.__members__.keys())
+
 
 class Form(Editable, FlaskApp().db.Model):
     __tablename__ = 'forms'
@@ -31,20 +34,18 @@ class Form(Editable, FlaskApp().db.Model):
     _name = FlaskApp().db.Column('name', VARCHAR(MAX_NAME_SIZE), unique=True)
     _form_type = FlaskApp().db.Column('form_type', FlaskApp().db.Enum(FormType))
 
-    def __init__(self, form_type: FormType, state=FormState.PLANNED):
+    def __init__(self, form_type: FormType, name: str, state=FormState.PLANNED):
         super().__init__()
         self._form_type = form_type
         self.state = state
+        self.name = name
 
-    def to_json(self, short_form: bool = False) -> JSON:
-        form = QuestionBlock.get_form(FormType.PROJECT)
+    def to_json(self) -> JSON:
         return super().to_json() | {
-            'state': self.state,
+            'state': self.state.name,
             'name': self.name,
             'form_type': self.form_type.name,
-            'answers': [
-                block.get_questions(with_answers=True, form_id=self.id, short_form=short_form) for block in form
-            ]
+            'answers': Answer.get_form_answers(self.id)
         }
 
     @staticmethod
@@ -63,6 +64,10 @@ class Form(Editable, FlaskApp().db.Model):
     @staticmethod
     def get_by_ids(ids: Set[int]) -> List['Form']:
         return FlaskApp().request(Form).filter(Form.id.in_(ids)).all()
+
+    @staticmethod
+    def get_all_ids() -> Set[int]:
+        return {item.id for item in FlaskApp().request(Form).with_entities(Form.id).all()}
 
     @staticmethod
     def prepare_statistics(question_id: int, min_value: int | datetime = None, max_value: int | datetime = None,
@@ -101,8 +106,9 @@ class Form(Editable, FlaskApp().db.Model):
 
     @state.setter
     @Editable.on_edit
-    def state(self, new_state: FormState) -> None:
+    def state(self, new_state: FormState) -> str:
         self._state = new_state
+        return self._state.name
 
     @staticmethod
     def _filter_by_answers_count(question_id: int, min_answers_count: int, max_answers_count: int) -> Set[int]:

@@ -17,6 +17,10 @@ class TagType(Editable, FlaskApp().db.Model):
         super().__init__()
         self.text = text
 
+    @staticmethod
+    def get_by_id(id: int) -> 'TagType':
+        return FlaskApp().request(TagType).filter_by(id=id).first()
+
     @property
     def text(self) -> TranslatedText:
         return json.loads(self._text)

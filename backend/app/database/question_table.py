@@ -20,6 +20,10 @@ class QuestionTable(Editable, FlaskApp().db.Model):
         super().__init__()
         self.block_sorting = block_sorting
 
+    @staticmethod
+    def get_by_id(id: int) -> 'QuestionTable':
+        return FlaskApp().request(QuestionTable).filter_by(id=id).first()
+
     @property
     def block_sorting(self) -> int:
         return self._block_sorting

@@ -1,6 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 from backend.app.flask_app import FlaskApp
+from backend.auxiliary.types import JSON
 from typing import List
 
 
@@ -21,10 +22,14 @@ class TagToAnswer(FlaskApp().db.Model):
         return TagToAnswer.query.filter_by(_tag_id=tag_id).count()
 
     @staticmethod
+    def get_answers_tags(answer_id: int) -> List[JSON]:
+        tags = TagToAnswer.query.filter_by(_answer_id=answer_id)
+        tags = tags.all()
+        return [item.to_json() for item in tags]
+
+    @staticmethod
     def get_answers_tag_ids(answer_id: int) -> List[int]:
-        tag_ids = TagToAnswer.query.filter_by(_answer_id=answer_id)
-        tag_ids = tag_ids.with_entities(TagToAnswer._tag_id)
-        return [item.tag_id for item in tag_ids.all()]
+        return [item['id'] for item in TagToAnswer.get_answers_tags(answer_id)]
 
     @staticmethod
     def add_tag(tag_id: int, answer_id: int) -> 'TagToAnswer':

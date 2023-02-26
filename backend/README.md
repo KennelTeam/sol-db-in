@@ -26,7 +26,8 @@ from `requests.txt` installed. And call `make all_checks`.
 - `constants.py` - all the public configuration of server is stored here
 - `auxiliary/` - folder with auxiliary types, functions and classes
 - `app/` - folder with flask app
-  - `app/api/` - folred to store API requests processors
+  - `app/api/` - folder to store API requests processors. You can read 
+further about API internal structure in [API readme](app/api/README.md)
   - `app/database/` - folder to store DB connection processors
 and DB ORM classes. You can read further about database architecture 
 in [database readme](app/database/README.md)
