@@ -37,7 +37,7 @@ def get_class_item_by_id_request(Class) -> Response:
 def create_standard_reqparser() -> reqparse.RequestParser:
     parser = reqparse.RequestParser()
     parser.add_argument('id', type=int, location='json', required=False, default=-1)
-    parser.add_argument('name', type=dict, location='json')
+    parser.add_argument('name', type=dict, location='json', required=True)
     parser.add_argument('deleted', type=bool, location='json', required=False, default=False)
     return parser
 
@@ -96,7 +96,7 @@ def check_json_format(source: Any, json_format: JSON) -> HTTPErrorCode:
         if key not in source:
             return HTTPErrorCode.MISSING_ARGUMENT
         if issubclass(json_format[key], enum.Enum):
-            if type(source[key]) != str or source[key] not in json_format[key]:
+            if type(source[key]) != str or source[key] not in json_format[key].items():
                 return HTTPErrorCode.INVALID_ARG_TYPE
         elif type(json_format[key]) != set:
             if type(source[key]) != json_format[key]:

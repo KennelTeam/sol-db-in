@@ -35,5 +35,5 @@ class TagTypes(Resource):
         current = TagType(arguments['name'])
         FlaskApp().add_database_item(current)
         FlaskApp().flush_to_database()
-        return Response(current.id, 200)
+        return Response(str(current.id), 200)
 

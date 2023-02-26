@@ -5,6 +5,8 @@ from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 
 from backend.app.database import User
+from .auxiliary import post_request
+from backend.app.database.user import Role
 
 
 class Register(Resource):
@@ -12,6 +14,7 @@ class Register(Resource):
 
     @staticmethod
     @jwt_required()
+    @post_request(Role.ADMIN)
     def post() -> Response:
         login = request.json.get('login')
         if User.get_by_login(login):

@@ -24,8 +24,8 @@ class FormState(Enum):
     FINISHED = 3
 
     @staticmethod
-    def __contains__(item: str) -> bool:
-        return item in FormState.__members__
+    def items() -> Set[str]:
+        return set(FormState.__members__.keys())
 
 
 class Form(Editable, FlaskApp().db.Model):

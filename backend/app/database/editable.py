@@ -30,7 +30,8 @@ class Editable:
 
     @deleted.setter
     def deleted(self, value: bool):
-        self._edit('deleted', value, self.__dict__['__tablename__'])  # so strange method of getting the tablename
+        self._edit('deleted', value, self.__class__.__dict__['__tablename__'])
+        # so strange method of getting the tablename
         # because it is not in editable, but supposed to be in derived classes (which are FlaskApp().db.Models)
         self._deleted = value
 
@@ -39,6 +40,7 @@ class Editable:
         FlaskApp().db.session.add(act)
 
     def to_json(self) -> JSON:
+        print(self.id)
         return {
             'id': self.id,
             'create_timestamp': datetime_to_string(self._create_timestamp),

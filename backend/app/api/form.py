@@ -22,12 +22,14 @@ class FormSchema(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('form_type', type=str, required=True)
         form_type = parser.parse_args()['form_type']
-        if form_type not in FormType:
+        if form_type not in FormType.items():
             return get_failure(HTTPErrorCode.INVALID_ARG_TYPE, 400)
         form_type = FormType[form_type]
 
         result = {
             'form_type': form_type.name,
-            'question_blocks': QuestionBlock.get_form(form_type)
+            'question_blocks': [block.to_json() for block in QuestionBlock.get_form(form_type)]
         }
+        print(form_type)
+        print(result)
         return Response(json.dumps(result), 200)

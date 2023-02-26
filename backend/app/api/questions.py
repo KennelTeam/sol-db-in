@@ -14,6 +14,7 @@ from backend.app.database.answer_block import AnswerBlock
 from backend.app.database.formatting_settings import FormattingSettings
 from backend.app.database.user import Role
 from backend.auxiliary import JSON
+from ..database.privacy_settings import AccessType
 
 
 class Questions(Resource):
@@ -47,7 +48,7 @@ class Questions(Resource):
         else:
             current = Questions._construct_question(arguments, formatting_settings, privacy_settings, relation_settings)
         FlaskApp().flush_to_database()
-        return Response(current.id, 200)
+        return Response(str(current.id), 200)
 
     @staticmethod
     def _construct_settings_objects(arguments: JSON) -> \
@@ -90,9 +91,10 @@ class Questions(Resource):
     @staticmethod
     def _construct_question(arguments: JSON, formatting_settings: FormattingSettings, privacy_settings: PrivacySettings,
                             relation_settings: RelationSettings) -> Question:
+        block = QuestionBlock.get_by_id(formatting_settings.block_id)
         current = Question(arguments['text'], arguments['short_text'], arguments['question_type'],
                            arguments['comment'], arguments['answer_block_id'], arguments['tag_type_id'],
-                           arguments['form_type'], arguments['related_question_id'])
+                           block.form.name, arguments['related_question_id'])
         current.privacy_settings = privacy_settings
         current.formatting_settings = formatting_settings
         if relation_settings is not None:
@@ -105,7 +107,7 @@ class Questions(Resource):
 
     @staticmethod
     def _check_arguments_consistency(arguments: JSON) -> Response | None:
-        if arguments['question_type'] not in QuestionType:
+        if arguments['question_type'] not in QuestionType.items():
             return post_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
         arguments['question_type'] = QuestionType[arguments['question_type']]
         if arguments['related_question_id'] is not None:
@@ -127,7 +129,9 @@ class Questions(Resource):
         res = check_json_format(privacy_json, PrivacySettings.json_format())
         if res != HTTPErrorCode.SUCCESS:
             return None, post_failure(res, 400)
-        return PrivacySettings(**privacy_json), None
+        return PrivacySettings(intern_access=AccessType[privacy_json['intern_access']],
+                               guest_access=AccessType[privacy_json['guest_access']],
+                               editor_access=AccessType[privacy_json['editor_access']]), None
 
     @staticmethod
     def _parse_formatting_settings(formatting_json: JSON) -> Tuple[FormattingSettings | None, Response | None]:
@@ -184,6 +188,7 @@ class Questions(Resource):
         parser.add_argument('comment', type=dict, location='json', required=True)
         parser.add_argument('text', type=dict, location='json', required=True)
         parser.add_argument('short_text', type=dict, location='json', required=True)
+        parser.add_argument('tag_type_id', type=int, location='json', required=False, default=None)
 
         parser.add_argument('formatting_settings', type=dict, location='json', required=True)
         parser.add_argument('privacy_settings', type=dict, location='json', required=True)

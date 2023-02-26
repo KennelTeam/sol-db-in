@@ -1,5 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
+from typing import Set
+
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
 from enum import Enum
@@ -13,8 +15,8 @@ class AccessType(Enum):
     CAN_EDIT = 3
 
     @staticmethod
-    def __contains__(item: str) -> bool:
-        return item in AccessType.__members__
+    def items() -> Set[str]:
+        return set(AccessType.__members__.keys())
 
 
 class PrivacySettings(Editable, FlaskApp().db.Model):
@@ -30,7 +32,7 @@ class PrivacySettings(Editable, FlaskApp().db.Model):
         self.intern_access = intern_access
 
     def to_json(self) -> JSON:
-        return super(Editable).to_json() | {
+        return super().to_json() | {
             "editor_access": self.editor_access.name,
             "guest_access": self.guest_access.name,
             "intern_access": self.intern_access.name

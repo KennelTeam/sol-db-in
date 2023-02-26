@@ -42,4 +42,4 @@ class Tags(Resource):
         current = Tag(arguments['name'], arguments['type_id'], arguments['parent_id'])
         FlaskApp().add_database_item(current)
         FlaskApp().flush_to_database()
-        return Response(current.id, 200)
+        return Response(str(current.id), 200)

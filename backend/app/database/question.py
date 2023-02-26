@@ -149,9 +149,9 @@ class Question(Editable, FlaskApp().db.Model):
             'answer_block_id': self.answer_block_id,
             'formatting_settings': self.formatting_settings.to_json(),
             'privacy_settings': self.privacy_settings.to_json(),
-            'relation_settings': self.relation_settings.to_json(),
+            'relation_settings': self.relation_settings.to_json() if self.relation_settings is not None else "",
             'related_question_id': self.related_question_id,
-            'form_type': self.form_type
+            'form_type': self.form_type.name
         }
         if with_answers:
             answers = Answer.filter(self.id, form_id=form_id)

@@ -40,4 +40,4 @@ class Table(Resource):
         if current.deleted != arguments['deleted']:
             current.deleted = arguments['deleted']
         FlaskApp().flush_to_database()
-        return Response(current.id, 200)
+        return Response(str(current.id), 200)

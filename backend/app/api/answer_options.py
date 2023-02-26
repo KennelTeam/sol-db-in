@@ -34,16 +34,18 @@ class AnswerOptionsPage(Resource):
         parser.add_argument('deleted', type=bool, location='json', required=False, default=False)
         arguments = parser.parse_args()
 
-        if AnswerBlock.get_by_id(arguments['answer_block']) is None:
+        if AnswerBlock.get_by_id(arguments['answer_block_id']) is None:
             return post_failure(HTTPErrorCode.WRONG_ID, 404)
 
-        if arguments['id'] != -1:
+        if arguments['id'] == -1:
             current = AnswerOption(arguments['name'], arguments['short_name'], arguments['answer_block_id'])
             FlaskApp().add_database_item(current)
         else:
             current = AnswerOption.get_by_id(arguments['id'])
             if current is None:
                 return post_failure(HTTPErrorCode.WRONG_ID, 404)
+            current.name = arguments['name']
+            current.short_name = arguments['short_name']
             current.deleted = arguments['deleted']
         FlaskApp().flush_to_database()
-        return Response(current.id, 200)
+        return Response(str(current.id), 200)

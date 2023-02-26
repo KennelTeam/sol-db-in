@@ -30,8 +30,8 @@ class Forms(Resource):
     @get_request()
     def get() -> Response:
         parser = reqparse.RequestParser()
-        parser.add_argument('form_type', type=str, location='json')
-        parser.add_argument('answer_filters', type=list, location='json')
+        parser.add_argument('form_type', type=str, location='json', required=True)
+        parser.add_argument('answer_filters', type=list, location='json', required=True)
         parser.add_argument('name_substr', type=str, location='json', required=False, default='')
 
         arguments = parser.parse_args()
@@ -55,19 +55,19 @@ class Forms(Resource):
     def post() -> Response:
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, location='json', required=False, default=-1)
-        parser.add_argument('state', type=str, location='json')
-        parser.add_argument('name', type=str, location='json')
-        parser.add_argument('form_type', type=str, location='json')
-        parser.add_argument('answers', type=list, location='json')
+        parser.add_argument('state', type=str, location='json', required=True)
+        parser.add_argument('name', type=str, location='json', required=True)
+        parser.add_argument('form_type', type=str, location='json', required=True)
+        parser.add_argument('answers', type=list, location='json', required=True)
         parser.add_argument('deleted', type=bool, location='json', required=False, default=False)
 
         content = parser.parse_args()
 
-        if content['form_type'] not in FormType:
+        if content['form_type'] not in FormType.items():
             return post_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
         form_type = FormType[content['form_type']]
 
-        if content['state'] not in FormState:
+        if content['state'] not in FormState.items():
             return post_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
         form_state = FormState[content['state']]
         return Forms._update_form_data(content, form_state, form_type, content['deleted'])
@@ -170,7 +170,7 @@ class Forms(Resource):
                     return post_failure(status, 400)
 
         FlaskApp().flush_to_database()
-        return Response(response=form.id, status=200)
+        return Response(str(form.id), status=200)
 
     @staticmethod
     def _check_answer_object_correctness(answer: JSON) -> HTTPErrorCode:

@@ -24,7 +24,7 @@ class QuestionBlockPage(Resource):
         parser.add_argument('form_type', type=str, location='json', required=True)
         parser.add_argument('sorting', type=int, location='json', required=True)
         arguments = parser.parse_args()
-        if arguments['form_type'] not in FormType:
+        if arguments['form_type'] not in FormType.items():
             return post_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
         arguments['form_type'] = FormType[arguments['form_type']]
         if arguments['id'] != -1:
@@ -40,5 +40,5 @@ class QuestionBlockPage(Resource):
             current = QuestionBlock(arguments['name'], arguments['form_type'], arguments['sorting'])
             FlaskApp().add_database_item(current)
         FlaskApp().flush_to_database()
-        return Response(current.id, 200)
+        return Response(str(current.id), 200)
 

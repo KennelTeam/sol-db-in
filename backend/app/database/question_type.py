@@ -1,6 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 from enum import Enum
+from typing import Set
 
 
 class QuestionType(Enum):
@@ -16,5 +17,5 @@ class QuestionType(Enum):
     RELATION = 10
 
     @staticmethod
-    def __contains__(item: str) -> bool:
-        return item in QuestionType.__members__
+    def items() -> Set[str]:
+        return set(QuestionType.__members__.keys())

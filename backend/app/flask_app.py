@@ -8,6 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from cheroot.wsgi import Server, PathInfoDispatcher
 from backend.auxiliary.singleton import Singleton
 from backend.constants import DB_ENGINE, MODE, DB_CHARSET, PORT, NUM_THREADS, REQUEST_CONTEXT_USE_DELETED_ITEMS
+from flask_cors import CORS
 
 
 class FlaskApp(metaclass=Singleton):
@@ -34,6 +35,7 @@ class FlaskApp(metaclass=Singleton):
 
     def __init__(self):
         self._app = Flask(__name__)
+        CORS(self.app, supports_credentials=True)
         self._configure_api()
         self._configure_db()
 

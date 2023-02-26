@@ -14,7 +14,7 @@ from ..database.user import Role
 
 
 class Toponyms(Resource):
-    route: final(str) = '/toponyms'
+    route: final(str) = '/toponym'
 
     @staticmethod
     @jwt_required()
@@ -52,7 +52,7 @@ class Toponyms(Resource):
         current = Toponym(arguments['name'], arguments['parent_id'])
         FlaskApp().add_database_item(current)
         FlaskApp().flush_to_database()
-        return Response(current.id, 201)
+        return Response(str(current.id), 201)
 
     @staticmethod
     @jwt_required()

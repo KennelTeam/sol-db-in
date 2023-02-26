@@ -1,6 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 from enum import Enum
+from typing import Set
 
 
 class FormType(Enum):
@@ -8,5 +9,5 @@ class FormType(Enum):
     PROJECT = 1
 
     @staticmethod
-    def __contains__(item: str) -> bool:
-        return item in FormType.__members__
+    def items() -> Set[str]:
+        return set(FormType.__members__.keys())

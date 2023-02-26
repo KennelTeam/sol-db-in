@@ -30,7 +30,7 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
     def to_json(self) -> JSON:
         return super().to_json() | {
             'name': self.name,
-            'form': self.form,
+            'form': self.form.name,
             'sorting': self.sorting,
             'questions': self.get_questions()
         }
@@ -94,10 +94,11 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
         free_questions_formattings = FormattingSettings.filter_only_free_questions(
             FormattingSettings.query_from_block(self.id)
         )
+        print(free_questions_formattings)
         # fqf = free questions formattings values
         fqf_dict = {item.id: item for item in free_questions_formattings}
         free_questions = Question.get_all_with_formattings(free_questions_formattings)
-        return [(question, fqf_dict[question.formatting_settings].block_sorting) for question in free_questions]
+        return [(question, fqf_dict[question.formatting_settings.id].block_sorting) for question in free_questions]
 
     def _get_table_questions(self) -> List[QuestionTable]:
         formattings = FormattingSettings.filter_only_table_questions(

@@ -83,8 +83,8 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
     def filter_only_free_questions(query: Query, short_form: bool = False) -> List['FormattingSettings']:
         if short_form:
             query = query.filter(FormattingSettings._show_on_main_page is True)
-        return query.filter(FormattingSettings.table_id is None) \
-            .filter(FormattingSettings._fixed_table_id is None).all()
+        return query.filter(FormattingSettings._table_id == None) \
+            .filter(FormattingSettings._fixed_table_id == None).all()
 
     @staticmethod
     def filter_only_table_questions(query: Query) -> List['FormattingSettings']:

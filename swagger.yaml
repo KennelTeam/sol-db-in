@@ -1284,7 +1284,7 @@ components:
             - LOCATION
             - NUMBER
             - BOOLEAN
-            - RELATIONte
+            - RELATION
         comment:
           $ref: '#/components/schemas/TranslatedText'
         answer_block_id:
@@ -1302,6 +1302,8 @@ components:
           $ref: '#/components/schemas/PrivacySettings'
         relation_settings:
           $ref: '#/components/schemas/RelationSettings'
+        tag_type_id:
+          type: integer
       required:
         - question_type
         - comment
