@@ -1,7 +1,7 @@
 import json
 from typing import final
 
-from flask import request, jsonify, Response
+from flask import request, Response
 from flask_jwt_extended import create_access_token, set_access_cookies
 from flask_restful import Resource
 
@@ -28,7 +28,7 @@ class Login(Resource):
             return get_failure(HTTPErrorCode.WRONG_ID, 403)
 
         user.current_ip = request.remote_addr
-        response = jsonify(role=user.role.name)
         access_token = create_access_token(identity=user)
+        response = Response(json.dumps({'role': user.role.name}), 200)
         set_access_cookies(response, access_token)
         return response

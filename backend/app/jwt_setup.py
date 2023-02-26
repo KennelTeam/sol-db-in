@@ -1,7 +1,7 @@
 import os
 from datetime import timedelta, datetime, timezone
 
-from flask import request, Response
+from flask import Response
 from flask_jwt_extended import JWTManager, get_jwt, create_access_token, set_access_cookies, jwt_required, current_user, \
     unset_jwt_cookies
 
