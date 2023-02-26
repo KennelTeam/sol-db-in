@@ -2,7 +2,7 @@
 #  All rights reserved.
 from .api.login import Login
 from .api.logout import Logout
-from .api.register import Register
+from .api.users import Users
 from .api.forms import Forms
 from .api.form_page import FormPage
 from .api.toponym_tree import ToponymTree
@@ -20,7 +20,7 @@ from .api.questions import Questions
 from .flask_app import FlaskApp
 
 resources = [
-    Login, Logout, Register, Forms, FormPage, Toponyms, ToponymTree, AnswerOptionsPage, AllAnswerBlocks,
+    Login, Logout, Users, Forms, FormPage, Toponyms, ToponymTree, AnswerOptionsPage, AllAnswerBlocks,
     AnswerBlockPage, QuestionBlockPage, Table, Tags, TagTypes, FormSchema, Questions
 ]
 

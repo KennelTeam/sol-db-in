@@ -27,7 +27,7 @@ class User(Editable, FlaskApp().db.Model):
     _password_hash = FlaskApp().db.Column('password', FlaskApp().db.Text(512 // 8))
     _role = FlaskApp().db.Column('role', FlaskApp().db.Enum(Role))
 
-    current_ip: str = ""
+    current_ip: str = ''
 
     def __init__(self, login: str, name: str, comment: str, password: str, role: str) -> None:
         super().__init__()
@@ -103,6 +103,21 @@ class User(Editable, FlaskApp().db.Model):
 
     def save_to_db(self) -> None:
         FlaskApp().add_database_item(self)
+        FlaskApp().flush_to_database()
+
+    def update(self, new_data: dict) -> None:
+        new_name = new_data.get('name')
+        if new_name is not None:
+            self.name = new_name
+        new_comment = new_data.get('comment')
+        if new_comment is not None:
+            self.comment = new_comment
+        new_password = new_data.get('password')
+        if new_password is not None and not bcrypt.checkpw(new_password.encode(), self.password_hash.encode()):
+            self.password = new_password
+        new_role = new_data.get('role')
+        if new_role is not None:
+            self.role = Role[new_role]
         FlaskApp().flush_to_database()
 
     @staticmethod
