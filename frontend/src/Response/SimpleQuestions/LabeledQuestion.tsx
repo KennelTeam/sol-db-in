@@ -12,7 +12,7 @@ export interface LabeledQuestionInterface extends SimpleQuestionInterface, WithI
 function LabeledQuestion(questionData: LabeledQuestionInterface): JSX.Element {
     const questionComponent = <SimpleQuestion questionType={questionData.questionType} questionData={questionData.questionData} />;
     return (
-        <Box display="block" sx={{
+        <Box display="inline-block" sx={{
             marginBottom: "10px"
         }}>
             <InputInfo {...questionData.inputInfo} />

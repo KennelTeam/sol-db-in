@@ -14,7 +14,7 @@
         "leaders": "Leaders",
         "statistics": "Statistics",
         "settings": "Settings",
-        "users": "User's Settings",
+        "users": "Users Control",
         "tags": "Tags",
         "catalog": "Catalog",
         "questionnaire": "Questionnaire",
@@ -25,6 +25,7 @@
         "leaders-per-page": "Leaders per page",
         "projects-per-page": "Projects per page",
         "leader-comment-max-length": "Comment max length on leaders interviews",
+        "change-language": "Change language",
         "save": "Save"
     },
     "users": {
@@ -42,6 +43,15 @@
             "new-password": "New password",
             "comment": "Comment",
             "block-access": "Block access to the site"
+        }
+    },
+    "options": {
+        "title": "Options editing",
+        "dialog": {
+            "save": "Save",
+            "cancel": "Cancel",
+            "title": "Edit translations",
+            "add": "Add \"{}\" translation"
         }
     }
 }

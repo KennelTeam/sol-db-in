@@ -6,6 +6,8 @@ It is being developed by [KennelTeam](https://github.com/KennelTeam)
 
 You can participate in the development process or just star this repository.
 
+This code is distributed under [`Apache 2.0 License`](license)
+
 For participating peak any open issue, make your own branch or fork and then
 open a pull-request to the `develop` branch.
 
