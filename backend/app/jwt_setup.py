@@ -1,11 +1,11 @@
 import os
 from datetime import timedelta, datetime, timezone
 
-from flask import Response
+from flask import Response, request
 from flask_jwt_extended import JWTManager, get_jwt, create_access_token, set_access_cookies, jwt_required, current_user, \
     unset_jwt_cookies
 
-from .api.auxiliary import get_failure, HTTPErrorCode
+from .api.auxiliary import get_failure, post_failure, HTTPErrorCode
 from .flask_app import FlaskApp
 from backend.app.database import User
 from ..constants import JWT_ACCESS_TOKEN_EXPIRES, JWT_REFRESH_EXPIRING_TIME
@@ -52,20 +52,29 @@ def user_lookup_callback(_jwt_header: dict, jwt_data: dict) -> User:
 
 @jwt.unauthorized_loader
 def unauthorized_loader_callback(_reason: str) -> Response:
-    response = get_failure(HTTPErrorCode.JWT_NOT_FOUND, 403)
+    if request.method == 'GET':
+        response = get_failure(HTTPErrorCode.JWT_NOT_FOUND, 403)
+    else:
+        response = post_failure(HTTPErrorCode.JWT_NOT_FOUND, 403)
     unset_jwt_cookies(response)
     return response
 
 
 @jwt.expired_token_loader
 def expired_token_loader_callback(_jwt_header: dict, _jwt_payload: dict) -> Response:
-    response = get_failure(HTTPErrorCode.JWT_NOT_FOUND, 401)
+    if request.method == 'GET':
+        response = get_failure(HTTPErrorCode.JWT_EXPIRED, 401)
+    else:
+        response = post_failure(HTTPErrorCode.JWT_EXPIRED, 401)
     unset_jwt_cookies(response)
     return response
 
 
 @jwt.invalid_token_loader
 def invalid_token_loader_callback(_reason: str) -> Response:
-    response = get_failure(HTTPErrorCode.JWT_NOT_FOUND, 403)
+    if request.method == 'GET':
+        response = get_failure(HTTPErrorCode.INVALID_JWT, 403)
+    else:
+        response = post_failure(HTTPErrorCode.INVALID_JWT, 403)
     unset_jwt_cookies(response)
     return response

@@ -105,19 +105,18 @@ class User(Editable, FlaskApp().db.Model):
         FlaskApp().add_database_item(self)
         FlaskApp().flush_to_database()
 
-    def update(self, new_data: dict) -> None:
-        new_name = new_data.get('name')
-        if new_name is not None:
-            self.name = new_name
-        new_comment = new_data.get('comment')
-        if new_comment is not None:
-            self.comment = new_comment
-        new_password = new_data.get('password')
-        if new_password is not None and not bcrypt.checkpw(new_password.encode(), self.password_hash.encode()):
-            self.password = new_password
-        new_role = new_data.get('role')
-        if new_role is not None:
-            self.role = Role[new_role]
+    def update(self, login: str = None, name: str = None, comment: str = None,
+               password: str = None, role: Role = None) -> None:
+        if login is not None:
+            self.login = login
+        if name is not None:
+            self.name = name
+        if comment is not None:
+            self.comment = comment
+        if password is not None:
+            self.password = password
+        if role is not None:
+            self.role = role
         FlaskApp().flush_to_database()
 
     @staticmethod
@@ -132,9 +131,11 @@ class User(Editable, FlaskApp().db.Model):
     def get_all_users() -> List['User']:
         return FlaskApp().request(User).all()
 
-    @staticmethod
-    def auth(login: str, password: str) -> 'User':
+    def check_password(self, password) -> bool:
+        return bcrypt.checkpw(password.encode(), self.password_hash.encode())
+
+    def auth(self, login: str, password: str) -> 'User':
         user = User.get_by_login(login)
-        if not user or not bcrypt.checkpw(password.encode(), user.password_hash.encode()):
+        if not user or not self.check_password(password):
             return None
         return user
