@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Catalog from "./Catalog";
 import Leader from "./Leader";
 import LeadersList from "./LeadersList";
@@ -17,6 +17,7 @@ import { Box, Container } from "@mui/material";
 import { Stack } from "@mui/system";
 import React from "react";
 import { MENU_WIDTH } from "./types/global.d";
+import FilterTablePage from "./FiltersTablePage";
 
 function App() {
 
@@ -27,11 +28,11 @@ function App() {
   return (
     <BrowserRouter>
       <Stack direction="row" alignItems="stretch" spacing={0}>
-        { user != UserType.None && // it makes NavigationMenu shown only when user isn't None
+        { user !== UserType.None && // it makes NavigationMenu shown only when user isn't None
         <Box  sx={{ width: MENU_WIDTH}} visibility="visible">
           <NavigationMenu user={user}/>
         </Box> }
-        <Container>
+        <Container sx={{ width: '100%', overflowX: "auto" }}>
           <Routes>
           <Route path='/catalog' element={<Catalog />}/>
           <Route path='/leader/:id' element={<Leader />}/>
@@ -45,6 +46,7 @@ function App() {
           <Route path='/questionnaire' element={<Questionnaire />}/>
           <Route path='/options' element={<Options />}/>
           <Route path='/users' element={<Users />}/>
+          <Route path='/filters' element={<FilterTablePage />}/> {/* route for testing FilterTablePage component */}
           </Routes>
         </Container>
       </Stack>
