@@ -22,6 +22,9 @@ class HTTPErrorCode(enum.Enum):
     INVALID_ARG_FORMAT = 5
     CONFLICTING_ARGUMENTS = 6
     NOT_ENOUGH_RIGHTS = 7
+    JWT_NOT_FOUND = 8
+    JWT_EXPIRED = 9
+    INVALID_JWT = 10
 
 
 def get_class_item_by_id_request(Class) -> Response:

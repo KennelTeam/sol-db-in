@@ -27,7 +27,7 @@ class User(Editable, FlaskApp().db.Model):
     _password_hash = FlaskApp().db.Column('password', FlaskApp().db.Text(512 // 8))
     _role = FlaskApp().db.Column('role', FlaskApp().db.Enum(Role))
 
-    current_ip: str = ""
+    current_ip: str = ''
 
     def __init__(self, login: str, name: str, comment: str, password: str, role: str) -> None:
         super().__init__()
@@ -105,6 +105,20 @@ class User(Editable, FlaskApp().db.Model):
         FlaskApp().add_database_item(self)
         FlaskApp().flush_to_database()
 
+    def update(self, login: str = None, name: str = None, comment: str = None,
+               password: str = None, role: Role = None) -> None:
+        if login is not None:
+            self.login = login
+        if name is not None:
+            self.name = name
+        if comment is not None:
+            self.comment = comment
+        if password is not None:
+            self.password = password
+        if role is not None:
+            self.role = role
+        FlaskApp().flush_to_database()
+
     @staticmethod
     def get_by_login(login: str) -> 'User':
         return FlaskApp().request(User).filter_by(_login=login).first()
@@ -117,9 +131,11 @@ class User(Editable, FlaskApp().db.Model):
     def get_all_users() -> List['User']:
         return FlaskApp().request(User).all()
 
-    @staticmethod
-    def auth(login: str, password: str) -> 'User':
+    def check_password(self, password) -> bool:
+        return bcrypt.checkpw(password.encode(), self.password_hash.encode())
+
+    def auth(self, login: str, password: str) -> 'User':
         user = User.get_by_login(login)
-        if not user or not bcrypt.checkpw(password.encode(), user.password_hash.encode()):
+        if not user or not self.check_password(password):
             return None
         return user
