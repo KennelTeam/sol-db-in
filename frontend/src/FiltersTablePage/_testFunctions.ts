@@ -1,4 +1,4 @@
-import { AnswerType } from "../types/global.d"
+import { AnswerType } from "../types/global"
 
 // TESTING FUNCTIONS //////////////////////////////////////
 // later these functions will work with server API by passing requests

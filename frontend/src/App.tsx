@@ -11,12 +11,12 @@ import Statistics from "./Statistics";
 import Tags from "./Tags";
 import Questionnaire from "./Questionnaire";
 import Options from "./Options";
-import { UserType } from "./types/global.d";
+import { UserType } from "./types/global";
 import Users from "./Users";
 import { Box, Container } from "@mui/material";
 import { Stack } from "@mui/system";
 import React from "react";
-import { MENU_WIDTH } from "./types/global.d";
+import { MENU_WIDTH } from "./types/global";
 import FilterTablePage from "./FiltersTablePage";
 
 function App() {
