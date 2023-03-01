@@ -14,5 +14,20 @@
         "catalog": "Справочники",
         "questionnaire": "Анкета",
         "options": "Ответы"
+    },
+    "filters": {
+        "title": "Фильтры",
+        "equals": "равно",
+        "contains": "подстрока",
+        "contained_in": "содержится в",
+        "filter_value": "Значение",
+        "checked": "Выбрано",
+        "unchecked": "Не выбрано",
+        "checked_one_of": "выбран хотя бы один из",
+        "from": "от",
+        "to": "до",
+        "table": "Таблица",
+        "rows_per_page": "Строк на странице:",
+        "choose_filter": "Новый фильтр..."
     }
 }

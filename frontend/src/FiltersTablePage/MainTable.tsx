@@ -1,8 +1,10 @@
-import { TableCell, TableRow, TableHead, Table, List, ListItem, TableBody, Card, TableContainer } from '@mui/material'
+import { TableCell, TableRow, TableHead, Table, List, ListItem, TableBody, Card, TableContainer, TablePagination } from '@mui/material'
 import { Link } from 'react-router-dom'
 import CheckIcon from '@mui/icons-material/Check'
 import { Row, _getRows, _getColumns } from './_testFunctions'
 import { Box, styled } from '@mui/system'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 const StyledTableCell = styled(TableCell)({
     fontSize: '11px',
@@ -79,9 +81,22 @@ function RenderRow(props: Row) {
     )
 }
 
-export default function LeadersTable() {
+export default function MainTable() {
+    const { t } = useTranslation('translation', { keyPrefix: "filters" })
+
+    const [rowsPerPage, setRowsPerPage] = useState(10)
+    const [page, setPage] = useState<number>(0)
 
     const rows = _getRows()
+
+    const handleChangePage = (event: unknown, newPage: number) => {
+        setPage(newPage);
+    }
+
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    }
 
     return (
         <Box component={Card}>
@@ -89,10 +104,22 @@ export default function LeadersTable() {
                 <Table size="small" stickyHeader>
                     <Head columnGroups={_getColumns()}/>
                     <TableBody>
-                        {rows.map((row: Row) => (<RenderRow {...row}/>))}
+                        {rows
+                            .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
+                            .map((row: Row) => (<RenderRow {...row}/>))}
                     </TableBody>
                 </Table>
             </TableContainer>
+            <TablePagination
+                rowsPerPage={rowsPerPage}
+                count={rows.length}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                labelRowsPerPage={t('rows_per_page')}
+                showFirstButton
+                showLastButton
+            />
         </Box>
     )
 }

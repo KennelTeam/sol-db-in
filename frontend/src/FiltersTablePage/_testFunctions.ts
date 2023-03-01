@@ -73,7 +73,7 @@ export interface Row {
 }
 
 export function _getRows() : Row[] {
-    const two = [
+    let list = [
         {
             id: 2,
             name: "Pavel Durov",
@@ -139,7 +139,41 @@ export function _getRows() : Row[] {
                 [{data: "-"}],
                 [{data: "*yes*"}]
             ]
+        },
+        {
+            id: 7,
+            name: "Mark Zuckerberg",
+            link: "/leader/7",
+            columns: [
+                [{data: "Syktyvkar"}],
+                [{data: "owner of Meta"}],
+                [
+                    {
+                        link: "/project/12",
+                        data: "Facebook"
+                    },
+                    {
+                        link: "/project/55",
+                        data: "Instagram"
+                    },
+                    {
+                        link: "/project/23",
+                        data: "WhatsApp"
+                    }
+                ],
+                [{data: "Lev"}],
+                [{data: "29.02.2023"}],
+                [{data: "by telephone"}],
+                [{data: "cool dude with beautiful smile"}],
+                [{data: "77"}],
+                [{data: "22"}],
+                [{data: "*yes*"}],
+                [{data: "*yes*"}]
+            ]
         }
     ]
-    return two.concat(two).concat(two).concat(two)
+    for (let i = 0; i < 5; i++) {
+        list = list.concat(list)
+    }
+    return list
 }

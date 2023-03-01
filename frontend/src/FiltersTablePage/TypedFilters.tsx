@@ -1,11 +1,12 @@
 import { Stack } from "@mui/system"
-import { MenuItem, Select, SelectChangeEvent, TextField, Typography, FormControlLabel } from "@mui/material";
-import React, { ReactNode, useState} from "react";
+import { MenuItem, Select, SelectChangeEvent, TextField, Typography, FormControlLabel } from "@mui/material"
+import React, { ReactNode, useState} from "react"
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker'
 import dayjs, { Dayjs } from "dayjs"
-import { FormControl, Checkbox, ListItemText, Autocomplete } from "@mui/material";
+import { FormControl, Checkbox, ListItemText, Autocomplete } from "@mui/material"
+import { useTranslation } from 'react-i18next'
 
 interface ListChoiceInterface {
     options: string[],
@@ -50,12 +51,14 @@ export function NumberFilter() {
 }
 
 export function TextFilter() {
+    const { t } = useTranslation('translation', { keyPrefix: "filters" })
+
     return (
         <Stack direction="row" spacing={1}>
-            <ListChoice options={['equals', 'contains', 'contained in']} defaultIdx={0}/>
+            <ListChoice options={[t('equals'), t('contains'), t('contained_in')]} defaultIdx={0}/>
             <TextField
                 size="small"
-                label="Filter value"
+                label={t('filter_value')}
                 InputLabelProps={{
                     shrink: true,
                 }}
@@ -65,6 +68,7 @@ export function TextFilter() {
 }
 
 export function DateFilter() {
+    const { t } = useTranslation('translation', { keyPrefix: "filters" })
 
     const [dateFrom, setDateFrom] = React.useState<Dayjs | null>(dayjs)
 
@@ -81,7 +85,7 @@ export function DateFilter() {
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-start">
-                <Typography variant="overline">FROM:</Typography>
+                <Typography variant="overline">{t("from")}</Typography>
                 <DesktopDatePicker
                     label="from"
                     inputFormat="DD.MM.YYYY"
@@ -89,7 +93,7 @@ export function DateFilter() {
                     onChange={handleChangeFrom}
                     renderInput={(params) => <TextField size="small" {...params} />}
                     />
-                <Typography variant="overline">TO:</Typography>
+                <Typography variant="overline">{t("to")}</Typography>
                 <DesktopDatePicker
                     label="to"
                     inputFormat="DD.MM.YYYY"
@@ -103,6 +107,8 @@ export function DateFilter() {
 }
 
 export function ChoiceFilter({variants} : {variants: string[]}) {
+    const { t } = useTranslation('translation', { keyPrefix: "filters" })
+
     const [checked, setChecked] = React.useState<string[]>([]);
 
     const handleChange = (event: SelectChangeEvent<string[]>) => {
@@ -120,7 +126,7 @@ export function ChoiceFilter({variants} : {variants: string[]}) {
 
   return (
     <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-start">
-        <Typography variant="overline">HAS CHECKED ONE OF:</Typography>
+        <Typography variant="overline">{t('checked_one_of')}</Typography>
             <FormControl sx={{ m: 1, minWidth: 120, maxWidth: 300 }}>
                 {/* <InputLabel id="demo-mutiple-checkbox-label">Variants</InputLabel> */}
                 <Select
@@ -146,10 +152,11 @@ export function ChoiceFilter({variants} : {variants: string[]}) {
 }
 
 export function AutocompleteChoiceFilter({variants} : {variants: string[]}) : JSX.Element {
+    const { t } = useTranslation('translation', { keyPrefix: "filters" })
 
     return (
         <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-start">
-            <Typography variant="overline">HAS CHECKED ONE OF:</Typography>
+            <Typography variant="overline">{t('checked_one_of')}</Typography>
                 <Autocomplete
                     sx={{ width: 300 }}
                     options={variants}
@@ -172,6 +179,8 @@ export function AutocompleteChoiceFilter({variants} : {variants: string[]}) : JS
 }
 
 export function CheckboxFilter() {
+    const { t } = useTranslation('translation', { keyPrefix: "filters" })
+
     const [checked, setChecked] = useState(true)
 
     const handleCheck = () => {
@@ -179,6 +188,6 @@ export function CheckboxFilter() {
     }
 
     return (
-        <FormControlLabel control={<Checkbox defaultChecked/>} onClick={handleCheck} label={checked ? "Checked" : "Unchecked"}/>
+        <FormControlLabel control={<Checkbox defaultChecked/>} onClick={handleCheck} label={checked ? t("checked") : t("unchecked")}/>
     )
 }
