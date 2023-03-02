@@ -33,7 +33,7 @@ class AnswerBlock(Editable, FlaskApp().db.Model):
 
     def to_json(self) -> JSON:
         return super().to_json() | {
-            'options': AnswerOption.get_all_from_block(self.id),
+            'options': [option for option in AnswerOption.get_all_from_block(self.id)],
             'name': self.name
         }
 

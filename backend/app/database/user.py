@@ -29,13 +29,13 @@ class User(Editable, FlaskApp().db.Model):
 
     current_ip: str = ''
 
-    def __init__(self, login: str, name: str, comment: str, password: str, role: str) -> None:
+    def __init__(self, login: str, name: str, comment: str, password: str, role: Role) -> None:
         super().__init__()
         self.login = login
         self.name = name
         self.comment = comment
         self.password = password
-        self.role = Role[role]
+        self.role = role
 
     def to_json(self) -> JSON:
         return super().to_json() | {

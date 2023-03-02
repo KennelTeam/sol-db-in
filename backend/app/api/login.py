@@ -3,7 +3,7 @@ from typing import final
 
 from flask import request, Response
 from flask_jwt_extended import create_access_token, set_access_cookies
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 
 from backend.app.api.auxiliary import get_failure, HTTPErrorCode
 from backend.app.database import User
@@ -14,16 +14,16 @@ class Login(Resource):
 
     @staticmethod
     def post() -> Response:
-        login = request.json.get('login')
-        password = request.json.get('password')
-        if not login or not password:
-            return get_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
+        parser = reqparse.RequestParser()
+        parser.add_argument('login', type=str, location='json', required=True)
+        parser.add_argument('password', type=str, location='json', required=True)
+        arguments = parser.parse_args()
 
-        user = User.get_by_login(login)
+        user = User.get_by_login(arguments['login'])
         if not user:
             return get_failure(HTTPErrorCode.WRONG_ID, 404)
 
-        user = user.auth(login, password)
+        user = user.auth(arguments['login'], arguments['password'])
         if not user:
             return get_failure(HTTPErrorCode.WRONG_ID, 403)
 

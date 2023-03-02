@@ -1,7 +1,9 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
+from .api.actions import Actions
 from .api.login import Login
 from .api.logout import Logout
+from .api.statistics import Statistics
 from .api.users import Users
 from .api.forms import Forms
 from .api.form_page import FormPage
@@ -21,7 +23,7 @@ from .flask_app import FlaskApp
 
 resources = [
     Login, Logout, Users, Forms, FormPage, Toponyms, ToponymTree, AnswerOptionsPage, AllAnswerBlocks,
-    AnswerBlockPage, QuestionBlockPage, Table, Tags, TagTypes, FormSchema, Questions
+    AnswerBlockPage, QuestionBlockPage, Table, Tags, TagTypes, FormSchema, Questions, Actions, Statistics
 ]
 
 for resource in resources:
