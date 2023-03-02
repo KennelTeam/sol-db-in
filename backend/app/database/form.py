@@ -179,7 +179,7 @@ class Form(Editable, FlaskApp().db.Model):
         options = AnswerOption.get_all_from_block(question.answer_block_id)
         return [
             {
-                'name': option.text,
+                'name': option['name'],
                 'filter': Answer.value_int.in_([option['id']])
             } for option in options
         ]
