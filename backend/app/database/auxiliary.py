@@ -28,7 +28,7 @@ def prettify_answer(answer: Answer) -> JSON:
     if question.question_type == QuestionType.DATE:
         result['value'] = date_to_string(answer.value)
     elif question.question_type == QuestionType.RELATION:
-        if type(answer.value) == int:
+        if isinstance(answer.value, int):
             result['ref_id'] = answer.value
             result['value'] = Form.get_by_ids({answer.value})[0].name
         else:

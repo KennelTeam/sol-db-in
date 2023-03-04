@@ -91,18 +91,18 @@ def get_failure(error: HTTPErrorCode, status: int) -> Response:
 
 
 def check_json_format(source: Any, json_format: JSON) -> HTTPErrorCode:
-    if type(source) != dict:
+    if not isinstance(source, dict):
         return HTTPErrorCode.INVALID_ARG_FORMAT
     for key in json_format:
-        if type(json_format[key]) == set and None in json_format[key] and key not in source:
+        if isinstance(json_format[key], set) and None in json_format[key] and key not in source:
             continue
         if key not in source:
             return HTTPErrorCode.MISSING_ARGUMENT
         if issubclass(json_format[key], enum.Enum):
-            if type(source[key]) != str or source[key] not in json_format[key].items():
+            if not isinstance(source[key], str) or source[key] not in json_format[key].items():
                 return HTTPErrorCode.INVALID_ARG_TYPE
-        elif type(json_format[key]) != set:
-            if type(source[key]) != json_format[key]:
+        elif not isinstance(json_format[key], set):
+            if type(source[key]) == json_format[key]:
                 return HTTPErrorCode.INVALID_ARG_TYPE
         elif type(source[key]) not in json_format[key]:
             return HTTPErrorCode.INVALID_ARG_TYPE

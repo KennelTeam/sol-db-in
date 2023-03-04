@@ -37,7 +37,7 @@ class Forms(Resource):
         arguments = parser.parse_args()
         ids = Form.get_all_ids()
         for item in arguments['answer_filters']:
-            if type(item) != dict:
+            if not isinstance(item, dict):
                 return get_failure(HTTPErrorCode.INVALID_ARG_LOCATION, 400)
             current_ids = Forms._solve_form_filter(item, arguments['name_substr'])
             if current_ids is None:
@@ -135,13 +135,13 @@ class Forms(Resource):
         min_value = filter.get('min_value')
         max_value = filter.get('max_value')
 
-        if type(min_value) == str:
+        if isinstance(min_value, str):
             min_value = string_to_datetime(min_value)
-        if type(max_value) == str:
+        if isinstance(max_value, str):
             max_value = string_to_datetime(max_value)
 
         substring = filter.get('substring')
-        if type(substring) != str:
+        if not isinstance(substring, str):
             return None
 
         return Form.filter(name_substr=name_substring, question_id=question_id, exact_value=exact_value,
@@ -174,11 +174,11 @@ class Forms(Resource):
 
     @staticmethod
     def _check_answer_object_correctness(answer: JSON) -> HTTPErrorCode:
-        if type(answer) != dict:
+        if not isinstance(answer, dict):
             return HTTPErrorCode.INVALID_ARG_TYPE
         if 'question_id' not in answer or 'answers' not in answer:
             return HTTPErrorCode.INVALID_ARG_TYPE
-        if type(answer['answers']) != list:
+        if not isinstance(answer['answers'], list):
             return HTTPErrorCode.INVALID_ARG_TYPE
         return HTTPErrorCode.SUCCESS
 
@@ -190,7 +190,7 @@ class Forms(Resource):
         if 'form_id' in answer and answer['form_id'] != form.id:
             return HTTPErrorCode.CONFLICTING_ARGUMENTS
         if 'id' in answer and answer['id'] > 0:
-            if type(answer['id']) != int:
+            if not isinstance(answer['id'], int):
                 return HTTPErrorCode.INVALID_ARG_TYPE
             current_ans = Answer.get_by_id(answer['id'])
             if current_ans is None:
