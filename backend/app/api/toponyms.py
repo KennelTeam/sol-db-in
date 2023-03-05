@@ -3,7 +3,7 @@
 import json
 from typing import final
 
-from flask import Response
+from flask import Response, request
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 
@@ -20,14 +20,12 @@ class Toponyms(Resource):
     @jwt_required()
     @get_request()
     def get() -> Response:
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, location='json', required=False, default=-1)
-        parser.add_argument('name', type=str, location='json', required=False, default="")
-        arguments = parser.parse_args()
-        if arguments['name'] != "":
-            top = Toponym.get_by_name(arguments['name'])
-        elif arguments['id'] != -1:
-            top = Toponym.get_by_id(arguments['id'])
+        id = request.args.get('id', type=int, default=-1)
+        name = request.args.get('name', type=str, default='')
+        if name != '':
+            top = Toponym.get_by_name(name)
+        elif id != -1:
+            top = Toponym.get_by_id(id)
         else:
             return get_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
         if top is None:

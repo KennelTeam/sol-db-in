@@ -9,7 +9,7 @@ from backend.app.flask_app import FlaskApp
 from backend.auxiliary.types import JSON
 from backend.app.database.user import Role
 
-from flask import Response
+from flask import Response, request
 import enum
 
 
@@ -28,10 +28,10 @@ class HTTPErrorCode(enum.Enum):
 
 
 def get_class_item_by_id_request(Class) -> Response:
-    parser = reqparse.RequestParser()
-    parser.add_argument('id', type=int, location='json', required=True)
-    arguments = parser.parse_args()
-    current = Class.get_by_id(arguments['id'])
+    id = request.args.get('id', type=int, default=None)
+    if id is None:
+        get_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
+    current = Class.get_by_id(id)
     if current is None:
         return get_failure(HTTPErrorCode.WRONG_ID, 404)
     return Response(json.dumps(current.to_json()), 200)
