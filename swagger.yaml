@@ -12,7 +12,7 @@ info:
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.1
 servers:
-  - url: http://127.0.0.1:5000
+  - url: http://52.192.211.221:5000
 paths:
   /actions:
     get:
@@ -78,6 +78,9 @@ paths:
                 type: string
               password:
                 type: string
+              language:
+                type: string
+                description: Sets the selected language for the user
             required:
               - login
               - password
@@ -159,6 +162,27 @@ paths:
       responses:
         200:
           description: Successfull log out
+  /language:
+    post:
+      tags:
+        - users
+      description:
+        Changes selected language
+      parameters:
+        - in: body
+          name: language
+          schema:
+            type: object
+            properties:
+              language:
+                type: string
+                enum:
+                  - ru
+                  - en
+                  - ba
+      resonses:
+        200:
+          description: Success
 
   /forms:
     get:

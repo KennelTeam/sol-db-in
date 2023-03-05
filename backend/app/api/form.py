@@ -4,12 +4,13 @@ import json
 from typing import final
 
 from flask import Response
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, current_user
 from flask_restful import Resource, reqparse
 
 from .auxiliary import HTTPErrorCode, get_request, get_failure
 from ..database import QuestionBlock
 from ..database.form_type import FormType
+from ...constants import ALL_LANGUAGES_TAG
 
 
 class FormSchema(Resource):
@@ -19,6 +20,7 @@ class FormSchema(Resource):
     @jwt_required()
     @get_request()
     def get():
+        current_user.selected_language = ALL_LANGUAGES_TAG
         parser = reqparse.RequestParser()
         parser.add_argument('form_type', type=str, required=True)
         form_type = parser.parse_args()['form_type']
