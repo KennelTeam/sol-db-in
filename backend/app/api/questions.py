@@ -113,7 +113,7 @@ class Questions(Resource):
         if arguments['related_question_id'] is not None:
             if Question.get_by_id(arguments['related_question_id']) is None:
                 return post_failure(HTTPErrorCode.WRONG_ID, 404)
-        if AnswerBlock.get_by_id(arguments['answer_block_id']) is None:
+        if arguments['answer_block_id'] is not None and AnswerBlock.get_by_id(arguments['answer_block_id']) is None:
             return post_failure(HTTPErrorCode.WRONG_ID, 404)
         return None
 

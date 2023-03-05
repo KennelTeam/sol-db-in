@@ -1,7 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 
-from backend.constants import MAX_LOGIN_SIZE, MAX_FULLNAME_SIZE, MAX_COMMENT_SIZE
+from backend.constants import MAX_LOGIN_SIZE, MAX_FULLNAME_SIZE, MAX_COMMENT_SIZE, DEFAULT_LANGUAGE
 from backend.auxiliary import JSON
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
@@ -28,6 +28,7 @@ class User(Editable, FlaskApp().db.Model):
     _role = FlaskApp().db.Column('role', FlaskApp().db.Enum(Role))
 
     current_ip: str = ''
+    selected_language: str = DEFAULT_LANGUAGE
 
     def __init__(self, login: str, name: str, comment: str, password: str, role: str) -> None:
         super().__init__()

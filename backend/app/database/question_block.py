@@ -5,6 +5,7 @@ import json
 from backend.constants import MAX_BLOCK_NAME_SIZE, MAX_LANGUAGES_COUNT
 from backend.auxiliary import JSON, TranslatedText
 from backend.app.flask_app import FlaskApp
+from .localization import localize
 from .editable import Editable
 from .form_type import FormType
 from .question_table import QuestionTable
@@ -29,7 +30,7 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
 
     def to_json(self) -> JSON:
         return super().to_json() | {
-            'name': self.name,
+            'name': localize(self.name),
             'form': self.form.name,
             'sorting': self.sorting,
             'questions': self.get_questions()
