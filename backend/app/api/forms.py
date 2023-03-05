@@ -20,6 +20,7 @@ from backend.app.database.auxiliary import prettify_answer
 from backend.app.database.question_type import QuestionType
 from backend.app.flask_app import FlaskApp
 from backend.constants import NAME_COLUMN_NAME
+from ..database.localization import localize
 
 
 class Forms(Resource):
@@ -75,7 +76,7 @@ class Forms(Resource):
     @staticmethod
     def _prepare_table(forms: List[Form], question_ids: List[JSON]) -> List[JSON]:
         name_column = {
-            'column_name': NAME_COLUMN_NAME,
+            'column_name': localize(NAME_COLUMN_NAME),
             'values': [
                 {
                     "answers": [{
