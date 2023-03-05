@@ -42,3 +42,7 @@ TOPONYMS_TABLE_URL: final(str) = "https://simplemaps.com/static/data/country-cit
 TOPONYMS_REQUEST_TIMEOUT: final(int) = 179
 DEFAULT_LANGUAGE: final(str) = 'en'
 ALL_LANGUAGES_TAG: final(str) = 'all'
+
+MAX_LEADERS_PAGE_SIZE: int
+MAX_PROJECTS_PAGE_SIZE: int
+MAX_LEADER_COMMENT_SIZE: int
