@@ -60,7 +60,7 @@ class Question(Editable, FlaskApp().db.Model):
         self.related_question_id = related_question_id
         self.form_type = FormType[form_type]
 
-    def prepare_my_table(self, inverse_relation=False) -> JSON:
+    def prepare_my_table(self, inverse_relation=False) -> JSON | None:
         if self.question_type is not QuestionType.RELATION:
             raise LogicException("Could not prepare a table for non-relational question")
         if not inverse_relation and not self.relation_settings.export_forward_relation:
@@ -209,7 +209,7 @@ class Question(Editable, FlaskApp().db.Model):
         return self._privacy_settings
 
     @property
-    def relation_settings(self) -> RelationSettings:
+    def relation_settings(self) -> RelationSettings | None:
         if self.question_type != QuestionType.RELATION:
             return None
         return RelationSettings.get_by_id(self._relation_settings)

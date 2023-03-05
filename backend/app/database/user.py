@@ -134,7 +134,7 @@ class User(Editable, FlaskApp().db.Model):
     def check_password(self, password) -> bool:
         return bcrypt.checkpw(password.encode(), self.password_hash.encode())
 
-    def auth(self, login: str, password: str) -> 'User':
+    def auth(self, login: str, password: str) -> 'User' | None:
         user = User.get_by_login(login)
         if not user or not self.check_password(password):
             return None
