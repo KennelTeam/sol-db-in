@@ -113,8 +113,8 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
     def get_distinct_filtered(question_id: int, exact_values: List[Any], min_value: Any,
                               max_value: Any, substring: str, row_question_id: int) -> List[int]:
 
-        query = Answer.filter_query(question_id, row_question_id=row_question_id, exact_value=exact_values,
-                                    min_value=min_value, max_value=max_value, substring=substring)
+        query = Answer._filter_query(question_id, row_question_id=row_question_id, exact_values=exact_values,
+                                     min_value=min_value, max_value=max_value, substring=substring)
 
         answers = query.with_entities(Answer._form_id).distinct(Answer._form_id).all()
         return [item.form_id for item in answers]
