@@ -1,9 +1,9 @@
 import json
 from typing import final
 
-from flask import request, Response
+from flask import Response
 from flask_jwt_extended import jwt_required
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 
 from backend.app.database import User
 from .auxiliary import post_request, get_request, post_failure, HTTPErrorCode
@@ -23,12 +23,22 @@ class Users(Resource):
     @jwt_required()
     @post_request(Role.ADMIN)
     def post() -> Response:
-        login = request.json.get('login')
-        if login is None:
-            return post_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
-        if User.get_by_login(login) is not None:
+        parser = reqparse.RequestParser()
+        parser.add_argument('login', type=str, location='json', required=True)
+        parser.add_argument('name', type=str, location='json', required=True)
+        parser.add_argument('comment', type=str, location='json', required=True)
+        parser.add_argument('password', type=str, location='json', required=True)
+        parser.add_argument('role', type=str, location='json', required=True)
+        arguments = parser.parse_args()
+
+        if User.get_by_login(arguments['login']) is not None:
             return post_failure(HTTPErrorCode.CONFLICTING_ARGUMENTS, 400)
-        new_user = User(**request.json)
+
+        role = arguments['role']
+        if role is not None:
+            role = Role[role]
+
+        new_user = User(arguments['login'], arguments['name'], arguments['comment'], arguments['password'], role)
         new_user.save_to_db()
         return Response(json.dumps({'message': 'Successfully registered'}), 201)
 
@@ -36,20 +46,24 @@ class Users(Resource):
     @jwt_required()
     @post_request(Role.ADMIN)
     def patch() -> Response:
-        user_id = request.json.get('id')
-        if user_id is None:
-            return post_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
-        user = User.get_by_id(user_id)
+        parser = reqparse.RequestParser()
+        parser.add_argument('id', type=int, location='json', required=True)
+        parser.add_argument('login', type=str, location='json', required=False, default=None)
+        parser.add_argument('name', type=str, location='json', required=False, default=None)
+        parser.add_argument('comment', type=str, location='json', required=False, default=None)
+        parser.add_argument('password', type=str, location='json', required=False, default=None)
+        parser.add_argument('role', type=str, location='json', required=False, default=None)
+        arguments = parser.parse_args()
+
+        user = User.get_by_id(arguments['id'])
         if user is None:
             return post_failure(HTTPErrorCode.WRONG_ID, 404)
-        new_login = request.json.get('login')
-        new_name = request.json.get('name')
-        new_comment = request.json.get('comment')
-        new_password = request.json.get('password')
+
+        new_password = arguments['password']
         if new_password is not None and user.check_password(new_password):
             new_password = None
-        new_role = request.json.get('role')
+        new_role = arguments['role']
         if new_role is not None:
             new_role = Role[new_role]
-        user.update(login=new_login, name=new_name, comment=new_comment, password=new_password, role=new_role)
+        user.update(arguments['login'], arguments['name'], arguments['comment'], new_password, new_role)
         return Response(json.dumps({'message': 'Successfully updated'}), 200)

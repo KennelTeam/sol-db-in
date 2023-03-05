@@ -3,7 +3,7 @@
 from typing import final
 
 from flask import Response
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, current_user
 from flask_restful import Resource
 
 from .auxiliary import get_request, post_request, get_class_item_by_id_request, \
@@ -11,6 +11,7 @@ from .auxiliary import get_request, post_request, get_class_item_by_id_request, 
 from backend.app.flask_app import FlaskApp
 from ..database import TagType
 from ..database.user import Role
+from ...constants import ALL_LANGUAGES_TAG
 
 
 class TagTypes(Resource):
@@ -20,6 +21,7 @@ class TagTypes(Resource):
     @jwt_required()
     @get_request()
     def get():
+        current_user.selected_language = ALL_LANGUAGES_TAG
         return get_class_item_by_id_request(TagType)
 
     @staticmethod
