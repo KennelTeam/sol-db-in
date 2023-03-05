@@ -152,7 +152,7 @@ class Questions(Resource):
             fixed_table_id = formatting_json['fixed_table_id']
             if FixedTable.get_by_id(fixed_table_id) is None:
                 return None, post_failure(HTTPErrorCode.WRONG_ID, 404)
-            if 'table_row' not in formatting_json or type(formatting_json['table_row']) != int:
+            if 'table_row' not in formatting_json or not isinstance(formatting_json['table_row'], int):
                 return None, post_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
             table_row = formatting_json['table_row']
 
@@ -167,7 +167,7 @@ class Questions(Resource):
             table_id = formatting_json['table_id']
             if QuestionTable.get_by_id(table_id) is None:
                 return None, None, post_failure(HTTPErrorCode.WRONG_ID, 404)
-            if 'table_column' not in formatting_json or type(formatting_json['table_column']) != int:
+            if 'table_column' not in formatting_json or not isinstance(formatting_json['table_column'], int):
                 return None, None, post_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
             table_column = formatting_json['table_column']
             if 'fixed_table_id' in formatting_json and formatting_json['fixed_table'] is not None:

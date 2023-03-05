@@ -27,10 +27,10 @@ class Statistics(Resource):
         arguments = parser.parse_args()
 
         min_value = arguments['min_value']
-        if min_value is not None and type(min_value) is str:
+        if min_value is not None and isinstance(min_value, str):
             min_value = string_to_datetime(min_value)
         max_value = arguments['min_value']
-        if max_value is not None and type(max_value) is str:
+        if max_value is not None and isinstance(max_value, str):
             max_value = string_to_datetime(max_value)
 
         if Question.get_by_id(arguments['question_id']) is None:

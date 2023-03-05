@@ -57,14 +57,14 @@ class Action(ValueHolder, FlaskApp().db.Model):
         if row_id != -1:
             query = query.filter_by(row_id=row_id)
 
-        if type(value) == int:
-            query = query.filter_by(value_int=value)
-        elif type(value) == str:
-            query = query.filter_by(value_str=value)
-        elif type(value) == datetime:
-            query = query.filter_by(value_datetime=value)
-        elif type(value) is bool:
+        if isinstance(value, bool):
             query = query.filter_by(value_boolean=value)
+        elif isinstance(value, int):
+            query = query.filter_by(value_int=value)
+        elif isinstance(value, str):
+            query = query.filter_by(value_str=value)
+        elif isinstance(value, datetime):
+            query = query.filter_by(value_datetime=value)
 
         query = query.filter(timestamp_range.begin <= Action.timestamp)
         query = query.filter(Action.timestamp <= timestamp_range.end)
