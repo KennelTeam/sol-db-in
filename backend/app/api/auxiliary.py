@@ -91,10 +91,10 @@ def get_failure(error: HTTPErrorCode, status: int) -> Response:
 
 
 def check_json_format(source: Any, json_format: JSON) -> HTTPErrorCode:
-    if type(source) != dict:
+    if not isinstance(source, dict):
         return HTTPErrorCode.INVALID_ARG_FORMAT
     for key in json_format:
-        if type(json_format[key]) == set and None in json_format[key] and key not in source:
+        if isinstance(json_format[key], set) and None in json_format[key] and key not in source:
             continue
         if key not in source:
             return HTTPErrorCode.MISSING_ARGUMENT

@@ -39,7 +39,7 @@ class EditableValueHolder(ValueHolder, Editable):
 
     @staticmethod
     def filter_range(table: Type[FlaskApp().db.Model], min_value: Any, max_value: Any) -> Query:
-        if type(min_value) == int or type(max_value) == int:
+        if isinstance(min_value, int) or isinstance(max_value, int):
             if min_value is None:
                 min_value = INT_MIN
             if max_value is None:

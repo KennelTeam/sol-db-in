@@ -20,6 +20,7 @@ from backend.app.database.auxiliary import prettify_answer
 from backend.app.database.question_type import QuestionType
 from backend.app.flask_app import FlaskApp
 from backend.constants import NAME_COLUMN_NAME
+from ..database.localization import localize
 
 
 class Forms(Resource):
@@ -37,7 +38,7 @@ class Forms(Resource):
         arguments = parser.parse_args()
         ids = Form.get_all_ids()
         for item in arguments['answer_filters']:
-            if type(item) != dict:
+            if not isinstance(item, dict):
                 return get_failure(HTTPErrorCode.INVALID_ARG_LOCATION, 400)
             current_ids = Forms._solve_form_filter(item, arguments['name_substr'])
             if current_ids is None:
@@ -75,7 +76,7 @@ class Forms(Resource):
     @staticmethod
     def _prepare_table(forms: List[Form], question_ids: List[JSON]) -> List[JSON]:
         name_column = {
-            'column_name': NAME_COLUMN_NAME,
+            'column_name': localize(NAME_COLUMN_NAME),
             'values': [
                 {
                     "answers": [{
@@ -134,9 +135,9 @@ class Forms(Resource):
         min_value = filter.get('min_value', None)
         max_value = filter.get('max_value', None)
 
-        if type(min_value) == str:
+        if isinstance(min_value, str):
             min_value = string_to_datetime(min_value)
-        if type(max_value) == str:
+        if isinstance(max_value, str):
             max_value = string_to_datetime(max_value)
 
         substring = filter.get('substring', None)
@@ -189,11 +190,11 @@ class Forms(Resource):
 
     @staticmethod
     def _check_answer_object_correctness(answer: JSON) -> HTTPErrorCode:
-        if type(answer) != dict:
+        if not isinstance(answer, dict):
             return HTTPErrorCode.INVALID_ARG_TYPE
         if 'question_id' not in answer or 'answers' not in answer:
             return HTTPErrorCode.INVALID_ARG_TYPE
-        if type(answer['answers']) != list:
+        if not isinstance(answer['answers'], list):
             return HTTPErrorCode.INVALID_ARG_TYPE
         return HTTPErrorCode.SUCCESS
 
@@ -205,7 +206,7 @@ class Forms(Resource):
         if 'form_id' in answer and answer['form_id'] != form.id:
             return HTTPErrorCode.CONFLICTING_ARGUMENTS
         if 'id' in answer and answer['id'] > 0:
-            if type(answer['id']) != int:
+            if not isinstance(answer['id'], int):
                 return HTTPErrorCode.INVALID_ARG_TYPE
             current_ans = Answer.get_by_id(answer['id'])
             if current_ans is None:

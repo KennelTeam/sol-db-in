@@ -9,6 +9,7 @@ from backend.constants import MAX_QUESTION_TEXT_SIZE, MAX_LANGUAGES_COUNT, MAX_C
     SOURCE_QUESTION_ID, ANSWER_ROW_QUESTION_ID, MAX_SHORT_QUESTION_SIZE
 from backend.auxiliary import JSON, TranslatedText, LogicException
 from backend.app.flask_app import FlaskApp
+from .localization import localize
 from .editable import Editable
 from .form_type import FormType
 from .formatting_settings import FormattingSettings
@@ -142,10 +143,10 @@ class Question(Editable, FlaskApp().db.Model):
 
     def to_json(self, with_answers=False, form_id: int = None) -> JSON:
         result = super().to_json() | {
-            'text': self.text,
-            'short_text': self.short_text,
+            'text': localize(self.text),
+            'short_text': localize(self.short_text),
             'question_type': self.question_type.name,
-            'comment': self.comment,
+            'comment': localize(self.comment),
             'answer_block_id': self.answer_block_id,
             'formatting_settings': self.formatting_settings.to_json(),
             'privacy_settings': self.privacy_settings.to_json(),
