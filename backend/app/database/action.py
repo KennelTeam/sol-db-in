@@ -1,6 +1,5 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
-import datetime
 from backend.app.flask_app import FlaskApp
 from sqlalchemy.dialects.mysql import VARCHAR
 from typing import Any, List
@@ -9,6 +8,7 @@ from flask_jwt_extended import current_user, jwt_required
 from backend.auxiliary import JSON
 from .timestamp_range import TimestampRange
 from .value_holder import ValueHolder
+from ...auxiliary.string_dt import datetime_to_string
 
 
 class Action(ValueHolder, FlaskApp().db.Model):
@@ -39,7 +39,7 @@ class Action(ValueHolder, FlaskApp().db.Model):
             'column_id': self.column_id,
             'row_id': self.row_id,
             'ip': self.ip,
-            'timestamp': self.timestamp,
+            'timestamp': datetime_to_string(self.timestamp),
             'value': self.value
         }
 
@@ -57,14 +57,14 @@ class Action(ValueHolder, FlaskApp().db.Model):
         if row_id != -1:
             query = query.filter_by(row_id=row_id)
 
-        if type(value) == int:
-            query = query.filter_by(value_int=value)
-        elif type(value) == str:
-            query = query.filter_by(value_str=value)
-        elif type(value) == datetime.datetime:
-            query = query.filter_by(value_datetime=value)
-        elif type(value) is bool:
+        if isinstance(value, bool):
             query = query.filter_by(value_boolean=value)
+        elif isinstance(value, int):
+            query = query.filter_by(value_int=value)
+        elif isinstance(value, str):
+            query = query.filter_by(value_str=value)
+        elif isinstance(value, datetime):
+            query = query.filter_by(value_datetime=value)
 
         query = query.filter(timestamp_range.begin <= Action.timestamp)
         query = query.filter(Action.timestamp <= timestamp_range.end)

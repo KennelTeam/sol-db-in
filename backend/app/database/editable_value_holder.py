@@ -29,17 +29,17 @@ class EditableValueHolder(ValueHolder, Editable):
 
     @staticmethod
     def filter_exact_value(table: Type[FlaskApp().db.Model], exact_value: Any) -> Query:
-        if type(exact_value) == int or type(exact_value) == Enum:
+        if isinstance(exact_value, (int, Enum)):
             return FlaskApp().request(table).filter(table.value_int == exact_value)
-        if type(exact_value) == str:
+        if isinstance(exact_value, str):
             return FlaskApp().request(table).filter(table.value_text == exact_value)
-        if type(exact_value) == bool:
+        if isinstance(exact_value, bool):
             return FlaskApp().request(table).filter(table.value_bool == exact_value)
         return FlaskApp().request(table).filter(table.value_datetime == exact_value)
 
     @staticmethod
     def filter_range(table: Type[FlaskApp().db.Model], min_value: Any, max_value: Any) -> Query:
-        if type(min_value) == int or type(max_value) == int:
+        if isinstance(min_value, int) or isinstance(max_value, int):
             if min_value is None:
                 min_value = INT_MIN
             if max_value is None:

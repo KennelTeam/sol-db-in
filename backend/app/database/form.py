@@ -83,7 +83,7 @@ class Form(Editable, FlaskApp().db.Model):
             ids = [form.id for form in forms.all()]
             result[state.name] = {}
             for condition in filters:
-                result[state.name][condition['name']] = Answer.count_with_condition(ids, condition)
+                result[state.name][str(condition['name'])] = Answer.count_with_condition(ids, condition['filter'])
 
         return result
 
@@ -179,7 +179,7 @@ class Form(Editable, FlaskApp().db.Model):
         options = AnswerOption.get_all_from_block(question.answer_block_id)
         return [
             {
-                'name': option.text,
+                'name': option['name'],
                 'filter': Answer.value_int.in_([option['id']])
             } for option in options
         ]
