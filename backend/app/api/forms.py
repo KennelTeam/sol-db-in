@@ -82,7 +82,8 @@ class Forms(Resource):
                     "answers": [{
                         'type': QuestionType.RELATION.name,
                         'id': item.id,
-                        'value': item.name
+                        'value': item.name,
+                        'relation_type': item.form_type.name
                     }]
                 } for item in forms
             ]
@@ -126,28 +127,42 @@ class Forms(Resource):
 
     @staticmethod
     def _solve_form_filter(filter: JSON, name_substring: str) -> Set[int] | None:
+        if not Forms._check_filter_consistency(filter):
+            return None
         question_id = filter.get('question_id')
-        if question_id is None:
-            return None
-        row_question_id = filter.get('row_question_id')
-        exact_value = filter.get('exact_value')
-        if type(exact_value) not in {bool, int, str}:
-            return None
-        min_value = filter.get('min_value')
-        max_value = filter.get('max_value')
+        row_question_id = filter.get('row_question_id', None)
+        exact_values = filter.get('exact_values', None)
+        min_value = filter.get('min_value', None)
+        max_value = filter.get('max_value', None)
 
         if isinstance(min_value, str):
             min_value = string_to_datetime(min_value)
         if isinstance(max_value, str):
             max_value = string_to_datetime(max_value)
 
-        substring = filter.get('substring')
-        if not isinstance(substring, str):
+        substring = filter.get('substring', None)
+        if substring is not None and not isinstance(substring, str):
             return None
 
-        return Form.filter(name_substr=name_substring, question_id=question_id, exact_value=exact_value,
+        return Form.filter(name_substr=name_substring, question_id=question_id, exact_values=exact_values,
                            min_value=min_value, max_value=max_value, substring=substring,
                            row_question_id=row_question_id)
+
+    @staticmethod
+    def _check_filter_consistency(filter: JSON) -> bool:
+        question_id = filter.get('question_id')
+        if question_id is None:
+            return False
+        exact_values = filter.get('exact_values', None)
+        if exact_values is not None and not isinstance(exact_values, list):
+            return False
+        if len(exact_values) == 0:
+            return False
+        if len(set(type(item) for item in exact_values)) != 1:
+            return False
+        if type(exact_values[0]) not in {bool, int, str}:
+            return False
+        return True
 
     @staticmethod
     def _update_form_data(content: JSON, form_state: FormState, form_type: FormType, deleted: bool) -> Response:
@@ -203,7 +218,7 @@ class Forms(Resource):
             current_ans.table_row = answer['table_row']
         else:
             current_ans = Answer(answer['question_id'], form.id, answer['value'],
-                                 answer['table_row'], answer['row_question_id'])
+                                 answer.get('table_row', None), answer.get('row_question_id', None))
             FlaskApp().add_database_item(current_ans)
         return Forms._update_answer_tags(current_ans.id, answer['tags'])
 

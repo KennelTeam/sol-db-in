@@ -49,14 +49,14 @@ class Form(Editable, FlaskApp().db.Model):
         }
 
     @staticmethod
-    def filter(name_substr: str, question_id: int, exact_value: Any = None, min_value: Any = None,
+    def filter(name_substr: str, question_id: int, exact_values: List[Any] = None, min_value: Any = None,
                max_value: Any = None, substring: str = None, row_question_id: int = None) -> Set[int]:
 
         name_pattern = f"%{name_substr}%"
         name_condition = Form._name.like(name_pattern)
         name_search = FlaskApp().request(Form).filter(name_condition)
 
-        ids = Answer.get_distinct_filtered(question_id, exact_value, min_value, max_value, substring, row_question_id)
+        ids = Answer.get_distinct_filtered(question_id, exact_values, min_value, max_value, substring, row_question_id)
         query = name_search.filter(Form.id.in_(ids))
         query = query.with_entities(Form.id).distinct(Form.id)
         return set(item.id for item in query.all())

@@ -201,21 +201,24 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    column_name:
-                      type: string
-                    values:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          answers:
-                            type: array
-                            items:
-                              $ref: '#/components/schemas/Answer'
+                type: object
+                properties:
+                  table:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        column_name:
+                          type: string
+                        values:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              answers:
+                                type: array
+                                items:
+                                  $ref: '#/components/schemas/Answer'
 
         400:
           description: Invalid argument
@@ -289,14 +292,12 @@ paths:
               min_value:
                 oneOf:
                   - type: integer
-                  - schema:
-                    type: string
+                  - type: string
                     format: date-time
               max_value:
                 oneOf:
                   - type: integer
-                  - schema:
-                    type: string
+                  - type: string
                     format: date-time
               step:
                 type: integer
@@ -986,6 +987,10 @@ paths:
       description:
         Sets a maximum possible size of a given field
       parameters:
+        - in: body
+          name: value
+          schema:
+            type: integer
         - in: path
           required: true
           name: field_name
@@ -997,10 +1002,6 @@ paths:
               - ANSWER
               - LEADERS_PAGE
               - PROJECTS_PAGE
-        - in: body
-          name: value
-          schema:
-            type: integer
       responses:
         200:
           description: Successfully updated the value
@@ -1253,10 +1254,8 @@ components:
         relation_type:
           type: string
           enum:
-            - LEADER_TO_LEADER
-            - LEADER_TO_PROJECT
-            - PROJECT_TO_LEADER
-            - PROJECT_TO_PROJECT
+            - LEADER
+            - PROJECT
         related_visualization_type:
           type: string
           enum:
@@ -1274,11 +1273,9 @@ components:
           type: string
           description: If it should be exported in such way, how to call the sheet (else None is stored)
         main_page_count_title:
-          type: '#/components/schemas/TranslatedText'
-          description: If count of relations should be shown on the main page, how to call the column
+          $ref: '#/components/schemas/TranslatedText'
         inverse_main_page_count_title:
-          type: '#/components/schemas/TranslatedText'
-          description: The same as main_page_count_title, but for inverse relation
+          $ref: '#/components/schemas/TranslatedText'
         creation_timestamp:
           type: string
           format: date-time
@@ -1500,22 +1497,22 @@ components:
           type: integer
           description:
             If it is supposed to be an answer to a fixed table question
-        exact_value:
-          oneOf:
-            - type: integer
-            - type: string
-            - type: boolean
+        exact_values:
+          type: array
+          items:
+            oneOf:
+              - type: integer
+              - type: string
+              - type: boolean
         min_value:
           oneOf:
             - type: integer
-            - schema:
-              type: string
+            - type: string
               format: date-time
         max_value:
           oneOf:
             - type: integer
-            - schema:
-              type: string
+            - type: string
               format: date-time
         substring:
           type: string

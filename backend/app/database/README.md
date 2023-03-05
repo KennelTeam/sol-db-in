@@ -747,7 +747,6 @@ planned/started/finished
 - [AccessType](privacy_settings.py) The level of access 
 of some role to some question
 - [QuestionType](question_type.py) The type of the answer to the question
-- [RelationType](relation_type.py) LeaderToLeader, LeaderToProject, etc...
 - [TimestampRange](timestamp_range.py) A range from...to of datetime
 - [Role](user.py) A role of a user (ADMIN, GUEST, etc...)
 - [VisualizationType](visualization_type.py) How to show
