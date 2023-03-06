@@ -1,4 +1,6 @@
 import { AnswerType } from "../types/global"
+import { AnswerVariant } from "./TypedFilters"
+import axios from 'axios'
 
 // TESTING FUNCTIONS //////////////////////////////////////
 // later these functions will work with server API by passing requests
@@ -17,29 +19,108 @@ export function _getFilterableQuestionsList() : { id: number, text: string, type
     ]
 }
 
-export function _getAnswersList(questionId: number) : string[] {
+export function _getAnswersList(questionId: number) : AnswerVariant[] {
     if (questionId === 6) {
-        return ["banana", "carbonara", "smoozi", "porrige", "kinder surprise", "watermelon"]
+        return [
+            {id: 1, name: "banana"},
+            {id: 2, name: "carbonara"},
+            {id: 3, name: "smoozi"},
+            {id: 5, name: "porrige"},
+            {id: 7, name: "kinder surprise"},
+            {id: 8, name: "watermelon"}]
     } else {
-        return ["WRONG QUESTION ID PASSED"]
+        return [{id: -1, name: "WRONG QUESTION ID PASSED"}]
     }
 }
 
-export function _getUsersList() : string[] {
-    return ["Andrey", "Maria", "Nikolay", "Nikita", "Lev"]
+export function _getUsersList() : AnswerVariant[] {
+    return [
+        {id: 2, name: "Andrey"},
+        {id: 3, name: "Maria"},
+        {id: 5, name: "Nikolay"},
+        {id: 6, name: "Nikita"},
+        {id: 10, name: "Lev"}
+    ]
 }
 
-export function _getLeadersList() : string[] {
-    return ["Elon Musk", "Tim Cook", "Rayan Gosling", "Geyb Neuell", "Notch", "Sergey Brin", "Bill Gates", "Arkadiy Volosh"]
+export function _getLeadersList() : AnswerVariant[] {
+    return [
+        {id: 1, name: "Elon Musk"},
+        {id: 3, name: "Tim Cook"},
+        {id: 4, name: "Rayan Gosling"},
+        {id: 8, name: "Geyb Neuell"},
+        {id: 10, name: "Notch"},
+        {id: 11, name: "Sergey Brin"},
+        {id: 12, name: "Bill Gates"},
+        {id: 13, name: "Arkadiy Volosh"}
+    ]
 }
 
-export function _getProjectsList() : string[] {
-    return ["Tesla", "Space X", "PayPal", "Google", "Microsoft", "Apple", "Mail.ru"]
+export function _getProjectsList() : AnswerVariant[] {
+    return [
+        {id: 1, name: "Tesla"},
+        {id: 3, name: "Space X"},
+        {id: 4, name: "PayPal"},
+        {id: 8, name: "Google"},
+        {id: 10, name: "Microsoft"},
+        {id: 11, name: "Sergey Brin"},
+        {id: 12, name: "Bill Gates"},
+        {id: 13, name: "Apple"},
+        {id: 14, name: "Mail.ru"}
+    ]
 }
 
-export function _getLocationsList() : string[] {
-    return ["Los-Angeles", "Las-Vegas", "Chelyabinsk", "Himki", "Tokyo", "Berlin"]
+export function _getLocationsList() : AnswerVariant[] {
+    return [
+        {id: 1, name: "Los-Angeles"},
+        {id: 3, name: "Las-Vegas"},
+        {id: 4, name: "Chelyabinsk"},
+        {id: 8, name: "Himki"},
+        {id: 10, name: "Tokyo"},
+        {id: 11, name: "Berlin"},
+    ]
 }
+
+export interface ColumnGroup {
+    name: string,
+    columns: string[]
+}
+
+export interface ColumnResponse {
+    column_name: "string",
+    values: {
+        answers: {
+            id: number,
+            value: number | string | boolean,
+            type: string
+        }[]
+    }[]
+}
+
+export interface Row {
+    id: number,
+    name: string,
+    link: string
+    columns: {
+        link?: string,
+        data: string
+    }[][]
+}
+
+export function getColumnsFromResponse(data: ColumnResponse[]) : ColumnGroup[] {
+
+    return data.map((column) => ({ name: column.column_name, columns: [column.column_name] }))
+}
+
+// export function getRowsFromResponse(data: ColumnResponse[], link: string) : Row[] {
+//     const rows : Row[] = []
+//     for (let i = 0; i < data[0].values.length; i++) {
+//         rows.push(data.map((column) => ({
+//             id: column.answers[0].id,
+
+//         })))
+//     }
+// }
 
 export function _getColumns() : { name: string, columns: string[] }[] {
     return [
@@ -60,16 +141,6 @@ export function _getColumns() : { name: string, columns: string[] }[] {
             columns: ["Check", "Filter"]
         }
     ]
-}
-
-export interface Row {
-    id: number,
-    name: string,
-    link: string
-    columns: {
-        link?: string,
-        data: string
-    }[][]
 }
 
 export function _getRows() : Row[] {

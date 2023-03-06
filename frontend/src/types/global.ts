@@ -1,4 +1,6 @@
 
+const SERVER_ADDRESS = 'http://52.192.211.221:3000'
+
 enum UserType {
     Admin,
     Editor,
@@ -21,4 +23,4 @@ enum AnswerType {
 
 const MENU_WIDTH = 200
 
-export { UserType, MENU_WIDTH, AnswerType }
+export { UserType, MENU_WIDTH, AnswerType, SERVER_ADDRESS }

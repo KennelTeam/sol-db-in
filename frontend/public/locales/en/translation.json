@@ -57,6 +57,7 @@
         "to": "to",
         "table": "Table",
         "rows_per_page": "Rows per page",
-        "choose_filter": "Choose filter..."
+        "choose_filter": "Choose filter...",
+        "submit_filter": "Submit filter"
     }
 }

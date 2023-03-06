@@ -1,13 +1,15 @@
 import { Stack } from "@mui/system";
-import { Card, Typography, IconButton, ListItem, List, TextField, TextFieldProps, Autocomplete } from "@mui/material";
-import { AnswerType } from "../types/global"
+import { Card, Typography, IconButton, ListItem, List, TextField, TextFieldProps, Autocomplete, Button } from "@mui/material";
+import { AnswerType, SERVER_ADDRESS } from "../types/global"
 import ClearIcon from '@material-ui/icons/Clear'
 import AddIcon from '@material-ui/icons/Add'
 import * as Test from './_testFunctions'
-import { ListChoice, NumberFilter, TextFilter, CheckboxFilter, ChoiceFilter, AutocompleteChoiceFilter, DateFilter } from './TypedFilters'
-import { useState } from "react";
+import { NumberFilter, TextFilter, CheckboxFilter, ChoiceFilter, AutocompleteChoiceFilter, DateFilter, AnswerFilter } from './TypedFilters'
+import React, { useState } from "react";
 import MainTable from "./MainTable";
+import { useImmer } from "use-immer"
 import { useTranslation } from 'react-i18next'
+import axios from "axios";
 
 interface QuestionAttributes {
     id: number,
@@ -16,42 +18,43 @@ interface QuestionAttributes {
 }
 
 interface SingleFilterProps extends QuestionAttributes {
-    filterIdx: number
+    setFilter: (newValue: AnswerFilter) => void
 }
 
-function SingleFilter({id, text, type, filterIdx} : SingleFilterProps) {
+function SingleFilter(props : SingleFilterProps) {
 
+    const { id, text, type, setFilter } = props
     const [active, setActive] = useState(true)
 
     let filter: JSX.Element
 
     switch (type) {
         case AnswerType.Number :
-            filter = <NumberFilter/>
+            filter = <NumberFilter setFilter={setFilter}/>
             break
         case AnswerType.Text :
-            filter = <TextFilter/>
+            filter = <TextFilter setFilter={setFilter}/>
             break
         case AnswerType.Checkbox :
-            filter = <CheckboxFilter/>
+            filter = <CheckboxFilter setFilter={setFilter}/>
             break
         case AnswerType.List :
-            filter = <ChoiceFilter variants={Test._getAnswersList(id)}/>
+            filter = <ChoiceFilter variants={Test._getAnswersList(id)} setFilter={setFilter}/>
             break
         case AnswerType.User :
-            filter = <ChoiceFilter variants={Test._getUsersList()}/>
+            filter = <ChoiceFilter variants={Test._getUsersList()} setFilter={setFilter}/>
             break
         case AnswerType.Leader :
-            filter = <AutocompleteChoiceFilter variants={Test._getLeadersList()}/>
+            filter = <AutocompleteChoiceFilter variants={Test._getLeadersList()} setFilter={setFilter}/>
             break
         case AnswerType.Project :
-            filter = <AutocompleteChoiceFilter variants={Test._getProjectsList()}/>
+            filter = <AutocompleteChoiceFilter variants={Test._getProjectsList()} setFilter={setFilter}/>
             break
         case AnswerType.Date :
-            filter = <DateFilter/>
+            filter = <DateFilter setFilter={setFilter}/>
             break
         case AnswerType.Location :
-            filter = <ChoiceFilter variants={Test._getLocationsList()}/>
+            filter = <AutocompleteChoiceFilter variants={Test._getLocationsList()} setFilter={setFilter}/>
             break
         default :
             filter = <Typography color="error" variant="h3">Wrong AnswerType</Typography>
@@ -59,6 +62,9 @@ function SingleFilter({id, text, type, filterIdx} : SingleFilterProps) {
 
     const handleDelete = () => {
         setActive(false)
+        setFilter({
+            question_id: -1
+        })
     }
 
     return (
@@ -94,21 +100,41 @@ function FilterTablePage() {
     const questions = Test._getFilterableQuestionsList()
     const [filtersList, setFiltersList] = useState<JSX.Element[]>([])
     const [newQuestion, setNewQuestion] = useState(questions[0].text)
-    const [indexes, setIndexes] = useState<number>(0)
+    const [filtersData, changeFiltersData] = useImmer<AnswerFilter[]>([])
+
+    function changeFilters(newValue: AnswerFilter, idx: number) {
+        changeFiltersData(draft => { draft.splice(idx, 1, newValue) })
+    }
 
     const handleAdd = () => {
         const newQuestionData = questions.filter(question => (question.text === newQuestion))
         if (newQuestionData.length === 0) {
             return
         }
-        const curIndex: number = indexes
-        console.log(curIndex)
+        const idx = filtersData.length
+        changeFiltersData(draft => { draft.push({ question_id: -1 }) })
+        console.log(filtersData)
+
         setFiltersList([...filtersList,
-            <SingleFilter {...newQuestionData[0]} filterIdx={curIndex}/>
+            <SingleFilter {...newQuestionData[0]} setFilter={(newValue: AnswerFilter) => {
+                if (newValue.question_id !== -1) {
+                    newValue.question_id = newQuestionData[0].id
+                }
+                changeFilters(newValue, idx)
+            }}/>
         ])
-        setIndexes(indexes + 1)
     }
 
+    const handleSubmitFilter = () => {
+        const body = {
+            form_type: "LEADER", // later must be a parameter from props
+            answer_filters: filtersData.filter((f) => f.question_id !== -1)
+        }
+        console.log("PUT request to /forms with data:", body)
+        const newTableData = axios.put(SERVER_ADDRESS + '/forms', body)
+    }
+
+    console.log(filtersData)
     return (
         <Stack direction="column" spacing={1}>
             <h2>{t('title')}</h2>
@@ -120,7 +146,6 @@ function FilterTablePage() {
                     <Typography variant="caption">Add filter:</Typography>
                     <Autocomplete
                         disablePortal
-                        id="combo-box-demo"
                         options={questions.map(question => question.text)}
                         sx={{ width: 300 }}
                         value={newQuestion}
@@ -136,6 +161,7 @@ function FilterTablePage() {
                     </IconButton>
                 </Stack>
             </Card>
+            <Button variant="contained" onClick={handleSubmitFilter}>{t('submit_filter')}</Button>
             <h2>{t('table')}</h2>
             <Card>
                 <MainTable/>

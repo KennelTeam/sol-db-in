@@ -28,6 +28,7 @@
         "to": "до",
         "table": "Таблица",
         "rows_per_page": "Строк на странице:",
-        "choose_filter": "Новый фильтр..."
+        "choose_filter": "Новый фильтр...",
+        "submit_filter": "Применить"
     }
 }
