@@ -45,8 +45,8 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
     def json_format() -> JSON:
         return {
             'question_id': int,
-            'table_row': int,
-            'row_question_id': int,
+            'table_row': {int, None},
+            'row_question_id': {int, None},
             'value': {int, str, bool},
             'tags': list,
         }
@@ -61,7 +61,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
 
     @staticmethod
     def query_question_grouped_by_forms(question_id: int) -> Query:
-        return FlaskApp().request(Answer).filter_by(question_id=question_id)\
+        return FlaskApp().request(Answer).filter_by(question_id=question_id) \
             .group_by(Answer._form_id).with_entities(Answer._form_id)
 
     @staticmethod
@@ -103,28 +103,28 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
 
     @staticmethod
     def filter(question_id: int = None, row_question_id: int = None, form_id: int = None,
-               exact_value: Any = None, min_value: Any = None,
+               exact_values: List[Any] = None, min_value: Any = None,
                max_value: Any = None, substring: str = None) -> List['Answer']:
 
         return Answer._filter_query(question_id, row_question_id, form_id,
-                                    exact_value, min_value, max_value, substring).all()
+                                    exact_values, min_value, max_value, substring).all()
 
     @staticmethod
-    def get_distinct_filtered(question_id: int, exact_value: Any, min_value: Any,
+    def get_distinct_filtered(question_id: int, exact_values: List[Any], min_value: Any,
                               max_value: Any, substring: str, row_question_id: int) -> List[int]:
 
-        query = Answer.filter_query(question_id, row_question_id=row_question_id, exact_value=exact_value,
-                                    min_value=min_value, max_value=max_value, substring=substring)
+        query = Answer._filter_query(question_id, row_question_id=row_question_id, exact_values=exact_values,
+                                     min_value=min_value, max_value=max_value, substring=substring)
 
-        answers = query.with_entities(Answer._form_id).distinct(Answer._form_id).all()
+        answers = query.distinct(Answer._form_id).all()
         return [item.form_id for item in answers]
 
     @staticmethod
     def _filter_query(question_id: int = None, row_question_id: int = None, form_id: int = None,
-                      exact_value: Any = None, min_value: Any = None,
+                      exact_values: List[Any] = None, min_value: Any = None,
                       max_value: Any = None, substring: str = None) -> Query:
 
-        query = EditableValueHolder.filter_by_value(Answer, exact_value=exact_value, min_value=min_value,
+        query = EditableValueHolder.filter_by_value(Answer, exact_values=exact_values, min_value=min_value,
                                                     max_value=max_value, substring=substring)
         if question_id is not None:
             query = query.filter_by(_question_id=question_id)
