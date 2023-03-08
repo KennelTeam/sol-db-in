@@ -29,9 +29,9 @@ class HTTPErrorCode(enum.Enum):
 
 class GetRequestParser:
     def __init__(self):
-        self.arguments = dict()
+        self.arguments = {}
 
-    def add_argument(self, name: str, type=None, required=False, default=None) -> None:
+    def add_argument(self, name: str, type=None, required=False, default=None) -> Response | None:
         if required:
             if request.args.get(name) is None:
                 return get_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)

@@ -6,7 +6,7 @@ from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 
-from .auxiliary import get_request, HTTPErrorCode, post_request, post_failure, get_class_item_by_id_request, get_failure
+from .auxiliary import get_request, HTTPErrorCode, post_request, post_failure, get_class_item_by_id_request
 from backend.app.database.answer_option import AnswerOption
 from backend.app.flask_app import FlaskApp
 from ..database import AnswerBlock
