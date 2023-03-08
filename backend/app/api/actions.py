@@ -1,11 +1,11 @@
 import json
 from typing import final
 
-from flask import Response, request
+from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 
-from backend.app.api.auxiliary import get_request, get_failure, HTTPErrorCode
+from backend.app.api.auxiliary import get_request, get_failure, HTTPErrorCode, GetRequestParser
 from backend.app.database import Action
 from backend.app.database.timestamp_range import TimestampRange
 from backend.app.database.user import Role
@@ -19,26 +19,29 @@ class Actions(Resource):
     @jwt_required()
     @get_request(Role.ADMIN)
     def get() -> Response:
-        user_id = request.args.get('user_id', type=int, default=-1)
-        timestamp_from = request.args.get('timestamp_from', type=str, default=None)
-        timestamp_to = request.args.get('timestamp_to', type=str, default=None)
-        table_id = request.args.get('table_id', type=int, default=-1)
-        column_id = request.args.get('column_id', type=str, default='')
-        row_id = request.args.get('row_id', type=int, default=-1)
-        value = request.args.get('value', type=int, default=None)
+        parser = GetRequestParser()
+        parser.add_argument('user_id', type=int, default=-1)
+        parser.add_argument('timestamp_from', type=str)
+        parser.add_argument('timestamp_to', type=str)
+        parser.add_argument('table_id', type=int, default=-1)
+        parser.add_argument('column_id', type=str, default='')
+        parser.add_argument('row_id', type=int, default=-1)
+        parser.add_argument('value', type=int, default=None)
+        arguments = parser.parse_args()
 
         timestamp_range = TimestampRange()
-        if timestamp_from is not None:
+        if arguments['timestamp_from'] is not None:
             try:
-                timestamp_range.begin = string_to_datetime(timestamp_from)
+                timestamp_range.begin = string_to_datetime(arguments['timestamp_from'])
             except ValueError:
                 return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
-        if timestamp_to is not None:
+        if arguments['timestamp_to'] is not None:
             try:
-                timestamp_range.end = string_to_datetime(timestamp_to)
+                timestamp_range.end = string_to_datetime(arguments['timestamp_to'])
             except ValueError:
                 return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
 
-        filtered_actions = Action.filter(user_id, timestamp_range, table_id, column_id, row_id, value)
+        filtered_actions = Action.filter(arguments['user_id'], timestamp_range, arguments['table_id'],
+                                         arguments['column_id'], arguments['row_id'], arguments['value'])
 
         return Response(json.dumps([action.to_json() for action in filtered_actions]), 200)

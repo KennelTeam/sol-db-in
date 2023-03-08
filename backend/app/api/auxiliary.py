@@ -27,11 +27,27 @@ class HTTPErrorCode(enum.Enum):
     INVALID_JWT = 10
 
 
+class GetRequestParser:
+    def __init__(self):
+        self.arguments = dict()
+
+    def add_argument(self, name: str, type=None, required=False, default=None) -> None:
+        if required:
+            if request.args.get(name) is None:
+                return get_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
+            if request.args.get(name, type=type) is None:
+                return get_failure(HTTPErrorCode.INVALID_ARG_TYPE, 400)
+        self.arguments[name] = request.args.get(name, type=type, default=default)
+
+    def parse_args(self):
+        return self.arguments
+
+
 def get_class_item_by_id_request(Class) -> Response:
-    id = request.args.get('id', type=int, default=None)
-    if id is None:
-        get_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
-    current = Class.get_by_id(id)
+    parser = GetRequestParser()
+    parser.add_argument('id', type=int, required=True)
+    arguments = parser.parse_args()
+    current = Class.get_by_id(arguments['id'])
     if current is None:
         return get_failure(HTTPErrorCode.WRONG_ID, 404)
     return Response(json.dumps(current.to_json()), 200)

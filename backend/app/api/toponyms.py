@@ -3,11 +3,11 @@
 import json
 from typing import final
 
-from flask import Response, request
+from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 
-from .auxiliary import get_request, get_failure, HTTPErrorCode, post_request, post_failure
+from .auxiliary import get_request, get_failure, HTTPErrorCode, post_request, post_failure, GetRequestParser
 from backend.app.database.toponym import Toponym
 from backend.app.flask_app import FlaskApp
 from ..database.user import Role
@@ -20,12 +20,14 @@ class Toponyms(Resource):
     @jwt_required()
     @get_request()
     def get() -> Response:
-        id = request.args.get('id', type=int, default=-1)
-        name = request.args.get('name', type=str, default='')
-        if name != '':
-            top = Toponym.get_by_name(name)
-        elif id != -1:
-            top = Toponym.get_by_id(id)
+        parser = GetRequestParser()
+        parser.add_argument('id', type=int, default=-1)
+        parser.add_argument('name', type=str, default="")
+        arguments = parser.parse_args()
+        if arguments['name'] != '':
+            top = Toponym.get_by_name(arguments['name'])
+        elif arguments['id'] != -1:
+            top = Toponym.get_by_id(arguments['id'])
         else:
             return get_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
         if top is None:
