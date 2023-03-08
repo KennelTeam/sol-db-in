@@ -31,12 +31,14 @@ class GetRequestParser:
     def __init__(self):
         self.arguments = {}
 
-    def add_argument(self, name: str, type=None, required=False, default=None) -> Response | None:
+    def add_argument(self, name: str, type=None, required=False, default=None) -> None:
         if required:
             if request.args.get(name) is None:
-                return get_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
+                get_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
+                return
             if request.args.get(name, type=type) is None:
-                return get_failure(HTTPErrorCode.INVALID_ARG_TYPE, 400)
+                get_failure(HTTPErrorCode.INVALID_ARG_TYPE, 400)
+                return
         self.arguments[name] = request.args.get(name, type=type, default=default)
 
     def parse_args(self):
