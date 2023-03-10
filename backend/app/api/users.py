@@ -40,7 +40,7 @@ class Users(Resource):
 
         new_user = User(arguments['login'], arguments['name'], arguments['comment'], arguments['password'], role)
         new_user.save_to_db()
-        return Response(json.dumps({'message': 'Successfully registered'}), 201)
+        return Response(str(new_user.id), 200)
 
     @staticmethod
     @jwt_required()
@@ -66,4 +66,4 @@ class Users(Resource):
         if new_role is not None:
             new_role = Role[new_role]
         user.update(arguments['login'], arguments['name'], arguments['comment'], new_password, new_role)
-        return Response(json.dumps({'message': 'Successfully updated'}), 200)
+        return Response(str(user.id), 200)
