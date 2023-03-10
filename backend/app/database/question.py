@@ -2,7 +2,6 @@
 #  All rights reserved.
 from enum import Enum
 
-from sqlalchemy import func
 from sqlalchemy.orm import Query
 from typing import List
 import json
