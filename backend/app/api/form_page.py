@@ -18,7 +18,7 @@ class FormPage(Resource):
     @staticmethod
     @jwt_required()
     @get_request()
-    def get() -> Response:
+    def put() -> Response:
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, location='json', required=True)
         arguments = parser.parse_args()

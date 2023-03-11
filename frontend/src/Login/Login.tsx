@@ -10,7 +10,7 @@ function Login() {
   const [isError, setIsError] = useState(false);
   const {t} = useTranslation('translation', { keyPrefix: 'login' });
 
-  function on_submit(e: SyntheticEvent) {
+  async function on_submit(e: SyntheticEvent) {
       setIsError(true);
       e.preventDefault();
       const target = e.target as typeof e.target & {
@@ -21,8 +21,34 @@ function Login() {
           login: target.login.value,
           password: target.password.value
       }
-      axios.post("http://127.0.0.1:5000/login", request)
-          .then((r) => {console.log(r)})
+      const res = await axios.post("http://127.0.0.1:5000/login", request, {withCredentials: true})
+      console.log(res)
+      const req = {
+          form_type: "LEADER"
+      }
+      /*axios.get("http://127.0.0.1:5000/form", {data: req, withCredentials: true})
+          .then((r) => {console.log(r)})*/
+      /*const response = await fetch("http://127.0.0.1:5000/form", {
+          method: "QUERY", // *GET, POST, PUT, DELETE, etc.
+          //mode: "cors", // no-cors, *cors, same-origin
+          //cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+          credentials: "include", // include, *same-origin, omit
+          headers: {
+              "Content-Type": "application/json"
+
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          //redirect: "follow", // manual, *follow, error
+          //referrerPolicy: "strict-origin", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+          body: JSON.stringify(req), // body data type must match "Content-Type" header
+      });
+      console.log(response)*/
+      axios.request({
+          method: "QUERY",
+          url: "http://127.0.0.1:5000/form",
+          data: req,
+          withCredentials: true
+      }).then((r) => {console.log(r)})
   }
 
   return (

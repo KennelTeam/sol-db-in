@@ -29,7 +29,7 @@ class Forms(Resource):
     @staticmethod
     @jwt_required()
     @get_request()
-    def get() -> Response:
+    def put() -> Response:
         parser = reqparse.RequestParser()
         parser.add_argument('form_type', type=str, location='json', required=True)
         parser.add_argument('answer_filters', type=list, location='json', required=True)
