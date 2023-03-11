@@ -1,6 +1,6 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
-from typing import final
+from typing import Final
 
 from flask import Response
 from flask_jwt_extended import jwt_required
@@ -14,7 +14,7 @@ from ..database.user import Role
 
 
 class AnswerOptionsPage(Resource):
-    route: final(str) = '/answer_options'
+    route: Final[str] = '/answer_options'
 
     @staticmethod
     @jwt_required()

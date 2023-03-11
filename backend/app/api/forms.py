@@ -5,7 +5,7 @@ import json
 from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
-from typing import Set, List, final
+from typing import Set, List, Final
 
 from .auxiliary import HTTPErrorCode, get_failure, post_failure, check_json_format, get_request, post_request
 from backend.app.database.form import Form, FormType, FormState
@@ -24,7 +24,7 @@ from ..database.localization import localize
 
 
 class Forms(Resource):
-    route: final(str) = '/forms'
+    route: Final[str] = '/forms'
 
     @staticmethod
     @jwt_required()

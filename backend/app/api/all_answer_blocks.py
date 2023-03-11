@@ -1,7 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 import json
-from typing import final
+from typing import Final
 
 from flask import Response
 from flask_jwt_extended import jwt_required, current_user
@@ -13,7 +13,7 @@ from ...constants import ALL_LANGUAGES_TAG
 
 
 class AllAnswerBlocks(Resource):
-    route: final(str) = '/all_answer_blocks'
+    route: Final[str] = '/all_answer_blocks'
 
     @staticmethod
     @jwt_required()

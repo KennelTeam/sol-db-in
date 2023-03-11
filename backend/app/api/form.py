@@ -1,7 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 import json
-from typing import final
+from typing import Final
 
 from flask import Response
 from flask_jwt_extended import jwt_required, current_user
@@ -14,7 +14,7 @@ from ...constants import ALL_LANGUAGES_TAG
 
 
 class FormSchema(Resource):
-    route: final(str) = '/form'
+    route: Final[str] = '/form'
 
     @staticmethod
     @jwt_required()

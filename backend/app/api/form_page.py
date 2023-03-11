@@ -1,7 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 import json
-from typing import final
+from typing import Final
 
 from flask import Response
 from flask_jwt_extended import jwt_required
@@ -13,7 +13,7 @@ from ..database.auxiliary import prettify_answer
 
 
 class FormPage(Resource):
-    route: final(str) = '/form_page'
+    route: Final[str] = '/form_page'
 
     @staticmethod
     @jwt_required()
