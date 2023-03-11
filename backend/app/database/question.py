@@ -5,7 +5,7 @@ from enum import Enum
 from sqlalchemy.orm import Query
 from typing import List
 import json
-from backend.constants import MAX_QUESTION_TEXT_SIZE, MAX_LANGUAGES_COUNT, MAX_COMMENT_SIZE, \
+from backend.constants import MAX_QUESTION_TEXT_SIZE, MAX_LANGUAGES_COUNT, MAX_QUESTION_COMMENT_SIZE, \
     SOURCE_QUESTION_ID, ANSWER_ROW_QUESTION_ID, MAX_SHORT_QUESTION_SIZE
 from backend.auxiliary import JSON, TranslatedText, LogicException
 from backend.app.flask_app import FlaskApp
@@ -31,7 +31,7 @@ class Question(Editable, FlaskApp().db.Model):
     _text = FlaskApp().db.Column('text', FlaskApp().db.Text(MAX_QUESTION_TEXT_SIZE * MAX_LANGUAGES_COUNT))
     _short_text = FlaskApp().db.Column('short_text', FlaskApp().db.Text(MAX_SHORT_QUESTION_SIZE * MAX_LANGUAGES_COUNT))
     _question_type = FlaskApp().db.Column('question_type', FlaskApp().db.Enum(QuestionType))
-    _comment = FlaskApp().db.Column('comment', FlaskApp().db.Text(MAX_COMMENT_SIZE * MAX_LANGUAGES_COUNT))
+    _comment = FlaskApp().db.Column('comment', FlaskApp().db.Text(MAX_QUESTION_COMMENT_SIZE * MAX_LANGUAGES_COUNT))
     _answer_block_id = FlaskApp().db.Column('answer_block_id',
                                             FlaskApp().db.ForeignKey('answer_blocks.id'), nullable=True)
 

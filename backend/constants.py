@@ -14,7 +14,8 @@ MAX_FULLNAME_SIZE: final(int) = 256
 MAX_NAME_SIZE: final(int) = 64
 MAX_PROJECT_NAME_SIZE: final(int) = 512
 MAX_TAG_SIZE: final(int) = 256
-MAX_COMMENT_SIZE: final(int) = 512
+MAX_USER_COMMENT_SIZE: final(int) = 512
+MAX_QUESTION_COMMENT_SIZE: final(int) = 512
 MAX_BLOCK_NAME_SIZE: final(int) = 64
 MAX_QUESTION_TEXT_SIZE: final(int) = 256
 MAX_ANSWER_BLOCK_NAME: final(int) = 128
@@ -42,3 +43,7 @@ TOPONYMS_TABLE_URL: final(str) = "https://simplemaps.com/static/data/country-cit
 TOPONYMS_REQUEST_TIMEOUT: final(int) = 179
 DEFAULT_LANGUAGE: final(str) = 'en'
 ALL_LANGUAGES_TAG: final(str) = 'all'
+
+MAX_LEADERS_PAGE_SIZE: int = 200
+MAX_PROJECTS_PAGE_SIZE: int = 200
+MAX_COMMENT_SIZE_IN_LEADERS_LIST: int = 10
