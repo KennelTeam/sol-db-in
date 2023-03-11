@@ -5,9 +5,9 @@ from typing import final
 
 from flask import Response
 from flask_jwt_extended import jwt_required, current_user
-from flask_restful import Resource, reqparse
+from flask_restful import Resource
 
-from .auxiliary import HTTPErrorCode, get_request, get_failure
+from .auxiliary import HTTPErrorCode, get_request, get_failure, GetRequestParser
 from ..database import QuestionBlock
 from ..database.form_type import FormType
 from ...constants import ALL_LANGUAGES_TAG
@@ -21,8 +21,10 @@ class FormSchema(Resource):
     @get_request()
     def get():
         current_user.selected_language = ALL_LANGUAGES_TAG
-        parser = reqparse.RequestParser()
+        parser = GetRequestParser()
         parser.add_argument('form_type', type=str, required=True)
+        if parser.error is not None:
+            return parser.error
         form_type = parser.parse_args()['form_type']
         if form_type not in FormType.items():
             return get_failure(HTTPErrorCode.INVALID_ARG_TYPE, 400)
