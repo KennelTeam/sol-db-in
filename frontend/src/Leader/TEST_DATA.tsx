@@ -95,13 +95,11 @@ const TEST_DATA: ResponseDataInterface = {
                                 description: null
                             },
                         ],
-                        questionData: {
-                            questionType: SimpleQuestionType.NUMBER,
-                            questionData: {
-                                label: null,
-                                initialValue: 0,
-                            }
-                        }
+                        questionType: SimpleQuestionType.NUMBER,
+                        questionData: [
+                            [{label: null, initialValue: 10}, {label: null, initialValue: 20}],
+                            [{label: null, initialValue: 30}, {label: null, initialValue: 40}],
+                        ]
                     },
                     inputInfo: {
                         title: "How good do participants interact with each other",
