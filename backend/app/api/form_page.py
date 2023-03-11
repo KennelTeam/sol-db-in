@@ -7,7 +7,7 @@ from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 
-from .auxiliary import HTTPErrorCode, get_failure, get_request, GetRequestParser
+from .auxiliary import HTTPErrorCode, get_failure, get_request, create_id_reqparser
 from backend.app.database.form import Form
 from ..database.auxiliary import prettify_answer
 
@@ -19,8 +19,7 @@ class FormPage(Resource):
     @jwt_required()
     @get_request()
     def get() -> Response:
-        parser = GetRequestParser()
-        parser.add_argument('id', type=int, required=True)
+        parser = create_id_reqparser()
         if parser.error is not None:
             return parser.error
         arguments = parser.parse_args()

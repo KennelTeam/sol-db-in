@@ -44,9 +44,14 @@ class GetRequestParser:
         return self.arguments
 
 
-def get_class_item_by_id_request(Class) -> Response:
+def create_id_reqparser() -> GetRequestParser:
     parser = GetRequestParser()
     parser.add_argument('id', type=int, required=True)
+    return parser
+
+
+def get_class_item_by_id_request(Class) -> Response:
+    parser = create_id_reqparser()
     if parser.error is not None:
         return parser.error
     arguments = parser.parse_args()
