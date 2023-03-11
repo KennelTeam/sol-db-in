@@ -8,6 +8,7 @@ from flask_restful import Resource, reqparse
 from backend.app.database import User
 from .auxiliary import post_request, get_request, post_failure, HTTPErrorCode
 from backend.app.database.user import Role
+from ..flask_app import FlaskApp
 
 
 class Users(Resource):
@@ -29,10 +30,18 @@ class Users(Resource):
         parser.add_argument('comment', type=str, location='json', required=True)
         parser.add_argument('password', type=str, location='json', required=True)
         parser.add_argument('role', type=str, location='json', required=True)
+        parser.add_argument('deleted', type=bool, location='json', required=False, default=False)
         arguments = parser.parse_args()
 
         if User.get_by_login(arguments['login']) is not None:
-            return post_failure(HTTPErrorCode.CONFLICTING_ARGUMENTS, 400)
+            user = User.get_by_login(arguments['login'])
+            user.name = arguments['name']
+            user.comment = arguments['comment']
+            user.deleted = arguments['deleted']
+            user.password = arguments['password']
+            user.role = Role[arguments['role']]
+            FlaskApp().flush_to_database()
+            return Response(json.dumps({'message': 'Successfully edited'}), 200)
 
         role = arguments['role']
         if role is not None:

@@ -66,8 +66,9 @@ class Form(Editable, FlaskApp().db.Model):
         return FlaskApp().request(Form).filter(Form.id.in_(ids)).all()
 
     @staticmethod
-    def get_all_ids() -> Set[int]:
-        return {item.id for item in FlaskApp().request(Form).with_entities(Form.id).all()}
+    def get_all_ids(form_type: FormType) -> Set[int]:
+        return {item.id for item in FlaskApp().request(Form).filter_by(_form_type=form_type)
+                .with_entities(Form.id).all()}
 
     @staticmethod
     def prepare_statistics(question_id: int, min_value: int | datetime = None, max_value: int | datetime = None,

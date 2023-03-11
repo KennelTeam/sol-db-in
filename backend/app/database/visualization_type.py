@@ -1,6 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 from enum import Enum
+from typing import Set
 
 
 class VisualizationType(Enum):
@@ -9,5 +10,5 @@ class VisualizationType(Enum):
     NOTHING = 3
 
     @staticmethod
-    def __contains__(item: str) -> bool:
-        return item in VisualizationType.__members__
+    def items() -> Set[str]:
+        return set(VisualizationType.__members__.keys())

@@ -102,7 +102,9 @@ class Questions(Resource):
             FlaskApp().add_database_item(relation_settings)
         FlaskApp().add_database_item(privacy_settings)
         FlaskApp().add_database_item(formatting_settings)
+        FlaskApp().flush_to_database()
         FlaskApp().add_database_item(current)
+
         return current
 
     @staticmethod
@@ -152,9 +154,14 @@ class Questions(Resource):
             fixed_table_id = formatting_json['fixed_table_id']
             if FixedTable.get_by_id(fixed_table_id) is None:
                 return None, post_failure(HTTPErrorCode.WRONG_ID, 404)
-            if 'table_row' not in formatting_json or not isinstance(formatting_json['table_row'], int):
+            table_row = formatting_json.get('table_row', None)
+            table_column = formatting_json.get('table_column', None)
+            if table_row is not None and not isinstance(table_row, int):
                 return None, post_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
-            table_row = formatting_json['table_row']
+            if table_column is not None and not isinstance(table_column, int):
+                return None, post_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
+            if table_row is None and table_column is None:
+                return None, post_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
 
         return FormattingSettings(block_sorting, block_id, table_row, table_id, table_column,
                                   show_on_main_page, fixed_table_id), None
@@ -169,7 +176,7 @@ class Questions(Resource):
                 return None, None, post_failure(HTTPErrorCode.WRONG_ID, 404)
             if 'table_column' not in formatting_json or not isinstance(formatting_json['table_column'], int):
                 return None, None, post_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
-            table_column = formatting_json['table_column']
+            table_column = formatting_json.get('table_column', None)
             if 'fixed_table_id' in formatting_json and formatting_json['fixed_table'] is not None:
                 return None, None, post_failure(HTTPErrorCode.CONFLICTING_ARGUMENTS, 400)
             if 'table_row' in formatting_json and formatting_json['table_row'] is not None:
