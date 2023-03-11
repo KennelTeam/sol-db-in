@@ -126,7 +126,7 @@ def check_json_format(source: Any, json_format: JSON) -> HTTPErrorCode:
             if type(source[key]) not in json_format[key]:
                 return HTTPErrorCode.INVALID_ARG_TYPE
         elif issubclass(json_format[key], enum.Enum):
-            if isinstance(source[key], str) or source[key] not in json_format[key].items():
+            if not isinstance(source[key], str) or source[key] not in json_format[key].items():
                 return HTTPErrorCode.INVALID_ARG_TYPE
         elif type(source[key]) != json_format[key]:
             return HTTPErrorCode.INVALID_ARG_TYPE

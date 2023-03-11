@@ -31,12 +31,15 @@ class Forms(Resource):
     @get_request()
     def get() -> Response:
         parser = reqparse.RequestParser()
-        parser.add_argument('form_type', type=str, location='json', required=True)
+        parser.add_argument('form_type', type=str, required=True)
         parser.add_argument('answer_filters', type=list, location='json', required=True)
-        parser.add_argument('name_substr', type=str, location='json', required=False, default='')
+        parser.add_argument('name_substr', type=str, required=False, default='')
 
         arguments = parser.parse_args()
-        ids = Form.get_all_ids()
+        if arguments['form_type'] not in FormType.items():
+            return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
+        form_type = FormType[arguments['form_type']]
+        ids = Form.get_all_ids(form_type)
         for item in arguments['answer_filters']:
             if not isinstance(item, dict):
                 return get_failure(HTTPErrorCode.INVALID_ARG_LOCATION, 400)
@@ -45,7 +48,7 @@ class Forms(Resource):
                 return get_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
             ids &= current_ids
         forms = Form.get_by_ids(ids)
-        question_ids = Question.get_only_main_page(FormType[arguments['form_type']])
+        question_ids = Question.get_only_main_page(form_type)
 
         result = Forms._prepare_table(forms, question_ids)
         return Response(json.dumps({'table': result}), 200)
@@ -98,8 +101,14 @@ class Forms(Resource):
                 answers.append(
                     Forms._get_forms_answer_prettified(form.id, question.id, q_type)
                 )
+            if q_type == AnswerType.INVERSE_COUNT:
+                title = question.relation_settings.inverse_main_page_count_title
+            elif q_type == AnswerType.FORWARD_COUNT:
+                title = question.relation_settings.main_page_count_title
+            else:
+                title = question.short_text
             result.append({
-                'column_name': question.short_text,
+                'column_name': localize(title),
                 'values': answers
             })
 
@@ -231,7 +240,7 @@ class Forms(Resource):
                 return status
             if Tag.get_by_id(tag['id']) is None:
                 return HTTPErrorCode.WRONG_ID
-            tags.append(tag['id'])
+            tags_set.add(tag['id'])
         old_tag_ids = TagToAnswer.get_answers_tag_ids(answer_id)
         for tag_id in old_tag_ids:
             if tag_id not in tags_set:

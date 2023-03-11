@@ -22,9 +22,9 @@ class RelationSettings(Editable, FlaskApp().db.Model):
                                                           FlaskApp().db.Integer, nullable=True)
 
     _forward_relation_sheet_name = FlaskApp().db.Column('forward_relation_sheet_name',
-                                                        FlaskApp().db.Boolean, nullable=True)
+                                                        FlaskApp().db.Text, nullable=True)
     _inverse_relation_sheet_name = FlaskApp().db.Column('inverse_relation_sheet_name',
-                                                        FlaskApp().db.Boolean, nullable=True)
+                                                        FlaskApp().db.Text, nullable=True)
     _main_page_count_title = FlaskApp().db.Column('main_page_count_title',
                                                   FlaskApp().db.Text(MAX_SHORT_QUESTION_SIZE * MAX_LANGUAGES_COUNT),
                                                   nullable=True)
@@ -33,14 +33,14 @@ class RelationSettings(Editable, FlaskApp().db.Model):
         FlaskApp().db.Text(MAX_SHORT_QUESTION_SIZE * MAX_LANGUAGES_COUNT),
         nullable=True)
 
-    def __init__(self, relation_type: FormType,
-                 related_visualization_type: VisualizationType, related_visualization_sorting: int = 0,
+    def __init__(self, relation_type: str,
+                 related_visualization_type: str, related_visualization_sorting: int = 0,
                  main_page_count_title: TranslatedText = None, inverse_main_page_count_title: TranslatedText = None,
                  forward_relation_sheet_name: str = None, inverse_relation_sheet_name: str = None) -> None:
 
         super().__init__()
-        self._relation_type = relation_type
-        self.related_visualization_type = related_visualization_type
+        self._relation_type = FormType[relation_type]
+        self.related_visualization_type = VisualizationType[related_visualization_type]
         self.related_visualization_sorting = related_visualization_sorting
 
         self.main_page_count_title = main_page_count_title
@@ -50,8 +50,8 @@ class RelationSettings(Editable, FlaskApp().db.Model):
 
     def to_json(self) -> JSON:
         return super().to_json() | {
-            'relation_type': self.relation_type,
-            'related_visualization_type': self.related_visualization_type,
+            'relation_type': self.relation_type.name,
+            'related_visualization_type': self.related_visualization_type.name,
             'related_visualization_sorting': self.related_visualization_sorting,
             'forward_relation_sheet_name': self.forward_relation_sheet_name,
             'inverse_relation_sheet_name': self.inverse_relation_sheet_name,
@@ -72,7 +72,7 @@ class RelationSettings(Editable, FlaskApp().db.Model):
         return {
             'relation_type': FormType,
             'related_visualization_type': VisualizationType,
-            'related_visualization_sorting': VisualizationType,
+            'related_visualization_sorting': int,
             'forward_relation_sheet_name': {str, None},
             'inverse_relation_sheet_name': {str, None},
             'main_page_count_title': {dict, None},
@@ -80,12 +80,12 @@ class RelationSettings(Editable, FlaskApp().db.Model):
         }
 
     @staticmethod
-    def get_main_page_count_presented() -> Tuple[List[int], List[int]]:
+    def get_main_page_count_presented(form_type: FormType) -> Tuple[List[int], List[int]]:
         forward_query = FlaskApp().request(RelationSettings).filter(RelationSettings._main_page_count_title is not None)
         forward_query = forward_query.with_entities(RelationSettings.id)
         forward = [item.id for item in forward_query.all()]
 
-        inverse_query = FlaskApp().request(RelationSettings)\
+        inverse_query = FlaskApp().request(RelationSettings).filter_by(_relation_type=form_type)\
             .filter(RelationSettings._inverse_main_page_count_title is not None).with_entities(RelationSettings.id)
         inverse = [item.id for item in inverse_query.all()]
         return forward, inverse
