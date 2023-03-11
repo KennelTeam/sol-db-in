@@ -30,15 +30,14 @@ class HTTPErrorCode(enum.Enum):
 class GetRequestParser:
     def __init__(self):
         self.arguments = {}
+        self.error: Response = None
 
     def add_argument(self, name: str, type=None, required=False, default=None) -> None:
         if required:
-            if request.args.get(name) is None:
-                get_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
-                return
-            if request.args.get(name, type=type) is None:
-                get_failure(HTTPErrorCode.INVALID_ARG_TYPE, 400)
-                return
+            if request.args.get(name) is None and self.error is None:
+                self.error = get_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
+            if request.args.get(name, type=type) is None and self.error is None:
+                self.error = get_failure(HTTPErrorCode.INVALID_ARG_TYPE, 400)
         self.arguments[name] = request.args.get(name, type=type, default=default)
 
     def parse_args(self):
@@ -48,6 +47,8 @@ class GetRequestParser:
 def get_class_item_by_id_request(Class) -> Response:
     parser = GetRequestParser()
     parser.add_argument('id', type=int, required=True)
+    if parser.error is not None:
+        return parser.error
     arguments = parser.parse_args()
     current = Class.get_by_id(arguments['id'])
     if current is None:

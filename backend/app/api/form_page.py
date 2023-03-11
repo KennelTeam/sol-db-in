@@ -21,6 +21,8 @@ class FormPage(Resource):
     def get() -> Response:
         parser = GetRequestParser()
         parser.add_argument('id', type=int, required=True)
+        if parser.error is not None:
+            return parser.error
         arguments = parser.parse_args()
         options = Form.get_by_ids({arguments['id']})
         if len(options) == 0:

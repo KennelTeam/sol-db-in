@@ -27,6 +27,8 @@ class Actions(Resource):
         parser.add_argument('column_id', type=str, default='')
         parser.add_argument('row_id', type=int, default=-1)
         parser.add_argument('value', type=int, default=None)
+        if parser.error is not None:
+            return parser.error
         arguments = parser.parse_args()
 
         timestamp_range = TimestampRange()

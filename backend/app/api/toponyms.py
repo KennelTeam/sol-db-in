@@ -22,7 +22,9 @@ class Toponyms(Resource):
     def get() -> Response:
         parser = GetRequestParser()
         parser.add_argument('id', type=int, default=-1)
-        parser.add_argument('name', type=str, default="")
+        parser.add_argument('name', type=str, default='')
+        if parser.error is not None:
+            return parser.error
         arguments = parser.parse_args()
         if arguments['name'] != '':
             top = Toponym.get_by_name(arguments['name'])
