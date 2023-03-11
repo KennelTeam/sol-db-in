@@ -35,11 +35,9 @@ class Users(Resource):
 
         if User.get_by_login(arguments['login']) is not None:
             user = User.get_by_login(arguments['login'])
-            user.name = arguments['name']
-            user.comment = arguments['comment']
+            user.update(name=arguments['name'], comment=arguments['comment'], password=arguments['password'],
+                        role=Role[arguments['role']])
             user.deleted = arguments['deleted']
-            user.password = arguments['password']
-            user.role = Role[arguments['role']]
             FlaskApp().flush_to_database()
             return Response(json.dumps({'message': 'Successfully edited'}), 200)
 

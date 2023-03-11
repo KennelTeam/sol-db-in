@@ -4,6 +4,7 @@ from typing import Tuple, final
 from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
+from typing_extensions import Any
 
 from .auxiliary import HTTPErrorCode, get_request, post_request, post_failure, check_json_format, \
     get_class_item_by_id_request
@@ -151,20 +152,29 @@ class Questions(Resource):
         table_row = None
         fixed_table_id = None
         if 'fixed_table_id' in formatting_json and formatting_json['fixed_table_id'] is not None:
-            fixed_table_id = formatting_json['fixed_table_id']
-            if FixedTable.get_by_id(fixed_table_id) is None:
-                return None, post_failure(HTTPErrorCode.WRONG_ID, 404)
-            table_row = formatting_json.get('table_row', None)
-            table_column = formatting_json.get('table_column', None)
-            if table_row is not None and not isinstance(table_row, int):
-                return None, post_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
-            if table_column is not None and not isinstance(table_column, int):
-                return None, post_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
-            if table_row is None and table_column is None:
-                return None, post_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
+            fixed_table_id, table_row, table_column, fail_response = Questions._check_fixed_table_args(formatting_json)
+            if fail_response is not None:
+                return None, fail_response
 
         return FormattingSettings(block_sorting, block_id, table_row, table_id, table_column,
                                   show_on_main_page, fixed_table_id), None
+
+    @staticmethod
+    def _check_fixed_table_args(formatting_json: JSON) -> Tuple[int | None, int | None, int | None, Response | None]:
+        fixed_table_id = formatting_json['fixed_table_id']
+        if FixedTable.get_by_id(fixed_table_id) is None:
+            return None, None, None, post_failure(HTTPErrorCode.WRONG_ID, 404)
+        table_row = formatting_json.get('table_row')
+        table_column = formatting_json.get('table_column')
+
+        def check_int(var: Any) -> bool:
+            return var is None or isinstance(var, int)
+
+        if not check_int(table_column) or not check_int(table_row):
+            return None, None, None, post_failure(HTTPErrorCode.INVALID_ARG_TYPE, 400)
+        if table_row is None and table_column is None:
+            return None, None, None, post_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
+        return fixed_table_id, table_row, table_column, None
 
     @staticmethod
     def _parse_table_info(formatting_json: JSON) -> Tuple[int | None, int | None, Response | None]:
@@ -176,7 +186,7 @@ class Questions(Resource):
                 return None, None, post_failure(HTTPErrorCode.WRONG_ID, 404)
             if 'table_column' not in formatting_json or not isinstance(formatting_json['table_column'], int):
                 return None, None, post_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
-            table_column = formatting_json.get('table_column', None)
+            table_column = formatting_json.get('table_column')
             if 'fixed_table_id' in formatting_json and formatting_json['fixed_table'] is not None:
                 return None, None, post_failure(HTTPErrorCode.CONFLICTING_ARGUMENTS, 400)
             if 'table_row' in formatting_json and formatting_json['table_row'] is not None:
