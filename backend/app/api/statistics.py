@@ -1,5 +1,5 @@
 import json
-from typing import final
+from typing import Final
 
 from flask import Response, request
 from flask_jwt_extended import jwt_required
@@ -13,7 +13,7 @@ from backend.auxiliary.string_dt import string_to_datetime
 
 
 class Statistics(Resource):
-    route: final(str) = '/statistics'
+    route: Final[str] = '/statistics'
 
     @staticmethod
     @jwt_required()

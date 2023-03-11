@@ -1,5 +1,5 @@
 import json
-from typing import final
+from typing import Final
 
 from flask import request, Response
 from flask_jwt_extended import create_access_token, set_access_cookies
@@ -11,7 +11,7 @@ from backend.constants import DEFAULT_LANGUAGE
 
 
 class Login(Resource):
-    route: final(str) = '/login'
+    route: Final[str] = '/login'
 
     @staticmethod
     def post() -> Response:

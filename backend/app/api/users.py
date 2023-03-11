@@ -1,5 +1,5 @@
 import json
-from typing import final
+from typing import Final
 
 from flask import Response
 from flask_jwt_extended import jwt_required
@@ -12,7 +12,7 @@ from ..flask_app import FlaskApp
 
 
 class Users(Resource):
-    route: final(str) = '/users'
+    route: Final[str] = '/users'
 
     @staticmethod
     @jwt_required()
