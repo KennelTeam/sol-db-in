@@ -1,20 +1,20 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 import json
-from typing import final
+from typing import Final
 
 from flask import Response, request
 from flask_jwt_extended import jwt_required, current_user
-from flask_restful import Resource, reqparse
+from flask_restful import Resource
 
-from .auxiliary import HTTPErrorCode, get_request, get_failure
+from .auxiliary import HTTPErrorCode, get_request, get_failure, GetRequestParser
 from ..database import QuestionBlock
 from ..database.form_type import FormType
 from ...constants import ALL_LANGUAGES_TAG
 
 
 class FormSchema(Resource):
-    route: final(str) = '/form'
+    route: Final[str] = '/form'
 
     @staticmethod
     @jwt_required()
@@ -22,8 +22,10 @@ class FormSchema(Resource):
     def get():
         print(request.json)
         current_user.selected_language = ALL_LANGUAGES_TAG
-        parser = reqparse.RequestParser()
+        parser = GetRequestParser()
         parser.add_argument('form_type', type=str, required=True)
+        if parser.error is not None:
+            return parser.error
         form_type = parser.parse_args()['form_type']
         if form_type not in FormType.items():
             return get_failure(HTTPErrorCode.INVALID_ARG_TYPE, 400)

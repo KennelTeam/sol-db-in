@@ -1,5 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
+import datetime
+
 from .form import Form
 from .user import User
 from .toponym import Toponym
@@ -26,7 +28,7 @@ def prettify_answer(answer: Answer) -> JSON:
         'type': question.question_type.name
     }
     if question.question_type == QuestionType.DATE:
-        result['value'] = date_to_string(answer.value)
+        result['value'] = date_to_string(answer.value) if isinstance(answer.value, datetime.datetime) else answer.value
     elif question.question_type == QuestionType.RELATION:
         if isinstance(answer.value, int):
             result['ref_id'] = answer.value

@@ -1,30 +1,32 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 import json
-from typing import final
+from typing import Final
 
 from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 
-from .auxiliary import get_request, get_failure, HTTPErrorCode, post_request, post_failure
+from .auxiliary import get_request, get_failure, HTTPErrorCode, post_request, post_failure, GetRequestParser
 from backend.app.database.toponym import Toponym
 from backend.app.flask_app import FlaskApp
 from ..database.user import Role
 
 
 class Toponyms(Resource):
-    route: final(str) = '/toponym'
+    route: Final[str] = '/toponym'
 
     @staticmethod
     @jwt_required()
     @get_request()
     def get() -> Response:
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, location='json', required=False, default=-1)
-        parser.add_argument('name', type=str, location='json', required=False, default="")
+        parser = GetRequestParser()
+        parser.add_argument('id', type=int, default=-1)
+        parser.add_argument('name', type=str, default='')
+        if parser.error is not None:
+            return parser.error
         arguments = parser.parse_args()
-        if arguments['name'] != "":
+        if arguments['name'] != '':
             top = Toponym.get_by_name(arguments['name'])
         elif arguments['id'] != -1:
             top = Toponym.get_by_id(arguments['id'])

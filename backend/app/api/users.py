@@ -1,5 +1,5 @@
 import json
-from typing import final
+from typing import Final
 
 from flask import Response
 from flask_jwt_extended import jwt_required
@@ -8,10 +8,11 @@ from flask_restful import Resource, reqparse
 from backend.app.database import User
 from .auxiliary import post_request, get_request, post_failure, HTTPErrorCode
 from backend.app.database.user import Role
+from ..flask_app import FlaskApp
 
 
 class Users(Resource):
-    route: final(str) = '/users'
+    route: Final[str] = '/users'
 
     @staticmethod
     @jwt_required()
@@ -29,10 +30,16 @@ class Users(Resource):
         parser.add_argument('comment', type=str, location='json', required=True)
         parser.add_argument('password', type=str, location='json', required=True)
         parser.add_argument('role', type=str, location='json', required=True)
+        parser.add_argument('deleted', type=bool, location='json', required=False, default=False)
         arguments = parser.parse_args()
 
         if User.get_by_login(arguments['login']) is not None:
-            return post_failure(HTTPErrorCode.CONFLICTING_ARGUMENTS, 400)
+            user = User.get_by_login(arguments['login'])
+            user.update(name=arguments['name'], comment=arguments['comment'], password=arguments['password'],
+                        role=Role[arguments['role']])
+            user.deleted = arguments['deleted']
+            FlaskApp().flush_to_database()
+            return Response(json.dumps({'message': 'Successfully edited'}), 200)
 
         role = arguments['role']
         if role is not None:
@@ -40,7 +47,7 @@ class Users(Resource):
 
         new_user = User(arguments['login'], arguments['name'], arguments['comment'], arguments['password'], role)
         new_user.save_to_db()
-        return Response(json.dumps({'message': 'Successfully registered'}), 201)
+        return Response(str(new_user.id), 200)
 
     @staticmethod
     @jwt_required()
@@ -66,4 +73,4 @@ class Users(Resource):
         if new_role is not None:
             new_role = Role[new_role]
         user.update(arguments['login'], arguments['name'], arguments['comment'], new_password, new_role)
-        return Response(json.dumps({'message': 'Successfully updated'}), 200)
+        return Response(str(user.id), 200)

@@ -1,11 +1,11 @@
-from typing import final
+from typing import Final
 from flask import Response
 from flask_jwt_extended import jwt_required, current_user
 from flask_restful import Resource, reqparse
 
 
 class Language(Resource):
-    route: final(str) = '/language'
+    route: Final[str] = '/language'
 
     @staticmethod
     @jwt_required

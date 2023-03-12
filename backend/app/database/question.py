@@ -5,7 +5,7 @@ from enum import Enum
 from sqlalchemy.orm import Query
 from typing import List
 import json
-from backend.constants import MAX_QUESTION_TEXT_SIZE, MAX_LANGUAGES_COUNT, MAX_COMMENT_SIZE, \
+from backend.constants import MAX_QUESTION_TEXT_SIZE, MAX_LANGUAGES_COUNT, MAX_QUESTION_COMMENT_SIZE, \
     SOURCE_QUESTION_ID, ANSWER_ROW_QUESTION_ID, MAX_SHORT_QUESTION_SIZE
 from backend.auxiliary import JSON, TranslatedText, LogicException
 from backend.app.flask_app import FlaskApp
@@ -31,7 +31,7 @@ class Question(Editable, FlaskApp().db.Model):
     _text = FlaskApp().db.Column('text', FlaskApp().db.Text(MAX_QUESTION_TEXT_SIZE * MAX_LANGUAGES_COUNT))
     _short_text = FlaskApp().db.Column('short_text', FlaskApp().db.Text(MAX_SHORT_QUESTION_SIZE * MAX_LANGUAGES_COUNT))
     _question_type = FlaskApp().db.Column('question_type', FlaskApp().db.Enum(QuestionType))
-    _comment = FlaskApp().db.Column('comment', FlaskApp().db.Text(MAX_COMMENT_SIZE * MAX_LANGUAGES_COUNT))
+    _comment = FlaskApp().db.Column('comment', FlaskApp().db.Text(MAX_QUESTION_COMMENT_SIZE * MAX_LANGUAGES_COUNT))
     _answer_block_id = FlaskApp().db.Column('answer_block_id',
                                             FlaskApp().db.ForeignKey('answer_blocks.id'), nullable=True)
 
@@ -117,7 +117,7 @@ class Question(Editable, FlaskApp().db.Model):
     def get_only_main_page(form_type: FormType) -> List[JSON]:
         formattings = FormattingSettings.get_main_page()
         questions = Question.get_all_with_formattings(formattings)
-        counted_relations = RelationSettings.get_main_page_count_presented()
+        counted_relations = RelationSettings.get_main_page_count_presented(form_type)
         counted_questions_forward = Question.get_all_with_relation_settings(counted_relations[0])
         counted_questions_inverse = Question.get_all_with_relation_settings(counted_relations[1])
 
@@ -152,7 +152,8 @@ class Question(Editable, FlaskApp().db.Model):
             'privacy_settings': self.privacy_settings.to_json(),
             'relation_settings': self.relation_settings.to_json() if self.relation_settings is not None else "",
             'related_question_id': self.related_question_id,
-            'form_type': self.form_type.name
+            'form_type': self.form_type.name,
+            'tag_type': self.tag_type_id
         }
         if with_answers:
             answers = Answer.filter(self.id, form_id=form_id)

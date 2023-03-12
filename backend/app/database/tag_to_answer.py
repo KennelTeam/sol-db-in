@@ -33,7 +33,7 @@ class TagToAnswer(FlaskApp().db.Model):
 
     @staticmethod
     def add_tag(tag_id: int, answer_id: int) -> 'TagToAnswer':
-        item = TagToAnswer.query.filter(_tag_id=tag_id, _answer_id=answer_id).first()
+        item = TagToAnswer.query.filter_by(_tag_id=tag_id, _answer_id=answer_id).first()
         if item is None:
             item = TagToAnswer(tag_id, answer_id)
             FlaskApp().add_database_item(item)

@@ -21,7 +21,7 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
     _fixed_table_id = FlaskApp().db.Column('fixed_table_id', FlaskApp().db.ForeignKey('fixed_tables.id'), nullable=True,
                                            default=None)
 
-    def __init__(self, block_sorting: int, block_id: int, table_row: int = 0, table_id: int = None,
+    def __init__(self, block_sorting: int, block_id: int, table_row: int = None, table_id: int = None,
                  table_column: int = None, show_on_main_page: bool = False, fixed_table_id: int = None):
 
         super().__init__()

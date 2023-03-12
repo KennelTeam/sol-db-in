@@ -1,7 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 
-from backend.constants import MAX_LOGIN_SIZE, MAX_FULLNAME_SIZE, MAX_COMMENT_SIZE, DEFAULT_LANGUAGE
+from backend.constants import MAX_LOGIN_SIZE, MAX_FULLNAME_SIZE, MAX_USER_COMMENT_SIZE, DEFAULT_LANGUAGE
 from backend.auxiliary import JSON
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
@@ -23,7 +23,7 @@ class User(Editable, FlaskApp().db.Model):
     __tablename__ = 'users'
     _login = FlaskApp().db.Column('login', VARCHAR(MAX_LOGIN_SIZE), unique=True)
     _name = FlaskApp().db.Column('name', FlaskApp().db.Text(MAX_FULLNAME_SIZE))
-    _comment = FlaskApp().db.Column('comment', FlaskApp().db.Text(MAX_COMMENT_SIZE))
+    _comment = FlaskApp().db.Column('comment', FlaskApp().db.Text(MAX_USER_COMMENT_SIZE))
     _password_hash = FlaskApp().db.Column('password', FlaskApp().db.Text(512 // 8))
     _role = FlaskApp().db.Column('role', FlaskApp().db.Enum(Role))
 

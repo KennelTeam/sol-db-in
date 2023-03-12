@@ -45,12 +45,10 @@ class FixedTable(Editable, FlaskApp().db.Model):
 
     def _get_only_questions(self) -> JSON:
         formattings = FormattingSettings.get_from_fixed_table(self.id)
-        ids = [item.id for item in formattings]
-        formattings_indexed = {item.id: item for item in formattings}
-        questions = Question.get_by_ids(ids)
+        questions = Question.get_all_with_formattings(formattings)
 
         def get_formatting(q: Question) -> FormattingSettings:
-            return formattings_indexed[q.formatting_settings]
+            return q.formatting_settings
 
         def get_column(q: Question) -> int:
             return get_formatting(q).table_column

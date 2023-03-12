@@ -9,7 +9,7 @@ from backend.app.flask_app import FlaskApp
 from backend.auxiliary.types import JSON
 from backend.app.database.user import Role
 
-from flask import Response
+from flask import Response, request
 import enum
 
 
@@ -27,9 +27,33 @@ class HTTPErrorCode(enum.Enum):
     INVALID_JWT = 10
 
 
+class GetRequestParser:
+    def __init__(self):
+        self.arguments = {}
+        self.error: Response = None
+
+    def add_argument(self, name: str, type=None, required=False, default=None) -> None:
+        if required:
+            if request.args.get(name) is None and self.error is None:
+                self.error = get_failure(HTTPErrorCode.MISSING_ARGUMENT, 400)
+            if request.args.get(name, type=type) is None and self.error is None:
+                self.error = get_failure(HTTPErrorCode.INVALID_ARG_TYPE, 400)
+        self.arguments[name] = request.args.get(name, type=type, default=default)
+
+    def parse_args(self):
+        return self.arguments
+
+
+def create_id_reqparser() -> GetRequestParser:
+    parser = GetRequestParser()
+    parser.add_argument('id', type=int, required=True)
+    return parser
+
+
 def get_class_item_by_id_request(Class) -> Response:
-    parser = reqparse.RequestParser()
-    parser.add_argument('id', type=int, location='json', required=True)
+    parser = create_id_reqparser()
+    if parser.error is not None:
+        return parser.error
     arguments = parser.parse_args()
     current = Class.get_by_id(arguments['id'])
     if current is None:
@@ -101,8 +125,8 @@ def check_json_format(source: Any, json_format: JSON) -> HTTPErrorCode:
         if issubclass(json_format[key], enum.Enum):
             if not isinstance(source[key], str) or source[key] not in json_format[key].items():
                 return HTTPErrorCode.INVALID_ARG_TYPE
-        elif not isinstance(json_format[key], set):
-            if type(source[key]) == json_format[key]:
+        elif issubclass(json_format[key], enum.Enum):
+            if not isinstance(source[key], str) or source[key] not in json_format[key].items():
                 return HTTPErrorCode.INVALID_ARG_TYPE
         elif type(source[key]) != json_format[key]:
             return HTTPErrorCode.INVALID_ARG_TYPE

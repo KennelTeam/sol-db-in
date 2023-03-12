@@ -4,6 +4,7 @@ from .api.actions import Actions
 from .api.language import Language
 from .api.login import Login
 from .api.logout import Logout
+from .api.settings import Settings
 from .api.statistics import Statistics
 from .api.users import Users
 from .api.forms import Forms
@@ -24,7 +25,7 @@ from .flask_app import FlaskApp
 
 resources = [
     Login, Logout, Users, Forms, FormPage, Toponyms, ToponymTree, AnswerOptionsPage, AllAnswerBlocks, Language,
-    AnswerBlockPage, QuestionBlockPage, Table, Tags, TagTypes, FormSchema, Questions, Actions, Statistics
+    AnswerBlockPage, QuestionBlockPage, Table, Tags, TagTypes, FormSchema, Questions, Actions, Statistics, Settings
 ]
 
 for resource in resources:
