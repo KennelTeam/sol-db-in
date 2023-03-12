@@ -36,6 +36,8 @@ class Forms(Resource):
         parser.add_argument('form_type', type=str, required=True)
         parser.add_argument('answer_filters', type=str, required=True)
         parser.add_argument('name_substr', type=str, default='')
+        if parser.error is not None:
+            return parser.error
         arguments = parser.parse_args()
 
         answer_filters = urlsafe_b64decode(arguments['answer_filters']).decode('ascii')
