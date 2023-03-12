@@ -3,7 +3,9 @@
         "title": "Welcome to sol db indonesia",
         "login": "Login",
         "password": "Password",
-        "incorrect-credentials": "Incorrect login or password"
+        "incorrect-credentials": "Incorrect password",
+        "unknown-error": "Unknown error occurred, sorry :(",
+        "incorrect-login": "There is no user with this login"
     },
     "description": {
         "part1": "To get started, edit <1>src/App.js</1> and save to reload.",

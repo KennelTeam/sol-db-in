@@ -2,7 +2,7 @@
 #  All rights reserved
 import json
 
-from flask import Response
+from flask import Response, request
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 from typing import Set, List, final
@@ -29,13 +29,21 @@ class Forms(Resource):
     @staticmethod
     @jwt_required()
     @get_request()
-    def put() -> Response:
-        parser = reqparse.RequestParser()
-        parser.add_argument('form_type', type=str, location='json', required=True)
-        parser.add_argument('answer_filters', type=list, location='json', required=True)
-        parser.add_argument('name_substr', type=str, location='json', required=False, default='')
+    def get() -> Response:
+        print("HERE")
+        # parser = reqparse.RequestParser()
+        # parser.add_argument('form_type', type=str, required=True)
+        # parser.add_argument('answer_filters', type=list, location='json', required=False, default=[])
+        # parser.add_argument('name_substr', type=str, location='json', required=False, default='')
 
-        arguments = parser.parse_args()
+        # arguments = parser.parse_args()
+
+        arguments = request.get_data()
+        if 'name_substr' not in arguments:
+            arguments['name_substr'] = ""
+        if 'answer_filters' not in arguments:
+            arguments['answer_filters'] = []
+
         ids = Form.get_all_ids()
         for item in arguments['answer_filters']:
             if not isinstance(item, dict):
