@@ -20,7 +20,6 @@ class FormSchema(Resource):
     @jwt_required()
     @get_request()
     def get():
-        print(request.json)
         current_user.selected_language = ALL_LANGUAGES_TAG
         parser = GetRequestParser()
         parser.add_argument('form_type', type=str, required=True)
