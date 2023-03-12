@@ -1,7 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 import json
-from base64 import urlsafe_b64decode
+from base64 import urlsafe_b64decode, urlsafe_b64encode
 
 from flask import Response, request
 from flask_jwt_extended import jwt_required
@@ -34,17 +34,20 @@ class Forms(Resource):
     def get() -> Response:
         parser = GetRequestParser()
         parser.add_argument('form_type', type=str, required=True)
-        parser.add_argument('answer_filters', type=str, required=True)
+        parser.add_argument('answer_filters', type=str, required=False, default=None)
         parser.add_argument('name_substr', type=str, default='')
         if parser.error is not None:
             return parser.error
         arguments = parser.parse_args()
 
-        answer_filters = urlsafe_b64decode(arguments['answer_filters']).decode('ascii')
-        try:
-            answer_filters = json.loads(answer_filters)
-        except ValueError:
-            return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
+        if arguments['answer_filters'] is None:
+            answer_filters = []
+        else:
+            try:
+                answer_filters = urlsafe_b64decode(arguments['answer_filters']).decode('ascii')
+                answer_filters = json.loads(answer_filters)
+            except ValueError:
+                return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
 
         if arguments['form_type'] not in FormType.items():
             return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
