@@ -1,13 +1,15 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 import json
+from base64 import urlsafe_b64decode
 
 from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 from typing import Set, List, Final
 
-from .auxiliary import HTTPErrorCode, get_failure, post_failure, check_json_format, get_request, post_request
+from .auxiliary import HTTPErrorCode, get_failure, post_failure, check_json_format, get_request, post_request, \
+    GetRequestParser
 from backend.app.database.form import Form, FormType, FormState
 from backend.app.database.answer import Answer
 from backend.app.database.tag_to_answer import TagToAnswer
@@ -30,17 +32,25 @@ class Forms(Resource):
     @jwt_required()
     @get_request()
     def get() -> Response:
-        parser = reqparse.RequestParser()
+        parser = GetRequestParser()
         parser.add_argument('form_type', type=str, required=True)
-        parser.add_argument('answer_filters', type=list, location='json', required=True)
-        parser.add_argument('name_substr', type=str, required=False, default='')
-
+        parser.add_argument('answer_filters', type=str, required=True)
+        parser.add_argument('name_substr', type=str, default='')
+        if parser.error is not None:
+            return parser.error
         arguments = parser.parse_args()
+
+        answer_filters = urlsafe_b64decode(arguments['answer_filters']).decode('ascii')
+        try:
+            answer_filters = json.loads(answer_filters)
+        except ValueError:
+            return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
+
         if arguments['form_type'] not in FormType.items():
             return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
         form_type = FormType[arguments['form_type']]
         ids = Form.get_all_ids(form_type)
-        for item in arguments['answer_filters']:
+        for item in answer_filters:
             if not isinstance(item, dict):
                 return get_failure(HTTPErrorCode.INVALID_ARG_LOCATION, 400)
             current_ids = Forms._solve_form_filter(item, arguments['name_substr'])
