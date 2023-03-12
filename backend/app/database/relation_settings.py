@@ -2,21 +2,19 @@
 #  All rights reserved.
 import json
 from typing import List, Tuple
-from sqlalchemy import or_
 
 from backend.app.flask_app import FlaskApp
 from backend.auxiliary import JSON, TranslatedText
 from backend.constants import MAX_SHORT_QUESTION_SIZE, MAX_LANGUAGES_COUNT
 from .editable import Editable
 from .visualization_type import VisualizationType
-from .relation_type import RelationType
 from .form_type import FormType
 
 
 class RelationSettings(Editable, FlaskApp().db.Model):
     __tablename__ = 'relation_settings'
 
-    _relation_type = FlaskApp().db.Column('relation_type', FlaskApp().db.Enum(RelationType))
+    _relation_type = FlaskApp().db.Column('relation_type', FlaskApp().db.Enum(FormType))
 
     _related_visualization_type = FlaskApp().db.Column('related_visualization_type',
                                                        FlaskApp().db.Enum(VisualizationType), nullable=True)
@@ -35,7 +33,7 @@ class RelationSettings(Editable, FlaskApp().db.Model):
         FlaskApp().db.Text(MAX_SHORT_QUESTION_SIZE * MAX_LANGUAGES_COUNT),
         nullable=True)
 
-    def __init__(self, relation_type: RelationType,
+    def __init__(self, relation_type: FormType,
                  related_visualization_type: VisualizationType, related_visualization_sorting: int = 0,
                  main_page_count_title: TranslatedText = None, inverse_main_page_count_title: TranslatedText = None,
                  forward_relation_sheet_name: str = None, inverse_relation_sheet_name: str = None) -> None:
@@ -72,7 +70,7 @@ class RelationSettings(Editable, FlaskApp().db.Model):
     @staticmethod
     def json_format() -> JSON:
         return {
-            'relation_type': RelationType,
+            'relation_type': FormType,
             'related_visualization_type': VisualizationType,
             'related_visualization_sorting': VisualizationType,
             'forward_relation_sheet_name': {str, None},
@@ -94,14 +92,7 @@ class RelationSettings(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_foreign_to_show_query(form: FormType):
-        if form == FormType.LEADER:
-            query = FlaskApp().request(RelationSettings).filter(
-                    or_(RelationSettings._relation_type == RelationType.LEADER_TO_LEADER,
-                        RelationSettings._relation_type == RelationType.PROJECT_TO_LEADER))
-        else:
-            query = FlaskApp().request(RelationSettings).filter(
-                or_(RelationSettings._relation_type == RelationType.LEADER_TO_PROJECT,
-                    RelationSettings._relation_type == RelationType.PROJECT_TO_PROJECT))
+        query = FlaskApp().request(RelationSettings).filter(RelationSettings._relation_type == form)
         return query.filter(RelationSettings._related_visualization_type != VisualizationType.NOTHING).with_entities(
             RelationSettings.id, RelationSettings._related_visualization_type
         )
@@ -111,7 +102,7 @@ class RelationSettings(Editable, FlaskApp().db.Model):
         return FlaskApp().request(RelationSettings).filter_by(id=id).first()
 
     @property
-    def relation_type(self) -> RelationType:
+    def relation_type(self) -> FormType:
         return self._relation_type
 
     @property

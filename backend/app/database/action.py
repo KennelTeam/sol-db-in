@@ -56,6 +56,7 @@ class Action(ValueHolder, FlaskApp().db.Model):
             query = query.filter_by(column_id=column_id)
         if row_id != -1:
             query = query.filter_by(row_id=row_id)
+
         if isinstance(value, bool):
             query = query.filter_by(value_boolean=value)
         elif isinstance(value, int):

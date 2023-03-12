@@ -24,6 +24,7 @@ class ValueHolder:
         return self.value_text
 
     def set_value(self, new_value: Any) -> None:
+<<<<<<< HEAD
 
         if isinstance(new_value, bool):
             self.value_bool = new_value
@@ -31,6 +32,14 @@ class ValueHolder:
             self.value_int = new_value
         elif isinstance(new_value, Enum):
             self.value_int = new_value.value
+=======
+        if isinstance(new_value, bool):
+            self.value_bool = new_value
+        elif isinstance(new_value, Enum):
+            self.value_int = new_value.value
+        elif isinstance(new_value, int):
+            self.value_int = new_value
+>>>>>>> develop
         elif isinstance(new_value, str):
             self.value_text = new_value
         elif isinstance(new_value, datetime):

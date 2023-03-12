@@ -104,6 +104,6 @@ def check_json_format(source: Any, json_format: JSON) -> HTTPErrorCode:
         elif not isinstance(json_format[key], set):
             if type(source[key]) == json_format[key]:
                 return HTTPErrorCode.INVALID_ARG_TYPE
-        elif type(source[key]) not in json_format[key]:
+        elif type(source[key]) != json_format[key]:
             return HTTPErrorCode.INVALID_ARG_TYPE
     return HTTPErrorCode.SUCCESS
