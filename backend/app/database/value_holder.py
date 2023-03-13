@@ -34,7 +34,7 @@ class ValueHolder:
             self.value_text = new_value
         elif isinstance(new_value, datetime):
             self.value_datetime = new_value
-    
+
     @value.setter
     def value(self, value: Any) -> None:
         self.set_value(value)

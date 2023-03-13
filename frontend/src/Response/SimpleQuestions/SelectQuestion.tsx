@@ -1,13 +1,13 @@
 import { Autocomplete, Box, TextField } from "@mui/material";
 import { CommonQuestionProperties } from "./common";
 
-interface SingleSelectItemInterface {
+export interface SingleSelectItemInterface {
   id: number;
   name: string;
 }
 
 export interface SelectQuestionInterface extends CommonQuestionProperties {
-  initialValue: number; // id
+  initialValue: number | null; // id
   dataToChooseFrom: Array<SingleSelectItemInterface>;
 }
 

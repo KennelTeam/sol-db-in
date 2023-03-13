@@ -34,17 +34,20 @@ class Forms(Resource):
     def get() -> Response:
         parser = GetRequestParser()
         parser.add_argument('form_type', type=str, required=True)
-        parser.add_argument('answer_filters', type=str, required=True)
+        parser.add_argument('answer_filters', type=str, required=False, default=None)
         parser.add_argument('name_substr', type=str, default='')
         if parser.error is not None:
             return parser.error
         arguments = parser.parse_args()
 
-        answer_filters = urlsafe_b64decode(arguments['answer_filters']).decode('ascii')
-        try:
-            answer_filters = json.loads(answer_filters)
-        except ValueError:
-            return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
+        if arguments['answer_filters'] is None:
+            answer_filters = []
+        else:
+            try:
+                answer_filters = urlsafe_b64decode(arguments['answer_filters']).decode('ascii')
+                answer_filters = json.loads(answer_filters)
+            except ValueError:
+                return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
 
         if arguments['form_type'] not in FormType.items():
             return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
@@ -159,7 +162,7 @@ class Forms(Resource):
         if isinstance(max_value, str):
             max_value = string_to_datetime(max_value)
 
-        substring = filter.get('substring', None)
+        substring = filter.get('substring')
         if substring is not None and not isinstance(substring, str):
             return None
 
