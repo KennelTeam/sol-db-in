@@ -5,6 +5,7 @@ import { Row, _getRows, _getColumns } from './_testFunctions'
 import { Box, styled } from '@mui/system'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { TableData } from './requests'
 
 const StyledTableCell = styled(TableCell)({
     fontSize: '11px',
@@ -22,6 +23,9 @@ function Head({ columnGroups }: { columnGroups: { name: string, columns: string[
     return (
         <TableHead>
             <TableRow>
+                <StyledTableCell style={{ fontWeight: "bold" }}>
+                    id
+                </StyledTableCell>
                 {columnGroups.map((group) => (
                     <StyledTableCell colSpan={group.columns.length} style={{ fontWeight: "bold" }}>
                         {group.name}
@@ -29,6 +33,9 @@ function Head({ columnGroups }: { columnGroups: { name: string, columns: string[
                 ))}
             </TableRow>
             <TableRow>
+                <StyledTableCell style={{ fontWeight: "bold" }}>
+                    id
+                </StyledTableCell>
                 {columnGroups.map((group) => (
                     group.columns.map((columnName) => (
                     <StyledTableCell style={{ fontWeight: "bold" }}>
@@ -53,9 +60,6 @@ function RenderRow(props: Row) {
     return (
         <TableRow>
             <StyledTableCell>{props.id}</StyledTableCell>
-            <StyledTableCell>
-                <Link to={props.link}>{props.name}</Link>
-            </StyledTableCell>
             {props.columns.map((col) => {
                 if (col.length === 1) {
                     return (
@@ -81,13 +85,11 @@ function RenderRow(props: Row) {
     )
 }
 
-export default function MainTable() {
+export default function MainTable(props: TableData) {
     const { t } = useTranslation('translation', { keyPrefix: "filters" })
 
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [page, setPage] = useState<number>(0)
-
-    const rows = _getRows()
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -102,9 +104,9 @@ export default function MainTable() {
         <Box component={Card}>
             <TableContainer>
                 <Table size="small" stickyHeader>
-                    <Head columnGroups={_getColumns()}/>
+                    <Head columnGroups={props.column_groups}/>
                     <TableBody>
-                        {rows
+                        {props.rows
                             .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
                             .map((row: Row) => (<RenderRow {...row}/>))}
                     </TableBody>
@@ -112,7 +114,7 @@ export default function MainTable() {
             </TableContainer>
             <TablePagination
                 rowsPerPage={rowsPerPage}
-                count={rows.length}
+                count={props.rows.length}
                 page={page}
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}

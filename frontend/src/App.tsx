@@ -46,7 +46,7 @@ function App() {
           <Route path='/questionnaire' element={<Questionnaire />}/>
           <Route path='/options' element={<Options />}/>
           <Route path='/users' element={<Users />}/>
-          <Route path='/filters' element={<FilterTablePage />}/> {/* route for testing FilterTablePage component */}
+          <Route path='/filters' element={<FilterTablePage formType="LEADER"/>}/> {/* route for testing FilterTablePage component */}
           </Routes>
         </Container>
       </Stack>

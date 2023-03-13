@@ -1,4 +1,4 @@
-import { AnswerType } from "../types/global"
+import { AnswerType, SERVER_ADDRESS } from "../types/global"
 import { AnswerVariant } from "./TypedFilters"
 import axios from 'axios'
 
@@ -31,6 +31,42 @@ export function _getAnswersList(questionId: number) : AnswerVariant[] {
     } else {
         return [{id: -1, name: "WRONG QUESTION ID PASSED"}]
     }
+}
+
+export function getAnswersList(questionId: number) : AnswerVariant[] {
+    let variants: AnswerVariant[] = []
+    console.log("Request to /answer_options with id =", questionId)
+    axios.get(SERVER_ADDRESS + '/answer_options', { params: { id: questionId } })
+        .then((response) => {
+            variants = <AnswerVariant[]>response.data
+        })
+        .catch((error) => {
+            console.log("Error while accessing /answer_options:", error)
+        })
+    return variants
+}
+
+export async function getUsersList() : Promise<AnswerVariant[]> {
+    return await axios.get(SERVER_ADDRESS + '/users', { withCredentials: true })
+        .then((response) => {
+            console.log("Users response:", response.status, response.data)
+            return <AnswerVariant[]>response.data
+        })
+        .catch((error) => {
+            console.log(error)
+            return []
+        })
+}
+
+export function getLeadersList() : AnswerVariant[] {
+    let users: AnswerVariant[] = []
+    console.log("Request to /users")
+    axios.get(SERVER_ADDRESS + '/forms', { params: { form_type: 'LEADER' } })
+        .then((response) => {
+            const responseData : any[] = response.data
+            users = responseData.map((user) => (<AnswerVariant>user))
+        })
+        return users
 }
 
 export function _getUsersList() : AnswerVariant[] {
@@ -97,10 +133,12 @@ export interface ColumnResponse {
     }[]
 }
 
+export interface FormsResponse {
+    table: ColumnResponse[]
+}
+
 export interface Row {
     id: number,
-    name: string,
-    link: string
     columns: {
         link?: string,
         data: string

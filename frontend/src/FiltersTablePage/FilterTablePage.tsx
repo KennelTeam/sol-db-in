@@ -4,27 +4,80 @@ import { AnswerType, SERVER_ADDRESS } from "../types/global"
 import ClearIcon from '@material-ui/icons/Clear'
 import AddIcon from '@material-ui/icons/Add'
 import * as Test from './_testFunctions'
-import { NumberFilter, TextFilter, CheckboxFilter, ChoiceFilter, AutocompleteChoiceFilter, DateFilter, AnswerFilter } from './TypedFilters'
-import React, { useState } from "react";
+import { NumberFilter, TextFilter, CheckboxFilter, ChoiceFilter, AutocompleteChoiceFilter, DateFilter, AnswerFilter, AnswerVariant } from './TypedFilters'
+import { getUsersList, getAnswersList, getObjectsList, getToponymsList, getFilteredTableData, TableData } from "./requests";
+import { useState, useEffect, useRef } from "react";
 import MainTable from "./MainTable";
 import { useImmer } from "use-immer"
 import { useTranslation } from 'react-i18next'
+import i18next from "i18next";
 import axios from "axios";
 
 interface QuestionAttributes {
     id: number,
     text: string,
     type: AnswerType
+    answer_block_id?: number
 }
 
 interface SingleFilterProps extends QuestionAttributes {
     setFilter: (newValue: AnswerFilter) => void
 }
 
+export interface FormResponse {
+    question_blocks: {
+        questions: {
+            type: string,
+            value: {
+                id: number,
+                question_type: 'DATE' | 'USER' | 'LONG_TEXT' | 'SHORT_TEXT' | 
+                'MULTIPLE_CHOICE' |'CHECKBOX' | 'LOCATION' | 'NUMBER' | 'BOOLEAN' | 'RELATION',
+                text: { [language: string]: string },
+                relation_settings: {
+                    relation_type: 'LEADER' | 'PROJECT'
+                } | any,
+                answer_block_id: number
+            }
+        }[]
+    }[]
+}
+
 function SingleFilter(props : SingleFilterProps) {
 
-    const { id, text, type, setFilter } = props
+    const { id, text, type, answer_block_id, setFilter } = props
     const [active, setActive] = useState(true)
+    const [variants, setVariants] = useState<AnswerVariant[]>([])
+
+    useEffect(() => {
+        switch (type) {
+            case AnswerType.List :
+                if (answer_block_id !== undefined) {
+                    getAnswersList(answer_block_id).then((answers) => {
+                        setVariants(answers)
+                    })
+                }
+                break
+            case AnswerType.User :
+                getUsersList().then((users) => {
+                    setVariants(users)
+                })
+                break
+            case AnswerType.Leader :
+                getObjectsList('LEADER').then((leaders) => {
+                    setVariants(leaders)
+                })
+                break
+            case AnswerType.Project :
+                getObjectsList('PROJECT').then((leaders) => {
+                    setVariants(leaders)
+                })
+                break
+            case AnswerType.Location :
+                getToponymsList().then((toponyms) => {
+                    setVariants(toponyms)
+                })
+        }
+    }, [])
 
     let filter: JSX.Element
 
@@ -39,16 +92,16 @@ function SingleFilter(props : SingleFilterProps) {
             filter = <CheckboxFilter setFilter={setFilter}/>
             break
         case AnswerType.List :
-            filter = <ChoiceFilter variants={Test._getAnswersList(id)} setFilter={setFilter}/>
+            filter = <ChoiceFilter variants={variants} setFilter={setFilter}/>
             break
         case AnswerType.User :
-            filter = <ChoiceFilter variants={Test._getUsersList()} setFilter={setFilter}/>
+            filter = <ChoiceFilter variants={variants} setFilter={setFilter}/>
             break
         case AnswerType.Leader :
-            filter = <AutocompleteChoiceFilter variants={Test._getLeadersList()} setFilter={setFilter}/>
+            filter = <AutocompleteChoiceFilter variants={variants} setFilter={setFilter}/>
             break
         case AnswerType.Project :
-            filter = <AutocompleteChoiceFilter variants={Test._getProjectsList()} setFilter={setFilter}/>
+            filter = <AutocompleteChoiceFilter variants={variants} setFilter={setFilter}/>
             break
         case AnswerType.Date :
             filter = <DateFilter setFilter={setFilter}/>
@@ -94,13 +147,18 @@ function SingleFilter(props : SingleFilterProps) {
     )
 }
 
-function FilterTablePage() {
+function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
     const { t } = useTranslation('translation', { keyPrefix: "filters" })
 
-    const questions = Test._getFilterableQuestionsList()
+    const [questions, setQuestions] = useState<QuestionAttributes[]>([])
     const [filtersList, setFiltersList] = useState<JSX.Element[]>([])
-    const [newQuestion, setNewQuestion] = useState(questions[0].text)
+    const [newQuestion, setNewQuestion] = useState<string>("")
     const [filtersData, changeFiltersData] = useImmer<AnswerFilter[]>([])
+    const [tableData, setTableData] = useState<TableData>({
+        column_groups: [],
+        rows: []
+    })
+    const isInitialMount = useRef(true)
 
     function changeFilters(newValue: AnswerFilter, idx: number) {
         changeFiltersData(draft => { draft.splice(idx, 1, newValue) })
@@ -127,14 +185,71 @@ function FilterTablePage() {
 
     const handleSubmitFilter = () => {
         const body = {
-            form_type: "LEADER", // later must be a parameter from props
+            form_type: formType,
             answer_filters: filtersData.filter((f) => f.question_id !== -1)
         }
-        console.log("PUT request to /forms with data:", body)
-        const newTableData = axios.put(SERVER_ADDRESS + '/forms', body)
+        getFilteredTableData(body).then((data) => {
+            console.log("New Table data:", data)
+            setTableData(data)
+        })
     }
 
-    console.log(filtersData)
+    const questionTypesMatch = {
+        'DATE': AnswerType.Date,
+        'USER': AnswerType.User,
+        'LONG_TEXT': AnswerType.Text,
+        'SHORT_TEXT': AnswerType.Text,
+        'MULTIPLE_CHOICE': AnswerType.List,
+        'CHECKBOX': AnswerType.Checkbox,
+        'LOCATION': AnswerType.Location,
+        'NUMBER': AnswerType.Number,
+        'BOOLEAN': AnswerType.List
+    }
+
+    useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false
+        } else {
+            return
+        }
+        axios.post(SERVER_ADDRESS + '/login', { login: 'coffeekey', password: 'password', language: 'ru' }, { withCredentials: true })
+            .then((loginResponse) => {
+                console.log(loginResponse.status, loginResponse.data)
+            console.log("Mounted")
+            axios.get(SERVER_ADDRESS + '/form', { params: { form_type: formType }, withCredentials: true })
+                .then((response) => {
+                    console.log("Form response:", response.status, response.data)
+                    const data : FormResponse = response.data
+                    const newQuestions : QuestionAttributes[] = []
+                    data.question_blocks.forEach( (questionBlock) => {
+                        questionBlock.questions.forEach((questionResponse) => {
+                            if (questionResponse.type === 'question') {
+                                let qType : AnswerType
+                                if (questionResponse.value.question_type !== 'RELATION') {
+                                    qType = questionTypesMatch[questionResponse.value.question_type]
+                                } else {
+                                    qType = questionResponse.value.relation_settings.relation_type == 'LEADER' ?
+                                        AnswerType.Leader : AnswerType.Project
+                                }
+                                newQuestions.push({
+                                    id: questionResponse.value.id,
+                                    text: questionResponse.value.text[i18next.language.split('-', 1)[0]],
+                                    type: qType,
+                                    answer_block_id: questionResponse.value.answer_block_id
+                                })
+                            }
+                        })
+                    })
+                    setQuestions(newQuestions)
+                    setNewQuestion(newQuestions[0].text)
+                })
+                .catch((error) => {
+                    console.log("Error while accessing to the /form: ", error)
+                })
+            })
+        handleSubmitFilter()
+    }, [])
+
     return (
         <Stack direction="column" spacing={1}>
             <h2>{t('title')}</h2>
@@ -164,7 +279,7 @@ function FilterTablePage() {
             <Button variant="contained" onClick={handleSubmitFilter}>{t('submit_filter')}</Button>
             <h2>{t('table')}</h2>
             <Card>
-                <MainTable/>
+                <MainTable {...tableData}/>
             </Card>
         </Stack>
     )
