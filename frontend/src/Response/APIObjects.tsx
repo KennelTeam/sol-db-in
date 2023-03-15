@@ -2,8 +2,30 @@ import { AccessRights } from '../types/global'
 
 
 export interface APIQuestionBlock {
+    elements: Array<APIQuestionElement>,
+    name: string
+}
+
+export interface APIQuestionElement {
     type: string,
     value: APIQuestion | APIQuestionTable | APIFixedTable
+}
+
+export enum APIFormState {
+    PLANNED,
+    STARTED,
+    FINISHED
+}
+
+export interface APIForm {
+    id: number,
+    state: APIFormState,
+    name: string,
+    form_type: APIFormType,
+    answers: Array<{
+        question_id: number,
+        answers: Array<APIAnswer>
+    }>
 }
 
 export interface APITranslatedText {
