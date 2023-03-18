@@ -205,7 +205,7 @@ async function ProcessFixedTable(table: APIFixedTable): Promise<QuestionInterfac
         }
         answers.push(currentRow)
     }
-
+    console.log(table)
     return {
         questionType: TableType.FIXED_TABLE,
         inputInfo: {

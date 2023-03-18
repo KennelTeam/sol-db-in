@@ -35,6 +35,8 @@ class FlaskApp(metaclass=Singleton):
 
     def __init__(self):
         self._app = Flask(__name__)
+        self.app.config['SQLALCHEMY_POOL_RECYCLE'] = 9
+        self.app.config['SQLALCHEMY_ECHO'] = True
         CORS(self.app, supports_credentials=True)
         self._configure_api()
         self._configure_db()
