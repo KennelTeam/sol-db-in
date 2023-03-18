@@ -42,7 +42,7 @@ def prettify_answer(answer: Answer) -> JSON:
         result['ref_id'] = answer.value
     elif question.question_type == QuestionType.LOCATION:
         result['ref_id'] = answer.value
-        result['value'] = Toponym.get_by_name(answer.value).name
+        result['value'] = Toponym.get_by_id(answer.value).name
     elif question.question_type in {QuestionType.MULTIPLE_CHOICE, QuestionType.CHECKBOX}:
         result['ref_id'] = answer.value
         result['value'] = AnswerOption.get_by_id(answer.value).name

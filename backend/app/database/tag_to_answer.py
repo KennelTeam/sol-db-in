@@ -17,6 +17,13 @@ class TagToAnswer(FlaskApp().db.Model):
         self._tag_id = tag_id
         self._answer_id = answer_id
 
+    def to_json(self) -> JSON:
+        return {
+            'id': self.id,
+            'tag_id': self.tag_id,
+            'answer_id': self.answer_id
+        }
+
     @staticmethod
     def count_tag_usage(tag_id: int) -> int:
         return TagToAnswer.query.filter_by(_tag_id=tag_id).count()
