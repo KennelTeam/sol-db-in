@@ -17,7 +17,7 @@ class TagToAnswer(FlaskApp().db.Model):
         self._tag_id = tag_id
         self._answer_id = answer_id
 
-    def to_json(self):
+    def to_json(self) -> JSON:
         return {
             'id': self.id,
             'tag_id': self.tag_id,
