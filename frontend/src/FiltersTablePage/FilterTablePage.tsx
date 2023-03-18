@@ -12,6 +12,7 @@ import { useImmer } from "use-immer"
 import { useTranslation } from 'react-i18next'
 import i18next from "i18next";
 import axios from "axios";
+import { Buffer } from "buffer";
 
 interface QuestionAttributes {
     id: number,
@@ -184,9 +185,11 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
     }
 
     const handleSubmitFilter = () => {
+        const buf = Buffer.from(JSON.stringify(filtersData.filter((filter) => (filter.question_id != -1))),
+                "utf8")
         const body = {
             form_type: formType,
-            answer_filters: filtersData.filter((f) => f.question_id !== -1)
+            answer_filters: buf.toString("base64")
         }
         getFilteredTableData(body).then((data) => {
             console.log("New Table data:", data)

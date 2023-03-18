@@ -18,7 +18,7 @@ interface AnswerBlockResponse {
 
 interface FiltersRequestData {
     form_type: 'LEADER' | 'PROJECT',
-    answer_filters: AnswerFilter[]
+    answer_filters: string
 }
 
 export interface TableData {
@@ -102,8 +102,8 @@ export async function getFilteredTableData(data: FiltersRequestData) : Promise<T
         }
     }
 
-
-    return await axios.put(SERVER_ADDRESS + '/forms', data, { withCredentials: true })
+    console.log("Requesting /forms with data: ", data)
+    return await axios.get(SERVER_ADDRESS + '/forms', { params: data, withCredentials: true })
         .then((response) => {
             console.log("Forms request with data:", data, "returns", response.status, response.data)
             const responseData = <FormsResponse>response.data
