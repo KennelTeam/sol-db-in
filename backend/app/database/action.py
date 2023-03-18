@@ -13,6 +13,7 @@ from ...auxiliary.string_dt import datetime_to_string
 
 class Action(ValueHolder, FlaskApp().db.Model):
     __tablename__ = 'actions'
+    cache_ok = True
     id = FlaskApp().db.Column('id', FlaskApp().db.Integer(), primary_key=True, unique=True)
     user_id = FlaskApp().db.Column('user_id', FlaskApp().db.ForeignKey('users.id'))
     table_id = FlaskApp().db.Column('table_id', VARCHAR(64))

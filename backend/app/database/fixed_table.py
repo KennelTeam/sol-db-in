@@ -72,8 +72,8 @@ class FixedTable(Editable, FlaskApp().db.Model):
         answers = [[None for _ in columns] for _ in rows]
         for i, r in enumerate(rows):
             for j, c in enumerate(columns):
-                options = Answer.filter(c.id, row_question_id=r.id, form_id=form_id)
-                answers[i][j] = None if len(options) == 0 else options
+                options = Answer.filter(c['id'], row_question_id=r['id'], form_id=form_id)
+                answers[i][j] = [option.to_json() for option in options]
         return questions | {
             'answers': answers
         }

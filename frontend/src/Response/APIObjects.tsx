@@ -2,7 +2,7 @@ import { AccessRights } from '../types/global'
 import { SimpleQuestionType } from "./SimpleQuestions/SimpleQuestion";
 
 export interface APIQuestionBlock {
-    elements: Array<APIQuestionElement>,
+    questions: Array<APIQuestionElement>,
     name: string
 }
 
@@ -33,8 +33,8 @@ export interface APITranslatedText {
 export interface APIQuestion {
     id: number,
     question_type: SimpleQuestionType,
-    comment: APITranslatedText,
-    text: APITranslatedText,
+    comment: string,
+    text: string,
     short_text: APITranslatedText,
     answer_block_id: number | null,
     related_question_id: number | null,
@@ -134,8 +134,8 @@ export interface AnswersIndexed {
 
 export interface APIAnswerOption {
     id: number,
-    name: APITranslatedText,
-    short_name: APITranslatedText,
+    name: string,
+    short_name: string,
     answer_block_id: number,
     deleted: boolean,
     creation_timestamp: string
@@ -143,6 +143,6 @@ export interface APIAnswerOption {
 
 export interface APIAnswerBlock {
     id: number,
-    options: APIAnswerOption[],
+    options: Array<APIAnswerOption>,
     name: APITranslatedText
 }

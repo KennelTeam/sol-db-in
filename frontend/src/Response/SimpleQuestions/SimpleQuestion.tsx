@@ -41,6 +41,9 @@ function SimpleQuestion(questionData: SimpleQuestionInterface): JSX.Element {
         case SimpleQuestionType.SHORT_TEXT:
             component = <TextQuestion {...(questionData.questionData as TextQuestionInterface)} />;
             break;
+        case SimpleQuestionType.RELATION:
+        case SimpleQuestionType.USER:
+        case SimpleQuestionType.LOCATION:
         case SimpleQuestionType.MULTIPLE_CHOICE:
             component = <SelectQuestion {...(questionData.questionData as SelectQuestionInterface)} />;
             break;

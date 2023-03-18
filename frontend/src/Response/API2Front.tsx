@@ -25,10 +25,10 @@ import {DynamicTableInterface} from "./Table/DynamicTable";
 import FixedTable, {FixedTableInterface} from "./Table/FixedTable";
 
 export async function GetFormInfo(id: number): Promise<ResponseDataInterface> {
-
+    console.log("REQUEST")
     const res_form = await getRequest("form_page", {id: id})
     const form = res_form.data as APIForm;
-
+    console.log(form)
     return {
         title: form.name,
         blocks: await Promise.all(form.answers.map(ProcessBlock))
@@ -38,7 +38,7 @@ export async function GetFormInfo(id: number): Promise<ResponseDataInterface> {
 
 async function ProcessBlock(block: APIQuestionBlock): Promise<BlockInterface> {
 
-    let questions = await Promise.all(block.elements.map(ProcessBlockElement));
+    let questions = await Promise.all(block.questions.map(ProcessBlockElement));
 
     return {
         title: block.name,
@@ -69,8 +69,7 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
         case SimpleQuestionType.NUMBER: {
             let initialValue = answers.length > 0 ? answers[0].value : -1;
             questionData = {
-                // @ts-ignore
-                label: question.text[i18n.language],
+                label: question.text,
                 initialValue: initialValue as number
             } as NumberQuestionInterface
             break;
@@ -83,13 +82,7 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
             if (question.question_type == SimpleQuestionType.MULTIPLE_CHOICE) {
                 const options_resp = await getRequest("answer_block", {id: question.answer_block_id})
                 const block = options_resp.data as APIAnswerBlock
-                options = block.options.map((option) => {
-                    return {
-                        id: option.id,
-                        // @ts-ignore
-                        name: option.name[i18n.language]
-                    }
-                })
+                options = block.options.map((option) => {return option as APIOption})
             } else if (question.question_type == SimpleQuestionType.LOCATION) {
                 const options_resp = await getRequest("all_toponyms")
                 options = options_resp.data as Array<APIOption>
@@ -101,17 +94,16 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
                     {form_type: question.relation_settings?.relation_type})
                 options = options_resp.data as Array<APIOption>
             }
-
+            console.log(options)
             let initialValue = answers.length > 0 ? answers[0].value : -1;
+            let value = options.find((opt) => opt.id == initialValue)
             questionData = {
-                // @ts-ignore
-                label: question.text[i18n.language],
-                initialValue: initialValue as number,
+                label: question.text,
+                initialValue: value ? value.name : null,
                 dataToChooseFrom: options.map((option) => {
                     return {
                         id: option.id,
-                        // @ts-ignore
-                        name: option.name[i18n.language]
+                        name: option.name
                     } as SingleSelectItemInterface
                 })
             } as SelectQuestionInterface
@@ -126,8 +118,7 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
                 questions: options.map((option) => {
                     return {
                         id: option.id,
-                        // @ts-ignore
-                        label: option.name[i18n.language],
+                        label: option.name,
                         initialValue: answers.find((item) => {return item.value == option.id}) !== undefined
                     } as SingleCheckboxQuestionInterface
                 })
@@ -145,10 +136,8 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
     return {
         questionType: question.question_type,
         inputInfo: {
-            // @ts-ignore
-            title: question.text[i18n.language],
-            // @ts-ignore
-            description: question.comment[i18n.language]
+            title: question.text,
+            description: question.comment
         },
         questionData: questionData
     }
@@ -199,10 +188,8 @@ async function ProcessTable(table: APIQuestionTable): Promise<QuestionInterface>
 async function ProcessFixedTable(table: APIFixedTable): Promise<QuestionInterface> {
     const questionToInputInfo = (question: APIQuestion) => {
         return {
-            // @ts-ignore
-            title: question.text[i18n.language],
-            // @ts-ignore
-            description: question.comment[i18n.language]
+            title: question.text,
+            description: question.comment
         }
     }
 
@@ -239,10 +226,8 @@ async function ProcessQuestionTableColumn(column: APIQuestion, rows: number): Pr
     answers: Array<SimpleQuestionInterface>
 }> {
     let inputInfo = {
-        // @ts-ignore
-        title: column.text[i18n.language],
-        // @ts-ignore
-        description: column.comment[i18n.language]
+        title: column.text,
+        description: column.comment
     } as InputInfoInterface
 
 

@@ -1,6 +1,6 @@
 import axios, {AxiosResponse} from "axios";
 
-const API_URL = "http://52.192.211.221:5000/"
+const API_URL = "http://127.0.0.1:5000/"
 
 export async function getRequest(endpoint: string, params: Object = {}): Promise<AxiosResponse<any, any>> {
     let query = API_URL + endpoint + "?"

@@ -29,7 +29,7 @@ class FormPage(Resource):
         if len(options) == 0:
             return get_failure(HTTPErrorCode.WRONG_ID, 404)
         blocks = QuestionBlock.get_form(options[0].form_type)
-        values = [block.get_questions(with_answers=True, form_id=arguments['id']) for block in blocks]
+        values = [block.to_json(with_answers=True, form_id=arguments['id']) for block in blocks]
         result = options[0].to_json(with_answers=False) | {
             "answers": values
         }
