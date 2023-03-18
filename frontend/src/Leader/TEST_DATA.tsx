@@ -9,7 +9,7 @@ const TEST_DATA: ResponseDataInterface = {
             title: "General person info",
             items: [
                 {
-                    questionType: SimpleQuestionType.TEXT,
+                    questionType: SimpleQuestionType.SHORT_TEXT,
                     questionData: {
                         initialValue: "Nikolay",
                         label: "Name",
@@ -36,7 +36,7 @@ const TEST_DATA: ResponseDataInterface = {
             title: "Main project info",
             items: [
                 {
-                    questionType: SimpleQuestionType.SELECT,
+                    questionType: SimpleQuestionType.MULTIPLE_CHOICE,
                     questionData: {
                         initialValue: 1,
                         label: "Select main project",
@@ -61,7 +61,7 @@ const TEST_DATA: ResponseDataInterface = {
                     }
                 },
                 {
-                    questionType: SimpleQuestionType.TEXT,
+                    questionType: SimpleQuestionType.SHORT_TEXT,
                     questionData: {
                         initialValue: "Because I fucking love it",
                         label: "Why this project?",
@@ -173,7 +173,7 @@ const TEST_DATA: ResponseDataInterface = {
                         questions: [
                             [
                                 {
-                                    questionType: SimpleQuestionType.TEXT,
+                                    questionType: SimpleQuestionType.SHORT_TEXT,
                                     questionData: {
                                         initialValue: "Mike",
                                         label: null,
@@ -187,7 +187,7 @@ const TEST_DATA: ResponseDataInterface = {
                                     },
                                 },
                                 {
-                                    questionType: SimpleQuestionType.SELECT,
+                                    questionType: SimpleQuestionType.MULTIPLE_CHOICE,
                                     questionData: {
                                         initialValue: 1,
                                         label: "Type",
@@ -208,7 +208,7 @@ const TEST_DATA: ResponseDataInterface = {
                                     },
                                 },
                                 {
-                                    questionType: SimpleQuestionType.TEXT,
+                                    questionType: SimpleQuestionType.SHORT_TEXT,
                                     questionData: {
                                         initialValue: "I made a logo",
                                         label: "Description",
@@ -231,7 +231,7 @@ const TEST_DATA: ResponseDataInterface = {
                             ],
                             [
                                 {
-                                    questionType: SimpleQuestionType.TEXT,
+                                    questionType: SimpleQuestionType.SHORT_TEXT,
                                     questionData: {
                                         initialValue: "Nick",
                                         label: null,
@@ -245,7 +245,7 @@ const TEST_DATA: ResponseDataInterface = {
                                     },
                                 },
                                 {
-                                    questionType: SimpleQuestionType.SELECT,
+                                    questionType: SimpleQuestionType.MULTIPLE_CHOICE,
                                     questionData: {
                                         initialValue: 1,
                                         label: "Type",
@@ -266,7 +266,7 @@ const TEST_DATA: ResponseDataInterface = {
                                     },
                                 },
                                 {
-                                    questionType: SimpleQuestionType.TEXT,
+                                    questionType: SimpleQuestionType.SHORT_TEXT,
                                     questionData: {
                                         initialValue: "I made a logo",
                                         label: "Description",

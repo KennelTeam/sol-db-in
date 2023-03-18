@@ -6,10 +6,16 @@ import SelectQuestion, { SelectQuestionInterface } from "./SelectQuestion";
 import TextQuestion, { TextQuestionInterface } from "./TextQuestion";
 
 export enum SimpleQuestionType {
-    TEXT = "SHORT_TEXT",
-    NUMBER = "NUMBER",
-    SELECT = "MULTIPLE_CHOICE",
+    DATE = "DATE",
+    USER = "USER",
+    LONG_TEXT = "LONG_TEXT",
+    SHORT_TEXT = "SHORT_TEXT",
+    MULTIPLE_CHOICE = "MULTIPLE_CHOICE",
     CHECKBOX = "CHECKBOX",
+    LOCATION = "LOCATION",
+    NUMBER = "NUMBER",
+    BOOLEAN = "BOOLEAN",
+    RELATION = "RELATION"
 }
 
 export type SimpleQuestionTypesList = (
@@ -31,15 +37,18 @@ function SimpleQuestion(questionData: SimpleQuestionInterface): JSX.Element {
         case SimpleQuestionType.NUMBER:
             component = <NumberQuestion {...(questionData.questionData as NumberQuestionInterface)} />;
             break;
-        case SimpleQuestionType.TEXT:
+        case SimpleQuestionType.LONG_TEXT:
+        case SimpleQuestionType.SHORT_TEXT:
             component = <TextQuestion {...(questionData.questionData as TextQuestionInterface)} />;
             break;
-        case SimpleQuestionType.SELECT:
+        case SimpleQuestionType.MULTIPLE_CHOICE:
             component = <SelectQuestion {...(questionData.questionData as SelectQuestionInterface)} />;
             break;
         case SimpleQuestionType.CHECKBOX:
             component = <CheckboxQuestion {...(questionData.questionData as CheckboxQuestionInterface)} />;
             break;
+        default:
+            component = <div>Not implemented yet, sorry</div>
     }
     return component;
 }

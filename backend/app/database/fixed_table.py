@@ -73,7 +73,7 @@ class FixedTable(Editable, FlaskApp().db.Model):
         for i, r in enumerate(rows):
             for j, c in enumerate(columns):
                 options = Answer.filter(c.id, row_question_id=r.id, form_id=form_id)
-                answers[i][j] = None if len(options) == 0 else options[0]
+                answers[i][j] = None if len(options) == 0 else options
         return questions | {
             'answers': answers
         }

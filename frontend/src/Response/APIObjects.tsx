@@ -1,5 +1,5 @@
 import { AccessRights } from '../types/global'
-
+import { SimpleQuestionType } from "./SimpleQuestions/SimpleQuestion";
 
 export interface APIQuestionBlock {
     elements: Array<APIQuestionElement>,
@@ -22,10 +22,7 @@ export interface APIForm {
     state: APIFormState,
     name: string,
     form_type: APIFormType,
-    answers: Array<{
-        question_id: number,
-        answers: Array<APIAnswer>
-    }>
+    answers: Array<APIQuestionBlock>
 }
 
 export interface APITranslatedText {
@@ -35,7 +32,7 @@ export interface APITranslatedText {
 
 export interface APIQuestion {
     id: number,
-    question_type: APIQuestionType,
+    question_type: SimpleQuestionType,
     comment: APITranslatedText,
     text: APITranslatedText,
     short_text: APITranslatedText,
@@ -68,19 +65,6 @@ export interface APITag {
     type_id: number,
     parent_id: number,
     deleted: boolean
-}
-
-export enum APIQuestionType {
-    DATE,
-    USER,
-    LONG_TEXT,
-    SHORT_TEXT,
-    MULTIPLE_CHOICE,
-    CHECKBOX,
-    LOCATION,
-    NUMBER,
-    BOOLEAN,
-    RELATION
 }
 
 export interface APIPrivacySettings {
@@ -129,6 +113,11 @@ export interface APIRelationSettings {
     deleted: boolean
 }
 
+export interface APIOption {
+    id: number,
+    name: string
+}
+
 export interface APIQuestionTable {
     questions: Array<APIQuestion>
 }
@@ -136,6 +125,24 @@ export interface APIQuestionTable {
 export interface APIFixedTable {
     columns: Array<APIQuestion>,
     rows: Array<APIQuestion>,
-    answers: Array<Array<APIAnswer>>
+    answers: Array<Array<APIAnswer[]>>
 }
 
+export interface AnswersIndexed {
+    [key: number]: Array<APIAnswer>
+}
+
+export interface APIAnswerOption {
+    id: number,
+    name: APITranslatedText,
+    short_name: APITranslatedText,
+    answer_block_id: number,
+    deleted: boolean,
+    creation_timestamp: string
+}
+
+export interface APIAnswerBlock {
+    id: number,
+    options: APIAnswerOption[],
+    name: APITranslatedText
+}

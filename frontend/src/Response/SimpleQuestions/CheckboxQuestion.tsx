@@ -2,7 +2,7 @@ import { Box, Checkbox, FormControl, FormControlLabel } from "@mui/material";
 import { useState } from "react";
 import { CommonQuestionProperties } from "./common";
 
-interface SingleCheckboxQuestionInterface extends CommonQuestionProperties {
+export interface SingleCheckboxQuestionInterface extends CommonQuestionProperties {
     initialValue: boolean;
 }
 

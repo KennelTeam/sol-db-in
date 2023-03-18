@@ -46,7 +46,7 @@ function EditTranslationsDialog(props: EditTranslationsDialogInterface): JSX.Ele
             <Box>
                 <LabeledQuestion
                     inputInfo={inputInfo}
-                    questionType={SimpleQuestionType.TEXT}
+                    questionType={SimpleQuestionType.SHORT_TEXT}
                     questionData={questionData}
                 />
                 <IconButton>
