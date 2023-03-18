@@ -97,7 +97,7 @@ class Forms(Resource):
                 {
                     "answers": [{
                         'type': QuestionType.RELATION.name,
-                        'id': item.id,
+                        'ref_id': item.id,
                         'value': item.name,
                         'relation_type': item.form_type.name
                     }]

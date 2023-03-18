@@ -3,6 +3,7 @@
 import datetime
 
 from .form import Form
+from .localization import localize
 from .user import User
 from .toponym import Toponym
 from .question import Question
@@ -45,7 +46,7 @@ def prettify_answer(answer: Answer) -> JSON:
         result['value'] = Toponym.get_by_id(answer.value).name
     elif question.question_type in {QuestionType.MULTIPLE_CHOICE, QuestionType.CHECKBOX}:
         result['ref_id'] = answer.value
-        result['value'] = AnswerOption.get_by_id(answer.value).name
+        result['value'] = localize(AnswerOption.get_by_id(answer.value).name)
     else:
         result['value'] = answer.value
     return result
