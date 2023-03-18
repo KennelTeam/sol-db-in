@@ -6,9 +6,9 @@ import SelectQuestion, { SelectQuestionInterface } from "./SelectQuestion";
 import TextQuestion, { TextQuestionInterface } from "./TextQuestion";
 
 export enum SimpleQuestionType {
-    TEXT = "TEXT",
+    TEXT = "SHORT_TEXT",
     NUMBER = "NUMBER",
-    SELECT = "SELECT",
+    SELECT = "MULTIPLE_CHOICE",
     CHECKBOX = "CHECKBOX",
 }
 

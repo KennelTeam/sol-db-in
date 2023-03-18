@@ -1,4 +1,4 @@
-import { ResponseDataInterface } from "../Response/Response";
+import { ResponseDataInterface } from "../Response/ResponseData";
 import { SimpleQuestionType } from "../Response/SimpleQuestions/SimpleQuestion";
 import { TableType } from "../Response/Table/BaseTable";
 
