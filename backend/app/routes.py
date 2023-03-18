@@ -20,6 +20,7 @@ from .api.table import Table
 from .api.tags import Tags
 from .api.tag_types import TagTypes
 from .api.form import FormSchema
+from .api.all_toponyms import AllToponyms
 from .api.questions import Questions
 
 from .flask_app import FlaskApp
@@ -27,7 +28,7 @@ from .flask_app import FlaskApp
 resources = [
     Login, Logout, Users, Forms, FormPage, Toponyms, ToponymTree, AnswerOptionsPage, AllAnswerBlocks, Language,
     AnswerBlockPage, QuestionBlockPage, Table, Tags, TagTypes, FormSchema, Questions, Actions, Statistics, Settings,
-    FormsLightweight
+    FormsLightweight, AllToponyms
 ]
 
 for resource in resources:
