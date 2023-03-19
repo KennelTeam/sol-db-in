@@ -3,6 +3,7 @@ import { Box, Button, IconButton, InputAdornment, TextField } from '@mui/materia
 import { SyntheticEvent, useState} from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router-dom'
+import { SERVER_ADDRESS } from '../types/global'
 import axios, {AxiosResponse} from "axios";
 import i18n from "../i18n";
 
@@ -63,7 +64,7 @@ function Login() {
           }
       }
 
-      axios.post("http://127.0.0.1:5000/login", request, config).then(processResponse)
+      axios.post(SERVER_ADDRESS + "/login", request, config).then(processResponse)
   }
 
   function errorBox(text: string, statusCode: Status) {
