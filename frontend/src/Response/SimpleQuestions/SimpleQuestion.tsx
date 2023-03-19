@@ -5,6 +5,7 @@ import NumberQuestion, { NumberQuestionInterface } from "./NumberQuestion";
 import SelectQuestion, { SelectQuestionInterface } from "./SelectQuestion";
 import TextQuestion, { TextQuestionInterface } from "./TextQuestion";
 import {DateQuestion} from './DateQuestion'
+import RelationQuestion, { RelationQuestionProps } from "./RelationQuestion";
 
 export enum SimpleQuestionType {
     DATE = "DATE",
@@ -23,7 +24,8 @@ export type SimpleQuestionTypesList = (
     TextQuestionInterface |
     NumberQuestionInterface |
     SelectQuestionInterface |
-    CheckboxQuestionInterface
+    CheckboxQuestionInterface |
+    RelationQuestionProps
 );
 
 export interface SimpleQuestionInterface {
@@ -44,6 +46,9 @@ function SimpleQuestion(props: { questionData: SimpleQuestionInterface; onChange
             component = <TextQuestion questionData={(questionData.questionData as TextQuestionInterface)} onChange={props.onChange}/>;
             break;
         case SimpleQuestionType.RELATION:
+            component = <RelationQuestion questionData={questionData.questionData as RelationQuestionProps}
+                onChange={props.onChange}/>
+            break;
         case SimpleQuestionType.USER:
         case SimpleQuestionType.LOCATION:
         case SimpleQuestionType.MULTIPLE_CHOICE:
