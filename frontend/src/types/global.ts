@@ -1,5 +1,5 @@
 
-const SERVER_ADDRESS = 'http://52.192.211.221:5000'
+const SERVER_ADDRESS = 'http://127.0.0.1:5000'
 
 enum UserType {
     Admin,

@@ -22,6 +22,7 @@ import {TableType} from "./Table/BaseTable";
 import {InputInfoInterface} from "./SimpleQuestions/InputInfo";
 import {DynamicTableInterface} from "./Table/DynamicTable";
 import {FixedTableInterface} from "./Table/FixedTable";
+import {RelationQuestionProps} from "./SimpleQuestions/RelationQuestion";
 
 export async function GetFormInfo(id: number): Promise<ResponseDataInterface> {
     console.log("REQUEST")
@@ -82,6 +83,17 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
             break;
         }
         case SimpleQuestionType.RELATION:
+            const options_resp = await getRequest("forms_lightweight",
+                {form_type: question.relation_settings ? question.relation_settings.relation_type : "LEADER"})
+            let options = options_resp.data as Array<APIOption>
+            questionData = {
+                label: question.text,
+                id: question.id,
+                relType: question.relation_settings?.relation_type,
+                uid: generateUID(),
+                initialValue: answers.length > 0 ? options.find((item) => item.id == answers[0].value) : {id: -1, name: ""}
+            } as RelationQuestionProps
+            break;
         case SimpleQuestionType.LOCATION:
         case SimpleQuestionType.USER:
         case SimpleQuestionType.MULTIPLE_CHOICE: {
@@ -93,12 +105,8 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
             } else if (question.question_type == SimpleQuestionType.LOCATION) {
                 const options_resp = await getRequest("all_toponyms")
                 options = options_resp.data as Array<APIOption>
-            } else if (question.question_type == SimpleQuestionType.USER){
-                const options_resp = await getRequest("users")
-                options = options_resp.data as Array<APIOption>
             } else {
-                const options_resp = await getRequest("forms_lightweight",
-                    {form_type: question.relation_settings ? question.relation_settings.relation_type : "LEADER"})
+                const options_resp = await getRequest("users")
                 options = options_resp.data as Array<APIOption>
             }
             console.log(options)
