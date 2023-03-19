@@ -19,5 +19,8 @@ class AllAnswerBlocks(Resource):
     @jwt_required()
     @get_request()
     def get() -> Response:
+        old_lang = current_user.selected_language
         current_user.selected_language = ALL_LANGUAGES_TAG
-        return Response(json.dumps(AnswerBlock.get_all_blocks()), 200)
+        result = Response(json.dumps(AnswerBlock.get_all_blocks()), 200)
+        current_user.selected_language = old_lang
+        return result

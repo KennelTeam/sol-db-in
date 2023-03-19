@@ -20,6 +20,7 @@ class FormSchema(Resource):
     @jwt_required()
     @get_request()
     def get():
+        old_lang = current_user.selected_language
         current_user.selected_language = ALL_LANGUAGES_TAG
         parser = GetRequestParser()
         parser.add_argument('form_type', type=str, required=True)
@@ -34,4 +35,5 @@ class FormSchema(Resource):
             'form_type': form_type.name,
             'question_blocks': [block.to_json() for block in QuestionBlock.get_form(form_type)]
         }
+        current_user.selected_language = old_lang
         return Response(json.dumps(result), 200)

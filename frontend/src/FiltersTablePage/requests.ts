@@ -62,14 +62,16 @@ export async function getObjectsList(type: 'LEADER' | 'PROJECT') : Promise<Answe
     return await axios.get(SERVER_ADDRESS + '/forms',
         { withCredentials: true, params: { form_type: type, answer_filters: [] } })
         .then((response) => {
+            console.log("WEEEEEEEEEEEEEEE")
             console.log(type, " response:", response.status, response.data)
             const data = <FormsResponse>response.data
             return data.table[0].values.map((cell) => ({
-                id: cell.answers[0].id,
+                id: cell.answers[0].ref_id,
                 name: <string>cell.answers[0].value
             }))
         })
         .catch((error) => {
+            console.log("EEERRORRRORRR!")
             console.log(error)
             return []
         })
@@ -124,12 +126,12 @@ export async function getFilteredTableData(data: FiltersRequestData) : Promise<T
             }
             for (let i = 0; i < responseData.table[0].values.length; i++) {
                 tableData.rows.push({
-                    id: responseData.table[0].values[0].answers[0].id,
+                    id: responseData.table[0].values[i].answers[0].ref_id,
                     columns: responseData.table.map((column) => (
                         column.values[i].answers.map((ans) => ({
                             data: stringify(ans.value),
                             link: ans.type === 'RELATION' ?
-                                makeLink(ans.id, ans.relation_settings.relation_type) : undefined
+                                makeLink(ans.ref_id, ans.relation_type) : undefined
                         }))
                     ))
                 })

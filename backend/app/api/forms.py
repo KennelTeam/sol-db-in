@@ -33,10 +33,13 @@ class Forms(Resource):
     @jwt_required()
     @get_request()
     def get() -> Response:
+        print("THEREHREHERHRJKDLB NV")
         parser = GetRequestParser()
         parser.add_argument('form_type', type=str, required=True)
         parser.add_argument('answer_filters', type=str, required=False, default=None)
         parser.add_argument('name_substr', type=str, default='')
+
+        print(User.selected_language)
         if parser.error is not None:
             return parser.error
         arguments = parser.parse_args()

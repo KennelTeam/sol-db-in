@@ -89,7 +89,8 @@ export default function MainTable(props: TableData) {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     }
-
+    console.log(props.rows)
+    console.log(props.column_groups)
     return (
         <Box component={Card}>
             <TableContainer>

@@ -126,12 +126,10 @@ export interface ColumnResponse {
     column_name: "string",
     values: {
         answers: {
-            id: number,
+            ref_id: number,
             value: number | string | boolean,
             type: string,
-            relation_settings: {
-                relation_type: 'LEADER' | 'PROJECT'
-            }
+            relation_type: 'LEADER' | 'PROJECT'
         }[]
     }[]
 }
