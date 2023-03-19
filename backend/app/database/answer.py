@@ -1,5 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
+import datetime
+
 from sqlalchemy.orm import Query
 from backend.app.flask_app import FlaskApp
 # from .tag_to_answer import TagToAnswer
@@ -8,6 +10,7 @@ from enum import Enum
 from typing import Any, List, Set
 from .question_type import QuestionType
 from backend.auxiliary import JSON
+from ...auxiliary.string_dt import datetime_to_string, date_to_string
 
 
 class ExtremumType(Enum):
@@ -40,7 +43,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             'table_row': self.table_row if self.table_row is not None else 0,
             'row_question_id': self.row_question_id,
             # 'tags': TagToAnswer.get_answers_tags(self.id),
-            'value': self.value
+            'value': self.value if not isinstance(self.value, datetime.datetime) else date_to_string(self.value)
         }
 
     @staticmethod
@@ -58,7 +61,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             'table_row': {int, None},
             'row_question_id': {int, None},
             'value': {int, str, bool},
-            'tags': list,
+            'tags': {list, None},
         }
 
     @staticmethod

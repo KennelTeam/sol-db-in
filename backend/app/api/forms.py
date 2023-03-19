@@ -5,7 +5,7 @@ import json
 from base64 import urlsafe_b64decode
 
 from flask import Response
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, current_user
 from flask_restful import Resource, reqparse
 from typing import Set, List, Final
 
@@ -17,7 +17,7 @@ from backend.app.database.tag_to_answer import TagToAnswer
 from backend.app.database.tag import Tag
 from backend.auxiliary.string_dt import string_to_datetime
 from backend.auxiliary.types import JSON
-from backend.app.database import Question, FormattingSettings, PrivacySettings, User
+from backend.app.database import Question, FormattingSettings, PrivacySettings, User, Toponym, QuestionBlock
 from backend.app.database.question import AnswerType
 from backend.app.database.auxiliary import prettify_answer
 from backend.app.database.question_type import QuestionType
@@ -33,13 +33,11 @@ class Forms(Resource):
     @jwt_required()
     @get_request()
     def get() -> Response:
-        print("THEREHREHERHRJKDLB NV")
         parser = GetRequestParser()
         parser.add_argument('form_type', type=str, required=True)
         parser.add_argument('answer_filters', type=str, required=False, default=None)
         parser.add_argument('name_substr', type=str, default='')
 
-        print(User.selected_language)
         if parser.error is not None:
             return parser.error
         arguments = parser.parse_args()
@@ -56,10 +54,12 @@ class Forms(Resource):
         if arguments['form_type'] not in FormType.items():
             return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
 
-        Question.upload_cache()
         FormattingSettings.upload_cache()
+        Question.upload_cache()
         PrivacySettings.upload_cache()
         User.upload_cache()
+        Toponym.upload_cache()
+        QuestionBlock.upload_cache()
         form_type = FormType[arguments['form_type']]
         ids = Form.get_all_ids(form_type)
         for item in answer_filters:
@@ -73,10 +73,12 @@ class Forms(Resource):
         question_ids = Question.get_only_main_page(form_type)
 
         result = Forms._prepare_table(forms, question_ids)
-        Question.clear_cache()
-        FormattingSettings.clear_cache()
-        PrivacySettings.clear_cache()
-        User.clear_cache()
+        # FormattingSettings.clear_cache()
+        # Question.clear_cache()
+        # PrivacySettings.clear_cache()
+        # User.clear_cache()
+        # Toponym.clear_cache()
+        # QuestionBlock.clear_cache()
         return Response(json.dumps({'table': result}), 200)
 
     @staticmethod
@@ -219,6 +221,7 @@ class Forms(Resource):
             if status != HTTPErrorCode.SUCCESS:
                 return post_failure(status, 400)
 
+        print("FLUSHING TO DATABASE")
         FlaskApp().flush_to_database()
         return Response(str(form.id), status=200)
 
@@ -250,21 +253,25 @@ class Forms(Resource):
                     or answer['question_id'] != current_ans.question_id:
                 return HTTPErrorCode.CONFLICTING_ARGUMENTS
             try:
-                print(answer['value'])
-                dt = datetime.datetime.strptime(answer['value'], "%m-%d-%Y")
+                dt = datetime.datetime.strptime(answer['value'], "%Y-%m-%d")
                 answer['value'] = dt
             except ValueError:
                 pass
+            except TypeError:
+                pass
             current_ans.value = answer['value']
             current_ans.table_row = answer['table_row']
+            current_ans.deleted = answer['deleted']
         else:
             current_ans = Answer(answer['question_id'], form.id, answer['value'],
                                  answer.get('table_row', None), answer.get('row_question_id', None))
             FlaskApp().add_database_item(current_ans)
-        return Forms._update_answer_tags(current_ans.id, answer['tags'])
+        return Forms._update_answer_tags(current_ans.id, answer.get('tags', None))
 
     @staticmethod
     def _update_answer_tags(answer_id: int, tags: List[JSON]) -> HTTPErrorCode:
+        if tags is None:
+            return HTTPErrorCode.SUCCESS
         tags_set = set()
         for tag in tags:
             status = check_json_format(tag, {'id': int})

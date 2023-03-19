@@ -34,6 +34,8 @@ class Form(Editable, FlaskApp().db.Model):
     _name = FlaskApp().db.Column('name', VARCHAR(MAX_NAME_SIZE), unique=True)
     _form_type = FlaskApp().db.Column('form_type', FlaskApp().db.Enum(FormType))
 
+    _cached = None
+
     def __init__(self, form_type: FormType, name: str, state=FormState.PLANNED):
         super().__init__()
         self._form_type = form_type
@@ -41,7 +43,7 @@ class Form(Editable, FlaskApp().db.Model):
         self.name = name
 
     def to_json(self, with_answers=True) -> JSON:
-        result =  super().to_json() | {
+        result = super().to_json() | {
             'state': self.state.name,
             'name': self.name,
             'form_type': self.form_type.name
@@ -49,6 +51,14 @@ class Form(Editable, FlaskApp().db.Model):
         if with_answers:
             result['answers'] = Answer.get_form_answers(self.id)
         return result
+
+    @staticmethod
+    def upload_cache():
+        Form._cached = FlaskApp().request(Form).all()
+
+    @staticmethod
+    def clear_cache():
+        Form._cached = None
 
     @staticmethod
     def filter(name_substr: str, question_id: int, exact_values: List[Any] = None, min_value: Any = None,
@@ -65,10 +75,14 @@ class Form(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_by_ids(ids: Set[int]) -> List['Form']:
+        if Form._cached is not None:
+            return list(filter(lambda x: x.id in ids, Form._cached))
         return FlaskApp().request(Form).filter(Form.id.in_(ids)).all()
 
     @staticmethod
     def get_all_ids(form_type: FormType) -> Set[int]:
+        if Form._cached is not None:
+            return set(map(lambda x: x.id, filter(lambda f: f.form_type == form_type, Form._cached)))
         return {item.id for item in FlaskApp().request(Form).filter_by(_form_type=form_type)
                 .with_entities(Form.id).all()}
 

@@ -24,6 +24,7 @@ function NumberQuestion(props: { questionData: NumberQuestionInterface; onChange
                 else {
                     let data = value
                     data.initialValue = +event.target.value
+                    data.value = data.initialValue
                     setAns(+event.target.value)
                     setValue(data)
                     props.onChange(value)
