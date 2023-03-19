@@ -114,6 +114,7 @@ class Question(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_all_with_formattings(formattings: List['FormattingSettings']) -> List['Question']:
+        # pylint: disable=protected-access
         if Question._cached is not None:
             ids = [item.id for item in formattings]
             return list(filter(lambda q: q._formatting_settings in ids, Question._cached))
@@ -124,6 +125,7 @@ class Question(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_all_with_relation_settings(relation_settings: List[int]) -> List['Question']:
+        # pylint: disable=protected-access
         if Question._cached is not None:
             return list(filter(lambda q: q._relation_settings in relation_settings, Question._cached))
 

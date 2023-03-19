@@ -250,7 +250,7 @@ class Forms(Resource):
                 print(answer['value'])
                 dt = datetime.datetime.strptime(answer['value'], "%m-%d-%Y")
                 answer['value'] = dt
-            except Exception as e:
+            except ValueError:
                 pass
             current_ans.value = answer['value']
             current_ans.table_row = answer['table_row']

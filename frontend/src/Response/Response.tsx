@@ -43,7 +43,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
             answers.push(resultData[ans])
         }
 
-        let form_type = "LEADER"
+        let form_type = responseData.form_type.toString()
         let id = responseData.id
 
         postRequest("forms", {

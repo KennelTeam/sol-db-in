@@ -90,14 +90,14 @@ export interface APIFormattingSettings {
 }
 
 export enum APIFormType {
-    LEADER,
-    PROJECT
+    LEADER = "LEADER",
+    PROJECT = "PROJECT"
 }
 
 export enum APIVisualizationType {
-    ALL,
-    NAMES_ONLY,
-    NOTHING
+    ALL = "ALL",
+    NAMES_ONLY = "NAMES_ONLY",
+    NOTHING = "NOTHING"
 }
 
 export interface APIRelationSettings {

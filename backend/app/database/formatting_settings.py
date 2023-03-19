@@ -71,6 +71,7 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_by_id(id: int) -> 'FormattingSettings':
+        # pylint: disable=protected-access
         if FormattingSettings._cached is not None:
             res = list(filter(lambda x: x.id == id, FormattingSettings._cached))
             return None if len(res) == 0 else res[0]
@@ -78,24 +79,28 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def query_from_block(block_id: int) -> Query | List['FormattingSettings']:
+        # pylint: disable=protected-access
         if FormattingSettings._cached:
             return list(filter(lambda x: x._block_id == block_id, FormattingSettings._cached))
         return FlaskApp().request(FormattingSettings).filter_by(_block_id=block_id)
 
     @staticmethod
     def get_from_question_table(question_table_id: int) -> List['FormattingSettings']:
+        # pylint: disable=protected-access
         if FormattingSettings._cached is not None:
             return list(filter(lambda x: x._table_id == question_table_id, FormattingSettings._cached))
         return FlaskApp().request(FormattingSettings).filter_by(_table_id=question_table_id).all()
 
     @staticmethod
     def get_from_fixed_table(fixed_table_id: int) -> List['FormattingSettings']:
+        # pylint: disable=protected-access
         if FormattingSettings._cached is not None:
             return list(filter(lambda x: x._fixed_table_id == fixed_table_id, FormattingSettings._cached))
         return FlaskApp().request(FormattingSettings).filter_by(_fixed_table_id=fixed_table_id).all()
 
     @staticmethod
     def get_main_page() -> List['FormattingSettings']:
+        # pylint: disable=protected-access
         if FormattingSettings._cached is not None:
             return list(filter(lambda x: x._show_on_main_page == True, FormattingSettings._cached))
         return FlaskApp().request(FormattingSettings).filter_by(_show_on_main_page=True).all()
@@ -103,6 +108,7 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
     @staticmethod
     def filter_only_free_questions(query: Query | List['FormattingSettings'],
                                    short_form: bool = False) -> List['FormattingSettings']:
+        # pylint: disable=protected-access
         if FormattingSettings._cached is not None:
             if short_form:
                 query = list(filter(lambda x: x._show_on_main_page == True, query))
@@ -114,12 +120,14 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def filter_only_table_questions(query: Query | List['FormattingSettings']) -> List['FormattingSettings']:
+        # pylint: disable=protected-access
         if FormattingSettings._cached is not None:
             return list(filter(lambda x: x._table_id is not None, query))
         return query.filter(FormattingSettings._table_id is not None).all()
 
     @staticmethod
     def filter_only_fixed_table_questions(query: Query | List['FormattingSettings']) -> List['FormattingSettings']:
+        # pylint: disable=protected-access
         if FormattingSettings._cached is not None:
             return list(filter(lambda x: x._fixed_table_id is not None, query))
         return query.filter(FormattingSettings._fixed_table_id is not None).all()
