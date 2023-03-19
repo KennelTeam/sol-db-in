@@ -63,7 +63,8 @@
         "rows_per_page": "Rows per page",
         "choose_filter": "Choose filter...",
         "submit_filter": "Submit filter",
-        "add_leader": "Add leader"
+        "add_leader": "Add leader",
+        "add_project": "Add project"
     },
 
     "options": {

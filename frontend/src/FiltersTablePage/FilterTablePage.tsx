@@ -217,9 +217,9 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
         } else {
             return
         }
-        axios.post(SERVER_ADDRESS + '/login', { login: 'coffeekey', password: 'password', language: 'ru' }, { withCredentials: true })
-            .then((loginResponse) => {
-                console.log(loginResponse.status, loginResponse.data)
+        // axios.post(SERVER_ADDRESS + '/login', { login: 'coffeekey', password: 'password', language: 'ru' }, { withCredentials: true })
+        //     .then((loginResponse) => {
+        //         console.log(loginResponse.status, loginResponse.data)
             console.log("Mounted")
             axios.get(SERVER_ADDRESS + '/form', { params: { form_type: formType }, withCredentials: true })
                 .then((response) => {
@@ -251,7 +251,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
                 .catch((error) => {
                     console.log("Error while accessing to the /form: ", error)
                 })
-            })
+            // })
         handleSubmitFilter()
     }, [])
 
