@@ -2,7 +2,7 @@
 #  All rights reserved.
 from sqlalchemy.orm import Query
 from backend.app.flask_app import FlaskApp
-from .tag_to_answer import TagToAnswer
+# from .tag_to_answer import TagToAnswer
 from .editable_value_holder import EditableValueHolder
 from enum import Enum
 from typing import Any, List, Set
@@ -22,6 +22,8 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
     _question_id = FlaskApp().db.Column('question_id', FlaskApp().db.ForeignKey('questions.id'))
     _form_id = FlaskApp().db.Column('form_id', FlaskApp().db.ForeignKey('forms.id'), nullable=False)
 
+    _cached = None
+
     def __init__(self, question_id: int, form_id: int,
                  value: Any, table_row: int, row_question_id: int) -> None:
         super().__init__()
@@ -37,9 +39,17 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             'question_id': self.question_id,
             'table_row': self.table_row if self.table_row is not None else 0,
             'row_question_id': self.row_question_id,
-            'tags': TagToAnswer.get_answers_tags(self.id),
+            # 'tags': TagToAnswer.get_answers_tags(self.id),
             'value': self.value
         }
+
+    @staticmethod
+    def upload_cache(form_id: int) -> None:
+        Answer._cached = FlaskApp().request(Answer).filter_by(_form_id=form_id).all()
+
+    @staticmethod
+    def clear_cache() -> None:
+        Answer._cached = None
 
     @staticmethod
     def json_format() -> JSON:
@@ -53,6 +63,9 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
 
     @staticmethod
     def get_by_id(id: int) -> 'Answer':
+        if Answer._cached is not None:
+            result = list(filter(lambda x: x.id == id, Answer._cached))
+            return None if len(result) == 0 else result[0]
         return FlaskApp().request(Answer).filter_by(id=id).first()
 
     @staticmethod
@@ -83,6 +96,10 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
 
     @staticmethod
     def get_form_answers(form_id: int, question_id: int = -1) -> List['Answer']:
+        if Answer._cached is not None:
+            if question_id == -1:
+                return Answer._cached
+            return list(filter(lambda x: x.question_id == question_id, Answer._cached))
         query = FlaskApp().request(Answer).filter_by(_form_id=form_id)
         if question_id != -1:
             query = query.filter_by(_question_id=question_id)

@@ -47,6 +47,8 @@ class Question(Editable, FlaskApp().db.Model):
 
     _form_type = FlaskApp().db.Column('form_type', FlaskApp().db.Enum(FormType))
 
+    _cached = None
+
     def __init__(self, texts: TranslatedText, short_texts: TranslatedText, question_type: QuestionType,
                  comment: TranslatedText, answer_block_id: int, tag_type_id: int, form_type: str,
                  related_question_id: int = None):
@@ -85,32 +87,58 @@ class Question(Editable, FlaskApp().db.Model):
         }
 
     @staticmethod
+    def upload_cache():
+        Question._cached = FlaskApp().request(Question).all()
+
+    @staticmethod
+    def clear_cache():
+        Question._cached = None
+
+    @staticmethod
     def filter_by_answer_block(answer_block_id: int) -> Query:
         return FlaskApp().request(Question).filter_by(_answer_block_id=answer_block_id)
 
     @staticmethod
     def get_by_id(id: int) -> 'Question':
-        result = Question.get_by_ids([id])
+        if Question._cached is not None:
+            result = list(filter(lambda x: x.id == id, Question._cached))
+        else:
+            result = Question.get_by_ids([id])
         return None if len(result) == 0 else result[0]
 
     @staticmethod
     def get_by_ids(ids: List[int]) -> List['Question']:
+        if Question._cached is not None:
+            return list(filter(lambda q: q.id in ids, Question._cached))
         return FlaskApp().request(Question).filter(Question.id.in_(ids)).all()
 
     @staticmethod
     def get_all_with_formattings(formattings: List['FormattingSettings']) -> List['Question']:
+        # pylint: disable=protected-access
+        if Question._cached is not None:
+            ids = [item.id for item in formattings]
+            return list(filter(lambda q: q._formatting_settings in ids, Question._cached))
+
         return FlaskApp().request(Question).filter(Question._formatting_settings.in_(
             [item.id for item in formattings]
         )).all()
 
     @staticmethod
     def get_all_with_relation_settings(relation_settings: List[int]) -> List['Question']:
+        # pylint: disable=protected-access
+        if Question._cached is not None:
+            return list(filter(lambda q: q._relation_settings in relation_settings, Question._cached))
+
         return FlaskApp().request(Question).filter(Question._relation_settings.in_(
             relation_settings
         )).all()
 
     @staticmethod
     def get_by_text(text: str) -> List['Question']:
+        if Question._cached is not None:
+            def text_match(q: 'Question') -> bool:
+                return max(text in v for v in q.text.values())
+            return list(filter(text_match, Question._cached))
         return FlaskApp().request(Question).filter(Question.text.like(f"%{text}%")).all()
 
     @staticmethod
@@ -156,8 +184,8 @@ class Question(Editable, FlaskApp().db.Model):
             'tag_type': self.tag_type_id
         }
         if with_answers:
-            answers = Answer.filter(self.id, form_id=form_id)
-            related_answers = Answer.filter(self.related_question_id, form_id=form_id)
+            answers = Answer.get_form_answers(form_id=form_id, question_id=self.id)
+            related_answers = Answer.get_form_answers(form_id=form_id, question_id=self.related_question_id)
             jsons = [answer.to_json() for answer in answers + related_answers]
             result.update({
                 'answers': sorted(jsons, key=lambda x: x['table_row'])

@@ -40,13 +40,15 @@ class Form(Editable, FlaskApp().db.Model):
         self.state = state
         self.name = name
 
-    def to_json(self) -> JSON:
-        return super().to_json() | {
+    def to_json(self, with_answers=True) -> JSON:
+        result =  super().to_json() | {
             'state': self.state.name,
             'name': self.name,
-            'form_type': self.form_type.name,
-            'answers': Answer.get_form_answers(self.id)
+            'form_type': self.form_type.name
         }
+        if with_answers:
+            result['answers'] = Answer.get_form_answers(self.id)
+        return result
 
     @staticmethod
     def filter(name_substr: str, question_id: int, exact_values: List[Any] = None, min_value: Any = None,

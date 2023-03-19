@@ -118,14 +118,17 @@ def check_json_format(source: Any, json_format: JSON) -> HTTPErrorCode:
     if not isinstance(source, dict):
         return HTTPErrorCode.INVALID_ARG_FORMAT
     for key in json_format:
-        if isinstance(json_format[key], set) and None in json_format[key] and key not in source:
+        if isinstance(json_format[key], set) and None in json_format[key] and (key not in source or source[key] is None):
             continue
         if key not in source:
             return HTTPErrorCode.MISSING_ARGUMENT
-        if issubclass(json_format[key], enum.Enum):
+        if not type(json_format[key]) == set and issubclass(json_format[key], enum.Enum):
             if not isinstance(source[key], str) or source[key] not in json_format[key].items():
                 return HTTPErrorCode.INVALID_ARG_TYPE
-        elif issubclass(json_format[key], enum.Enum):
+        elif type(json_format[key]) == set:
+            if type(source[key]) not in json_format[key]:
+                return HTTPErrorCode.INVALID_ARG_TYPE
+        elif not type(json_format[key]) == set and issubclass(json_format[key], enum.Enum):
             if not isinstance(source[key], str) or source[key] not in json_format[key].items():
                 return HTTPErrorCode.INVALID_ARG_TYPE
         elif type(source[key]) != json_format[key]:

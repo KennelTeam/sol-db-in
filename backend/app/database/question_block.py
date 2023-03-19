@@ -28,12 +28,12 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
         self._form = form
         self.sorting = sorting
 
-    def to_json(self) -> JSON:
+    def to_json(self, with_answers: bool = False, form_id: int = None) -> JSON:
         return super().to_json() | {
             'name': localize(self.name),
             'form': self.form.name,
             'sorting': self.sorting,
-            'questions': self.get_questions()
+            'questions': self.get_questions(with_answers, form_id)
         }
 
     @staticmethod
@@ -72,7 +72,7 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
         free_questions: List[Tuple[JSON, int]] = [(
             {
                 'type': 'question',
-                'value': item[0].to_json()
+                'value': item[0].to_json(with_answers, form_id)
             }, item[1]) for item in self._get_free_questions()]
 
         table_questions: List[Tuple[JSON, int]] = [(

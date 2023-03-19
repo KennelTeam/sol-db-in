@@ -34,7 +34,7 @@ def prettify_answer(answer: Answer) -> JSON:
         if isinstance(answer.value, int):
             result['ref_id'] = answer.value
             result['value'] = Form.get_by_ids({answer.value})[0].name
-            result['relation_type'] = Question.get_by_id(answer.question_id).relation_settings.relation_type.name
+            result['relation_type'] = question.relation_settings.relation_type.name
         else:
             result['value'] = answer.value
             result['ref_id'] = -1

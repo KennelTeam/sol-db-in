@@ -17,18 +17,27 @@ export interface QuestionInterface {
     inputInfo: InputInfoInterface;
 }
 
-function Question(questionData: QuestionInterface): JSX.Element {
+function Question(props: { questionData: QuestionInterface; onChange: any; }): JSX.Element {
+    let questionData: QuestionInterface = props.questionData;
+    let callBack = props.onChange;
+
     let component: JSX.Element;
     if (questionData.questionType in SimpleQuestionType) {
         component = <LabeledQuestion
             questionType={questionData.questionType as SimpleQuestionType}
             questionData={questionData.questionData as SimpleQuestionTypesList}
             inputInfo={questionData.inputInfo}
+            onChange={callBack}
         />
     } else if (questionData.questionType === TableType.FIXED_TABLE) {
-        component = <FixedTable inputInfo={questionData.inputInfo} {...(questionData.questionData as FixedTableInterface)}/>
+        component = <FixedTable onChange={callBack} fixedTableData={
+            {
+                ...(questionData.questionData as FixedTableInterface),
+                inputInfo: questionData.inputInfo
+            }}/>
     } else if (questionData.questionType === TableType.DYNAMIC_TABLE) {
-        component = <DynamicTable inputInfo={questionData.inputInfo} {...(questionData.questionData as DynamicTableInterface)}/>
+        component = <DynamicTable onChange={callBack} dynamicTableData={questionData.questionData as DynamicTableInterface}
+        inputInfo={questionData.inputInfo}/>
     } else {
         component = <h1>Question type not found</h1>
     }

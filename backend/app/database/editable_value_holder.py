@@ -25,7 +25,9 @@ class EditableValueHolder(ValueHolder, Editable):
             return EditableValueHolder.filter_exact_values(table, exact_values)
         if substring is not None:
             return EditableValueHolder.filter_substring(table, substring)
-        return EditableValueHolder.filter_range(table, min_value, max_value)
+        if min_value is not None or max_value is not None:
+            return EditableValueHolder.filter_range(table, min_value, max_value)
+        return FlaskApp().request(table)
 
     @staticmethod
     def filter_exact_values(table: Type[FlaskApp().db.Model], exact_values: List[Any]) -> Query:

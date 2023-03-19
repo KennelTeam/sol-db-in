@@ -7,6 +7,8 @@ from backend.constants import ALL_LANGUAGES_TAG, DEFAULT_LANGUAGE
 
 
 def localize(text: TranslatedText) -> str | TranslatedText:
+    print(text, current_user.selected_language)
+    print(isinstance(text, dict))
     if not isinstance(text, dict):
         return text
     lang = current_user.selected_language

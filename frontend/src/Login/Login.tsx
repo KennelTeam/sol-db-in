@@ -45,7 +45,6 @@ function Login() {
   }
 
   function onSubmit(e: SyntheticEvent) {
-      console.log("HERE")
       e.preventDefault();
       const target = e.target as typeof e.target & {
           login: { value: string },

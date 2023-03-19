@@ -1,12 +1,12 @@
 import { Stack } from "@mui/system"
-import { MenuItem, Select, SelectChangeEvent, TextField, Typography, FormControlLabel } from "@mui/material"
-import React, { ReactNode, SyntheticEvent, useEffect, useState} from "react"
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker'
-import dayjs, { Dayjs } from "dayjs"
-import { FormControl, Checkbox, ListItemText, Autocomplete } from "@mui/material"
-import { useTranslation } from 'react-i18next'
+import { MenuItem, Select, SelectChangeEvent, TextField, Typography, FormControlLabel, TextFieldProps} from "@mui/material"
+import React, {ReactNode, SyntheticEvent, useEffect, useState} from "react"
+import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider'
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs'
+import {DesktopDatePicker} from '@mui/x-date-pickers/DesktopDatePicker'
+import dayjs, {Dayjs} from "dayjs"
+import {FormControl, Checkbox, ListItemText, Autocomplete} from "@mui/material"
+import {useTranslation} from 'react-i18next'
 
 export interface AnswerVariant {
     id: number,
@@ -38,11 +38,11 @@ interface MultipleFilterProps extends FilterProps {
     }[]
 }
 
-export function ListChoice({ options, defaultIdx, returnValue } : ListChoiceProps) {
+export function ListChoice({options, defaultIdx, returnValue}: ListChoiceProps) {
     // makes Select element (drop-down list) with default value options[defaultIdx]
     const [curValue, setValue] = useState(options[defaultIdx])
 
-    const handleChange = (event: SelectChangeEvent<string>, child: ReactNode) : void => {
+    const handleChange = (event: SelectChangeEvent<string>, child: ReactNode): void => {
         setValue(event.target.value)
         if (returnValue !== undefined) {
             returnValue(event.target.value)
@@ -50,15 +50,15 @@ export function ListChoice({ options, defaultIdx, returnValue } : ListChoiceProp
     }
 
     return (
-    <Select value={curValue} onChange={handleChange} size="small">
-        {options.map((option: string, i: number) => (
-            <MenuItem value={option}>{option}</MenuItem>
-        ))}
-    </Select>
+        <Select value={curValue} onChange={handleChange} size="small">
+            {options.map((option: string, i: number) => (
+                <MenuItem value={option}>{option}</MenuItem>
+            ))}
+        </Select>
     )
 }
 
-export function NumberFilter({ setFilter } : FilterProps) {
+export function NumberFilter({setFilter}: FilterProps) {
 
     const [compare, setCompare] = useState('=')
     const [value, setValue] = useState(0)
@@ -114,15 +114,15 @@ export function NumberFilter({ setFilter } : FilterProps) {
     )
 }
 
-export function TextFilter(props : FilterProps) {
-    const { t } = useTranslation('translation', { keyPrefix: "filters" })
+export function TextFilter(props: FilterProps) {
+    const {t} = useTranslation('translation', {keyPrefix: "filters"})
     const [compare, setCompare] = useState(t('equals'))
     const [value, setValue] = useState('')
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setValue(e.target.value)
     }
-    
+
     useEffect(() => {
         switch (compare) {
             case t('equals') : {
@@ -162,8 +162,8 @@ export function TextFilter(props : FilterProps) {
     )
 }
 
-export function DateFilter({ setFilter } : FilterProps) {
-    const { t } = useTranslation('translation', { keyPrefix: "filters" })
+export function DateFilter({setFilter}: FilterProps) {
+    const {t} = useTranslation('translation', {keyPrefix: "filters"})
 
     const [dateFrom, setDateFrom] = React.useState<Dayjs | null>(dayjs)
     const [dateTo, setDateTo] = React.useState<Dayjs | null>(dayjs)
@@ -178,7 +178,7 @@ export function DateFilter({ setFilter } : FilterProps) {
 
     const handleChangeFrom = (newDateFrom: Dayjs | null) => {
         setDateFrom(newDateFrom)
-      }
+    }
 
     const handleChangeTo = (newDateTo: Dayjs | null) => {
         setDateTo(newDateTo)
@@ -193,7 +193,7 @@ export function DateFilter({ setFilter } : FilterProps) {
                     inputFormat="DD.MM.YYYY"
                     value={dateFrom}
                     onChange={handleChangeFrom}
-                    renderInput={(params) => <TextField size="small" {...params} />}
+                    renderInput={(params: JSX.IntrinsicAttributes & TextFieldProps) => <TextField size="small" {...params} />}
                     />
                 <Typography variant="overline">{t("to")}</Typography>
                 <DesktopDatePicker
@@ -201,7 +201,7 @@ export function DateFilter({ setFilter } : FilterProps) {
                     inputFormat="DD.MM.YYYY"
                     value={dateTo}
                     onChange={handleChangeTo}
-                    renderInput={(params) => <TextField size="small" {...params} />}
+                    renderInput={(params: JSX.IntrinsicAttributes & TextFieldProps) => <TextField size="small" {...params} />}
                     />
             </Stack>
         </LocalizationProvider>

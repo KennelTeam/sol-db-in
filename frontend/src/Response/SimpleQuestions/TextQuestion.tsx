@@ -6,16 +6,24 @@ export interface TextQuestionInterface extends CommonQuestionProperties {
     initialValue: string;
 }
 
-function TextQuestion(questionData: TextQuestionInterface): JSX.Element {
-    const [value, setValue] = useState<string>(questionData.initialValue)
+function TextQuestion(props: { questionData: TextQuestionInterface; onChange: (arg0: TextQuestionInterface) => void; }): JSX.Element {
+    let questionData: TextQuestionInterface = props.questionData
+    const [value, setValue] = useState(questionData)
+    const [text, setText] = useState(questionData.initialValue)
     return <Box display="inline-block">
     <TextField
       size="small"
       type="text"
       sx={{ display: "block" }}
       label={questionData.label}
-      value={value}
-      onChange={(event) => setValue(event.target.value)}
+      value={text}
+      onChange={(event) => {
+          let data = value
+          data.initialValue = event.target.value
+          setText(event.target.value)
+          setValue(data)
+          props.onChange(value)
+      }}
     />
   </Box>
 }

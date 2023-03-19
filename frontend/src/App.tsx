@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
 import Catalog from "./Catalog";
 import Leader from "./Leader";
 import LeadersList from "./LeadersList";
@@ -34,6 +34,7 @@ function App() {
         </Box> }
         <Container sx={{ width: '100%', overflowX: "auto" }}>
           <Routes>
+            <Route path='/' element={<Navigate to={'/login'}/>}/>
           <Route path='/catalog' element={<Catalog />}/>
           <Route path='/leader/:id' element={<Leader />}/>
           <Route path='/leaders' element={<LeadersList />}/>

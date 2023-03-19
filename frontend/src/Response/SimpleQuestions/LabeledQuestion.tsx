@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import InputInfo, { InputInfoInterface } from "./InputInfo";
-import SimpleQuestion, { SimpleQuestionInterface } from "./SimpleQuestion";
+import SimpleQuestion, {SimpleQuestionInterface, SimpleQuestionType, SimpleQuestionTypesList} from "./SimpleQuestion";
 
 
 export interface WithInputInfoInterface {
@@ -9,13 +9,23 @@ export interface WithInputInfoInterface {
 
 export interface LabeledQuestionInterface extends SimpleQuestionInterface, WithInputInfoInterface {}
 
-function LabeledQuestion(questionData: LabeledQuestionInterface): JSX.Element {
-    const questionComponent = <SimpleQuestion questionType={questionData.questionType} questionData={questionData.questionData} />;
+function LabeledQuestion(props: { questionData: SimpleQuestionTypesList; questionType: SimpleQuestionType; inputInfo: InputInfoInterface; onChange: (arg0: any) => void; }): JSX.Element {
+    let questionData: SimpleQuestionTypesList = props.questionData
+    let questionType: SimpleQuestionType = props.questionType
+    let inputInfo: InputInfoInterface = props.inputInfo
+
+    const questionComponent = <SimpleQuestion onChange={props.onChange}
+                                              questionData={{
+        questionData: questionData,
+        questionType: questionType,
+        inputInfo: inputInfo
+    } as SimpleQuestionInterface
+                                              } />;
     return (
         <Box display="inline-block" sx={{
             marginBottom: "10px"
         }}>
-            <InputInfo {...questionData.inputInfo} />
+            <InputInfo {...inputInfo} />
             {questionComponent}
         </Box>
     )

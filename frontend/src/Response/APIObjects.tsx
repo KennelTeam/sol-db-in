@@ -1,9 +1,28 @@
 import { AccessRights } from '../types/global'
-
+import { SimpleQuestionType } from "./SimpleQuestions/SimpleQuestion";
 
 export interface APIQuestionBlock {
+    questions: Array<APIQuestionElement>,
+    name: string
+}
+
+export interface APIQuestionElement {
     type: string,
     value: APIQuestion | APIQuestionTable | APIFixedTable
+}
+
+export enum APIFormState {
+    PLANNED = "PLANNED",
+    STARTED = "STARTED",
+    FINISHED = "FINISHED"
+}
+
+export interface APIForm {
+    id: number,
+    state: APIFormState,
+    name: string,
+    form_type: APIFormType,
+    answers: Array<APIQuestionBlock>
 }
 
 export interface APITranslatedText {
@@ -13,9 +32,9 @@ export interface APITranslatedText {
 
 export interface APIQuestion {
     id: number,
-    question_type: APIQuestionType,
-    comment: APITranslatedText,
-    text: APITranslatedText,
+    question_type: SimpleQuestionType,
+    comment: string,
+    text: string,
     short_text: APITranslatedText,
     answer_block_id: number | null,
     related_question_id: number | null,
@@ -48,19 +67,6 @@ export interface APITag {
     deleted: boolean
 }
 
-export enum APIQuestionType {
-    DATE,
-    USER,
-    LONG_TEXT,
-    SHORT_TEXT,
-    MULTIPLE_CHOICE,
-    CHECKBOX,
-    LOCATION,
-    NUMBER,
-    BOOLEAN,
-    RELATION
-}
-
 export interface APIPrivacySettings {
     id: number,
     editor_access: AccessRights,
@@ -84,14 +90,14 @@ export interface APIFormattingSettings {
 }
 
 export enum APIFormType {
-    LEADER,
-    PROJECT
+    LEADER = "LEADER",
+    PROJECT = "PROJECT"
 }
 
 export enum APIVisualizationType {
-    ALL,
-    NAMES_ONLY,
-    NOTHING
+    ALL = "ALL",
+    NAMES_ONLY = "NAMES_ONLY",
+    NOTHING = "NOTHING"
 }
 
 export interface APIRelationSettings {
@@ -107,6 +113,11 @@ export interface APIRelationSettings {
     deleted: boolean
 }
 
+export interface APIOption {
+    id: number,
+    name: string
+}
+
 export interface APIQuestionTable {
     questions: Array<APIQuestion>
 }
@@ -114,6 +125,24 @@ export interface APIQuestionTable {
 export interface APIFixedTable {
     columns: Array<APIQuestion>,
     rows: Array<APIQuestion>,
-    answers: Array<Array<APIAnswer>>
+    answers: Array<Array<APIAnswer[]>>
 }
 
+export interface AnswersIndexed {
+    [key: number]: Array<APIAnswer>
+}
+
+export interface APIAnswerOption {
+    id: number,
+    name: string,
+    short_name: string,
+    answer_block_id: number,
+    deleted: boolean,
+    creation_timestamp: string
+}
+
+export interface APIAnswerBlock {
+    id: number,
+    options: Array<APIAnswerOption>,
+    name: APITranslatedText
+}

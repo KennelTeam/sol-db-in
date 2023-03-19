@@ -9,7 +9,7 @@ from flask_restful import Resource
 
 from .auxiliary import HTTPErrorCode, get_failure, get_request, create_id_reqparser
 from backend.app.database.form import Form
-from ..database.auxiliary import prettify_answer
+from ..database import QuestionBlock, FormattingSettings, Question, Answer, PrivacySettings, User
 
 
 class FormPage(Resource):
@@ -23,9 +23,25 @@ class FormPage(Resource):
         if parser.error is not None:
             return parser.error
         arguments = parser.parse_args()
+
         options = Form.get_by_ids({arguments['id']})
         if len(options) == 0:
             return get_failure(HTTPErrorCode.WRONG_ID, 404)
-        result = options[0].to_json()
-        result['answers'] = [prettify_answer(answer) for answer in result['answers']]
+
+        FormattingSettings.upload_cache()
+        Question.upload_cache()
+        Answer.upload_cache(arguments['id'])
+        PrivacySettings.upload_cache()
+        User.upload_cache()
+        print('successfully cached')
+        blocks = QuestionBlock.get_form(options[0].form_type)
+        values = [block.to_json(with_answers=True, form_id=arguments['id']) for block in blocks]
+        result = options[0].to_json(with_answers=False) | {
+            "answers": values
+        }
+        FormattingSettings.clear_cache()
+        Question.clear_cache()
+        Answer.clear_cache()
+        PrivacySettings.clear_cache()
+        User.clear_cache()
         return Response(json.dumps(result), 200)

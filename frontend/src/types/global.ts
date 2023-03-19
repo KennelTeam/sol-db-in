@@ -1,5 +1,5 @@
 
-const SERVER_ADDRESS = 'http://52.192.211.221:5000'
+const SERVER_ADDRESS = 'http://127.0.0.1:5000'
 
 enum UserType {
     Admin,
@@ -7,6 +7,12 @@ enum UserType {
     Intern,
     Guest,
     None
+}
+
+export enum AccessRights {
+    CAN_SEE = "CAN_SEE",
+    CAN_EDIT = "CAN_EDIT",
+    CAN_NOTHING = "CAN_NOTHING"
 }
 
 enum AnswerType {

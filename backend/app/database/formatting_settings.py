@@ -21,6 +21,8 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
     _fixed_table_id = FlaskApp().db.Column('fixed_table_id', FlaskApp().db.ForeignKey('fixed_tables.id'), nullable=True,
                                            default=None)
 
+    _cached = None
+
     def __init__(self, block_sorting: int, block_id: int, table_row: int = None, table_id: int = None,
                  table_column: int = None, show_on_main_page: bool = False, fixed_table_id: int = None):
 
@@ -46,6 +48,14 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
         }
 
     @staticmethod
+    def upload_cache():
+        FormattingSettings._cached = FlaskApp().request(FormattingSettings).all()
+
+    @staticmethod
+    def clear_cache():
+        FormattingSettings._cached = None
+
+    @staticmethod
     def json_format() -> JSON:
         return {
             'block_sorting': int,
@@ -61,37 +71,65 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_by_id(id: int) -> 'FormattingSettings':
+        # pylint: disable=protected-access
+        if FormattingSettings._cached is not None:
+            res = list(filter(lambda x: x.id == id, FormattingSettings._cached))
+            return None if len(res) == 0 else res[0]
         return FlaskApp().request(FormattingSettings).filter_by(id=id).first()
 
     @staticmethod
-    def query_from_block(block_id: int) -> Query:
+    def query_from_block(block_id: int) -> Query | List['FormattingSettings']:
+        # pylint: disable=protected-access
+        if FormattingSettings._cached:
+            return list(filter(lambda x: x._block_id == block_id, FormattingSettings._cached))
         return FlaskApp().request(FormattingSettings).filter_by(_block_id=block_id)
 
     @staticmethod
     def get_from_question_table(question_table_id: int) -> List['FormattingSettings']:
+        # pylint: disable=protected-access
+        if FormattingSettings._cached is not None:
+            return list(filter(lambda x: x._table_id == question_table_id, FormattingSettings._cached))
         return FlaskApp().request(FormattingSettings).filter_by(_table_id=question_table_id).all()
 
     @staticmethod
     def get_from_fixed_table(fixed_table_id: int) -> List['FormattingSettings']:
+        # pylint: disable=protected-access
+        if FormattingSettings._cached is not None:
+            return list(filter(lambda x: x._fixed_table_id == fixed_table_id, FormattingSettings._cached))
         return FlaskApp().request(FormattingSettings).filter_by(_fixed_table_id=fixed_table_id).all()
 
     @staticmethod
     def get_main_page() -> List['FormattingSettings']:
+        # pylint: disable=protected-access
+        if FormattingSettings._cached is not None:
+            return list(filter(lambda x: x._show_on_main_page == True, FormattingSettings._cached))
         return FlaskApp().request(FormattingSettings).filter_by(_show_on_main_page=True).all()
 
     @staticmethod
-    def filter_only_free_questions(query: Query, short_form: bool = False) -> List['FormattingSettings']:
+    def filter_only_free_questions(query: Query | List['FormattingSettings'],
+                                   short_form: bool = False) -> List['FormattingSettings']:
+        # pylint: disable=protected-access
+        if FormattingSettings._cached is not None:
+            if short_form:
+                query = list(filter(lambda x: x._show_on_main_page == True, query))
+            return list(filter(lambda x: x._table_id is None and x._fixed_table_id is None, query))
         if short_form:
             query = query.filter(FormattingSettings._show_on_main_page is True)
         return query.filter(FormattingSettings._table_id == None) \
             .filter(FormattingSettings._fixed_table_id == None).all()
 
     @staticmethod
-    def filter_only_table_questions(query: Query) -> List['FormattingSettings']:
+    def filter_only_table_questions(query: Query | List['FormattingSettings']) -> List['FormattingSettings']:
+        # pylint: disable=protected-access
+        if FormattingSettings._cached is not None:
+            return list(filter(lambda x: x._table_id is not None, query))
         return query.filter(FormattingSettings._table_id is not None).all()
 
     @staticmethod
-    def filter_only_fixed_table_questions(query: Query) -> List['FormattingSettings']:
+    def filter_only_fixed_table_questions(query: Query | List['FormattingSettings']) -> List['FormattingSettings']:
+        # pylint: disable=protected-access
+        if FormattingSettings._cached is not None:
+            return list(filter(lambda x: x._fixed_table_id is not None, query))
         return query.filter(FormattingSettings._fixed_table_id is not None).all()
 
     @property

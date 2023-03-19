@@ -1,6 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
 from .api.actions import Actions
+from .api.forms_lightweight import FormsLightweight
 from .api.language import Language
 from .api.login import Login
 from .api.logout import Logout
@@ -27,7 +28,7 @@ from .flask_app import FlaskApp
 resources = [
     Login, Logout, Users, Forms, FormPage, Toponyms, ToponymTree, AnswerOptionsPage, AllAnswerBlocks, Language,
     AnswerBlockPage, QuestionBlockPage, Table, Tags, TagTypes, FormSchema, Questions, Actions, Statistics, Settings,
-    AllToponyms
+    FormsLightweight, AllToponyms
 ]
 
 for resource in resources:
