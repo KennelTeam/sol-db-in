@@ -1,4 +1,5 @@
 import axios from "axios";
+import { SERVER_ADDRESS } from './types/global'
 
 export interface TranslatedText {
     ru: string,
@@ -11,11 +12,9 @@ export enum RESTMethod {
     PUT
 }
 
-const API_URL = "http://127.0.0.1:5000/"
-
 export async function APIRequest(method: RESTMethod, endpoint: string, data: Object): Promise<Object | null> {
     let response = null;
-    const url = API_URL + endpoint
+    const url = SERVER_ADDRESS + endpoint
     switch (method) {
         case RESTMethod.GET:
             response = await axios.get(url, {
