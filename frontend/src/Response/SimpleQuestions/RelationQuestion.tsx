@@ -6,26 +6,31 @@ import { getObjectsList, makeNewObject } from "../../FiltersTablePage/requests"
 import AddIcon from '@material-ui/icons/Add'
 import { useTranslation } from "react-i18next"
 import { CommonQuestionProperties } from "./common"
+import {APIOption} from "../APIObjects";
 
 
 export interface RelationQuestionProps extends CommonQuestionProperties{
-    relType: 'LEADER' | 'PROJECT'
+    relType: 'LEADER' | 'PROJECT';
+    initialValue: APIOption;
 }
 
 export default function RelationQuestion(props: {
         questionData: RelationQuestionProps,
-        onChange: (arg0: number) => void
+        onChange: (arg0: RelationQuestionProps) => void
     }) {
     const questionData : RelationQuestionProps = props.questionData
     const { t } = useTranslation('translation', { keyPrefix: "filters" })
     const [variants, setVariants] = useState<AnswerVariant[]>([])
-    const [value, setValue] = useState<AnswerVariant>({ id: -1, name: ""})
-    const [inputValue, setInputValue] = useState<string>(value.name)
+    const [value, setValue] = useState<AnswerVariant>(questionData.initialValue as AnswerVariant)
+    const [inputValue, setInputValue] = useState<string>(questionData.initialValue ? questionData.initialValue.name : "")
 
     const handleChange = (event: SyntheticEvent, newValue: string | AnswerVariant | null) => {
         setValue(newValue as AnswerVariant)
         if (newValue && typeof newValue !== 'string') {
-            props.onChange(newValue.id)
+            let data = questionData
+            data.initialValue = newValue
+            data.value = newValue.id
+            props.onChange(data)
         }
     }
 
@@ -81,7 +86,7 @@ export default function RelationQuestion(props: {
                     </TextField>
                 )}
             />
-            <IconButton onClick={handleAddObject}>
+            <IconButton onClick={handleAddObject} disabled={variants.filter((v) => (v.name === inputValue)).length > 0}>
                 <AddIcon htmlColor="green" fontSize="small"/>
             </IconButton>
         </Stack>
