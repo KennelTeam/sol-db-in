@@ -11,7 +11,7 @@ from backend.app.database import User
 from ..constants import JWT_ACCESS_TOKEN_EXPIRES, JWT_REFRESH_EXPIRING_TIME
 
 FlaskApp().app.config['JWT_COOKIE_SECURE'] = True
-FlaskApp().app.config['JWT_COOKIE_SAMESITE'] = None
+FlaskApp().app.config['JWT_COOKIE_SAMESITE'] = "None"
 FlaskApp().app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 FlaskApp().app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 FlaskApp().app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=JWT_ACCESS_TOKEN_EXPIRES)

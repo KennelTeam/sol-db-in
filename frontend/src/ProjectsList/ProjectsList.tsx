@@ -1,5 +1,7 @@
+import FilterTablePage from "../FiltersTablePage";
+
 function ProjectsList() {
-    return <h1>ProjectsList component</h1>
+    return <FilterTablePage formType='PROJECT'/>
 }
 
 export default ProjectsList;
