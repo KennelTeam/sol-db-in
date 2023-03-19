@@ -147,10 +147,10 @@ export async function getFilteredTableData(data: FiltersRequestData) : Promise<T
         })
 }
 
-export async function makeNewObject(formType: 'LEADER' | 'PROJECT') {
+export async function makeNewObject(formType: 'LEADER' | 'PROJECT', name?: string) {
     return await axios.post(SERVER_ADDRESS + '/forms', {
         state: 'PLANNED',
-        name: "insert name here",
+        name: name ? name : "insert name here",
         form_type: formType,
         answers: []
     }, { withCredentials: true })

@@ -4,7 +4,6 @@ import { Stack } from "@mui/system"
 import { AnswerVariant } from "../../FiltersTablePage/TypedFilters"
 import { getObjectsList, makeNewObject } from "../../FiltersTablePage/requests"
 import AddIcon from '@material-ui/icons/Add'
-import { useTranslation } from "react-i18next"
 import { CommonQuestionProperties } from "./common"
 import {APIOption} from "../APIObjects";
 
@@ -19,7 +18,6 @@ export default function RelationQuestion(props: {
         onChange: (arg0: RelationQuestionProps) => void
     }) {
     const questionData : RelationQuestionProps = props.questionData
-    const { t } = useTranslation('translation', { keyPrefix: "filters" })
     const [variants, setVariants] = useState<AnswerVariant[]>([])
     const [value, setValue] = useState<AnswerVariant>(questionData.initialValue as AnswerVariant)
     const [inputValue, setInputValue] = useState<string>(questionData.initialValue ? questionData.initialValue.name : "")
@@ -48,7 +46,7 @@ export default function RelationQuestion(props: {
 
     const handleAddObject = () => {
         if (variants.filter((v) => (v.name === inputValue)).length === 0) {
-            makeNewObject(questionData.relType).then((newId) => {
+            makeNewObject(questionData.relType, inputValue).then((newId) => {
                 setVariants([...variants, {
                     id: newId,
                     name: inputValue
@@ -80,7 +78,7 @@ export default function RelationQuestion(props: {
                         label={questionData.label}
                         inputProps={{
                             ...params.inputProps,
-                            autoComplete: 'new-password', // disable autocomplete and autofill
+                            autoComplete: 'new-password',
                         }}
                         >
                     </TextField>
