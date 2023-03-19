@@ -3,22 +3,31 @@ import { useState } from "react";
 import { CommonQuestionProperties } from "./common";
 
 export interface NumberQuestionInterface extends CommonQuestionProperties {
-    initialValue: number;
+    initialValue: number | null;
 }
 
-function NumberQuestion(questionData: NumberQuestionInterface): JSX.Element {
-    const [value, setValue] = useState<number | null>(questionData.initialValue)
+function NumberQuestion(props: { questionData: NumberQuestionInterface; onChange: (arg0: any) => void; }): JSX.Element {
+    let questionData: NumberQuestionInterface = props.questionData
+    const [value, setValue] = useState(questionData)
+    const [ans, setAns] = useState(questionData.initialValue ? questionData.initialValue : 0)
     return <Box display="inline-block">
         <TextField
         type="number"
         label={questionData.label}
         size="small"
         sx={{ display: "inline-block", maxWidth: "200px", minWidth: "120px" }}
-        value={value? value.toString() : 0}
+        value={ans.toString()}
         onChange={(event) => {
             if (!event.target.validity.badInput) {
-                if (event.target.value === '') setValue(null)
-                else setValue(+event.target.value)
+                if (event.target.value === '') {
+                }
+                else {
+                    let data = value
+                    data.initialValue = +event.target.value
+                    setAns(+event.target.value)
+                    setValue(data)
+                    props.onChange(value)
+                }
             }
             event.preventDefault()
         }}

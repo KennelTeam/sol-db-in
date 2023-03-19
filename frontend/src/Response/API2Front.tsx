@@ -15,14 +15,13 @@ import {QuestionInterface} from "./Question";
 import {SimpleQuestionInterface, SimpleQuestionType, SimpleQuestionTypesList} from "./SimpleQuestions/SimpleQuestion";
 import {TextQuestionInterface} from "./SimpleQuestions/TextQuestion";
 import {NumberQuestionInterface} from "./SimpleQuestions/NumberQuestion";
-import i18n from "../i18n";
 import {SelectQuestionInterface, SingleSelectItemInterface} from "./SimpleQuestions/SelectQuestion";
 import {CheckboxQuestionInterface, SingleCheckboxQuestionInterface} from "./SimpleQuestions/CheckboxQuestion";
 import {getRequest} from "./APIRequests";
 import {TableType} from "./Table/BaseTable";
 import {InputInfoInterface} from "./SimpleQuestions/InputInfo";
 import {DynamicTableInterface} from "./Table/DynamicTable";
-import FixedTable, {FixedTableInterface} from "./Table/FixedTable";
+import {FixedTableInterface} from "./Table/FixedTable";
 
 export async function GetFormInfo(id: number): Promise<ResponseDataInterface> {
     console.log("REQUEST")
@@ -31,7 +30,9 @@ export async function GetFormInfo(id: number): Promise<ResponseDataInterface> {
     console.log(form)
     return {
         title: form.name,
-        blocks: await Promise.all(form.answers.map(ProcessBlock))
+        blocks: await Promise.all(form.answers.map(ProcessBlock)),
+        id: form.id,
+        state: form.state
     } as ResponseDataInterface
 }
 
@@ -65,12 +66,17 @@ async function ProcessBlockElement(element: APIQuestionElement): Promise<Questio
 
 async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>): Promise<QuestionInterface> {
     let questionData: SimpleQuestionTypesList;
+    let defaultObject = answers.length > 0 ? answers[0] : {
+        question_id: question.id,
+        tags: []
+    }
     switch (question.question_type) {
         case SimpleQuestionType.NUMBER: {
             let initialValue = answers.length > 0 ? answers[0].value : -1;
             questionData = {
                 label: question.text,
-                initialValue: initialValue as number
+                initialValue: initialValue as number,
+                id: question.id
             } as NumberQuestionInterface
             break;
         }
@@ -91,7 +97,7 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
                 options = options_resp.data as Array<APIOption>
             } else {
                 const options_resp = await getRequest("forms_lightweight",
-                    {form_type: question.relation_settings?.relation_type})
+                    {form_type: question.relation_settings ? question.relation_settings.relation_type : "LEADER"})
                 options = options_resp.data as Array<APIOption>
             }
             console.log(options)
@@ -105,7 +111,7 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
                         id: option.id,
                         name: option.name
                     } as SingleSelectItemInterface
-                })
+                }),
             } as SelectQuestionInterface
             break;
         }
@@ -116,19 +122,40 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
 
             questionData = {
                 questions: options.map((option) => {
+                    let ans = answers.find((item) => {return item.value == option.id})
+                    let cur_answer = ans ? ans : {
+                        question_id: question.id,
+                        tags: []
+                    }
                     return {
-                        id: option.id,
+                        value: option.id as number,
+                        id: ans ? ans : -1,
                         label: option.name,
-                        initialValue: answers.find((item) => {return item.value == option.id}) !== undefined
+                        initialValue: ans !== undefined,
+                        uid: generateUID(),
+                        ...cur_answer
                     } as SingleCheckboxQuestionInterface
-                })
+                }),
+                id: question.id,
+                label: question.text
             } as CheckboxQuestionInterface
+            break;
+        }
+        case SimpleQuestionType.DATE: {
+            let initialValue = answers.length > 0 ? answers[0].value as string : "";
+            questionData = {
+                initialValue: initialValue,
+                label: question.text,
+                id: question.id
+            } as TextQuestionInterface
             break;
         }
         default: {
             let initialValue = answers.length > 0 ? answers[0].value as string : "";
             questionData = {
-                initialValue: initialValue
+                initialValue: initialValue,
+                label: question.text,
+                id: question.id
             } as TextQuestionInterface
         }
     }
@@ -139,7 +166,11 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
             title: question.text,
             description: question.comment
         },
-        questionData: questionData
+        questionData: {
+            ...questionData,
+            ...defaultObject,
+            uid: generateUID()
+        }
     }
 }
 
@@ -158,7 +189,7 @@ async function ProcessTable(table: APIQuestionTable): Promise<QuestionInterface>
     ))
     let columns = await Promise.all(table.questions.map(
         async (question) => {
-            return await ProcessQuestionTableColumn(question, rows)
+            return await ProcessQuestionTableColumn(question, rows + 1)
         }
     ))
 
@@ -172,6 +203,11 @@ async function ProcessTable(table: APIQuestionTable): Promise<QuestionInterface>
         )
     }
 
+    let sample: SimpleQuestionInterface[] = []
+    for (let column = 0; column < columns.length; ++column) {
+        sample.push(columns[column].answers[rows] as SimpleQuestionInterface)
+    }
+
     return {
         questionType: TableType.DYNAMIC_TABLE,
         inputInfo: {
@@ -180,7 +216,8 @@ async function ProcessTable(table: APIQuestionTable): Promise<QuestionInterface>
         },
         questionData: {
             inputInfos: inputInfos,
-            questions: questions
+            questions: questions,
+            sample: sample
         } as DynamicTableInterface
     } as QuestionInterface
 }
@@ -201,7 +238,11 @@ async function ProcessFixedTable(table: APIFixedTable): Promise<QuestionInterfac
     for (let row = 0; row < inputsOnLeft.length; ++row) {
         let currentRow: SimpleQuestionTypesList[] = []
         for (let column = 0; column < inputsOnTop.length; ++column) {
-            currentRow.push((await ProcessQuestion(table.columns[column], table.answers[row][column])).questionData as SimpleQuestionTypesList)
+            currentRow.push({
+                ...(await ProcessQuestion(table.columns[column], table.answers[row][column])).questionData,
+                // @ts-ignore
+                row_question_id: table.rows[row].id
+            } as SimpleQuestionTypesList)
         }
         answers.push(currentRow)
     }
@@ -237,7 +278,11 @@ async function ProcessQuestionTableColumn(column: APIQuestion, rows: number): Pr
         const res = await ProcessQuestion(column, cur_answers)
         answers.push({
             questionType: res.questionType,
-            questionData: res.questionData
+            questionData: {
+                ...res.questionData,
+                // @ts-ignore
+                table_row: row as number
+            } as SimpleQuestionTypesList
         } as SimpleQuestionInterface)
     }
 
@@ -246,3 +291,10 @@ async function ProcessQuestionTableColumn(column: APIQuestion, rows: number): Pr
         answers: answers
     }
 }
+
+let CURRENT_MAX_UID = 1
+
+function generateUID(): number {
+    return ++CURRENT_MAX_UID;
+}
+

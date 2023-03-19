@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import LabeledQuestion from "../Response/SimpleQuestions/LabeledQuestion";
 import { SimpleQuestionType } from "../Response/SimpleQuestions/SimpleQuestion";
+import {TextQuestionInterface} from "../Response/SimpleQuestions/TextQuestion";
 
 type Translations = { [language: string]: string };
 
@@ -40,14 +41,16 @@ function EditTranslationsDialog(props: EditTranslationsDialogInterface): JSX.Ele
         const languageFullName = languageNames.of(langCode);
         const questionData = {
             initialValue: langTranslation,
-            label: languageFullName ? languageFullName : "En"
-        }
+            label: languageFullName ? languageFullName : "En",
+            id: 0
+        } as TextQuestionInterface
         return (
             <Box>
                 <LabeledQuestion
                     inputInfo={inputInfo}
                     questionType={SimpleQuestionType.SHORT_TEXT}
                     questionData={questionData}
+                    onChange={(_) => {}}
                 />
                 <IconButton>
                     <Remove sx={{ color: "red" }} />

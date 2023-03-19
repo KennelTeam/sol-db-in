@@ -13,14 +13,19 @@ export interface FixedTableInterface {
 
 interface FixedTableWithInputInfoInterface extends FixedTableInterface, WithInputInfoInterface {}
 
-function FixedTable(fixedTableData: FixedTableWithInputInfoInterface): JSX.Element {
+function FixedTable(props: { fixedTableData: FixedTableWithInputInfoInterface; onChange: (arg0: any) => void; }): JSX.Element {
+    let fixedTableData: FixedTableWithInputInfoInterface = props.fixedTableData
     const topQuestions = fixedTableData.inputInfoOnTop.map((inputInfoData) => {return <InputInfo {...inputInfoData} />})
     topQuestions.splice(0, 0, <></>)
     const otherComponents = fixedTableData.inputInfoOnLeft.map((inputInfoData, row_index) => {
         const fieldsRow = [...Array(fixedTableData.inputInfoOnTop.length)].map((_, column_index) => {
             return <SimpleQuestion
-                questionType={fixedTableData.questionType}
-                questionData={fixedTableData.questionData[row_index][column_index]}
+                questionData={{
+                    questionType: fixedTableData.questionType,
+                    questionData: fixedTableData.questionData[row_index][column_index]
+                }
+                }
+                onChange={props.onChange}
             />
         })
         return [<InputInfo {...inputInfoData} />, ...fieldsRow]

@@ -1,6 +1,7 @@
 import { ResponseDataInterface } from "../Response/ResponseData";
 import { SimpleQuestionType } from "../Response/SimpleQuestions/SimpleQuestion";
 import { TableType } from "../Response/Table/BaseTable";
+import {SingleCheckboxQuestionInterface} from "../Response/SimpleQuestions/CheckboxQuestion";
 
 const TEST_DATA: ResponseDataInterface = {
     title: "Super mega anketa",
@@ -13,6 +14,8 @@ const TEST_DATA: ResponseDataInterface = {
                     questionData: {
                         initialValue: "Nikolay",
                         label: "Name",
+                        id: 0,
+                         uid: 0
                     },
                     inputInfo: {
                         title: "Name",
@@ -24,6 +27,8 @@ const TEST_DATA: ResponseDataInterface = {
                     questionData: {
                         initialValue: 19,
                         label: "Age",
+                        id: 0,
+                        uid: 0
                     },
                     inputInfo: {
                         title: "Age",
@@ -39,6 +44,7 @@ const TEST_DATA: ResponseDataInterface = {
                     questionType: SimpleQuestionType.MULTIPLE_CHOICE,
                     questionData: {
                         initialValue: 1,
+                        uid: 0,
                         label: "Select main project",
                         dataToChooseFrom: [
                             {
@@ -53,7 +59,8 @@ const TEST_DATA: ResponseDataInterface = {
                                 id: 3,
                                 name: "Work project"
                             },
-                        ]
+                        ],
+                        id: 0
                     },
                     inputInfo: {
                         title: "Main project",
@@ -65,6 +72,8 @@ const TEST_DATA: ResponseDataInterface = {
                     questionData: {
                         initialValue: "Because I fucking love it",
                         label: "Why this project?",
+                        id: 0,
+                        uid: 0
                     },
                     inputInfo: {
                         title: "x",
@@ -97,8 +106,8 @@ const TEST_DATA: ResponseDataInterface = {
                         ],
                         questionType: SimpleQuestionType.NUMBER,
                         questionData: [
-                            [{label: null, initialValue: 10}, {label: null, initialValue: 20}],
-                            [{label: null, initialValue: 30}, {label: null, initialValue: 40}],
+                            [{label: null, initialValue: 10, id: 0, uid: 0}, {label: null, initialValue: 20, id: 0, uid: 0}],
+                            [{label: null, initialValue: 30, id: 0, uid: 0}, {label: null, initialValue: 40, id: 0, uid: 0}],
                         ]
                     },
                     inputInfo: {
@@ -134,7 +143,10 @@ const TEST_DATA: ResponseDataInterface = {
                                 initialValue: true,
                                 label: "Does your grandma like this project?",
                             }
-                        ]
+                        ] as SingleCheckboxQuestionInterface[],
+                        label: "",
+                        id: 0,
+                        uid: 0
                     },
                     inputInfo: {
                         title: "Do you like this project?",
@@ -177,6 +189,8 @@ const TEST_DATA: ResponseDataInterface = {
                                     questionData: {
                                         initialValue: "Mike",
                                         label: null,
+                                        id: 0,
+                                        uid: 0
                                     },
                                 },
                                 {
@@ -184,12 +198,16 @@ const TEST_DATA: ResponseDataInterface = {
                                     questionData: {
                                         initialValue: 10,
                                         label: "Impact",
+                                        id: 0,
+                                        uid: 0
                                     },
                                 },
                                 {
                                     questionType: SimpleQuestionType.MULTIPLE_CHOICE,
                                     questionData: {
                                         initialValue: 1,
+                                        id: 0,
+                                        uid: 0,
                                         label: "Type",
                                         dataToChooseFrom: [
                                             {
@@ -212,6 +230,8 @@ const TEST_DATA: ResponseDataInterface = {
                                     questionData: {
                                         initialValue: "I made a logo",
                                         label: "Description",
+                                        id: 0,
+                                        uid: 0
                                     },
                                 },
                                 {
@@ -219,6 +239,8 @@ const TEST_DATA: ResponseDataInterface = {
                                     questionData: {
                                         initialValue: 10,
                                         label: "Time",
+                                        id: 0,
+                                        uid: 0
                                     },
                                 },
                                 {
@@ -226,6 +248,8 @@ const TEST_DATA: ResponseDataInterface = {
                                     questionData: {
                                         initialValue: 25,
                                         label: "Cost",
+                                        id: 0,
+                                        uid: 0
                                     },
                                 },
                             ],
@@ -235,6 +259,8 @@ const TEST_DATA: ResponseDataInterface = {
                                     questionData: {
                                         initialValue: "Nick",
                                         label: null,
+                                        id: 0,
+                                        uid: 0
                                     },
                                 },
                                 {
@@ -242,6 +268,8 @@ const TEST_DATA: ResponseDataInterface = {
                                     questionData: {
                                         initialValue: 10,
                                         label: "Impact",
+                                        id: 0,
+                                        uid: 0
                                     },
                                 },
                                 {
@@ -263,6 +291,8 @@ const TEST_DATA: ResponseDataInterface = {
                                                 name: "Marketing"
                                             },
                                         ],
+                                        id: 0,
+                                        uid: 0
                                     },
                                 },
                                 {
@@ -270,6 +300,8 @@ const TEST_DATA: ResponseDataInterface = {
                                     questionData: {
                                         initialValue: "I made a logo",
                                         label: "Description",
+                                        id: 0,
+                                        uid: 0
                                     },
                                 },
                                 {
@@ -277,6 +309,8 @@ const TEST_DATA: ResponseDataInterface = {
                                     questionData: {
                                         initialValue: 10,
                                         label: "Time",
+                                        id: 0,
+                                        uid: 0
                                     },
                                 },
                                 {
@@ -284,6 +318,8 @@ const TEST_DATA: ResponseDataInterface = {
                                     questionData: {
                                         initialValue: 25,
                                         label: "Cost",
+                                        id: 0,
+                                        uid: 0
                                     },
                                 },
                             ]
@@ -297,6 +333,6 @@ const TEST_DATA: ResponseDataInterface = {
             ]
         },
     ]
-};
+} as ResponseDataInterface;
 
 export default TEST_DATA;

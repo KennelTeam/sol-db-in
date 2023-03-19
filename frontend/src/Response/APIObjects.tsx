@@ -12,9 +12,9 @@ export interface APIQuestionElement {
 }
 
 export enum APIFormState {
-    PLANNED,
-    STARTED,
-    FINISHED
+    PLANNED = "PLANNED",
+    STARTED = "STARTED",
+    FINISHED = "FINISHED"
 }
 
 export interface APIForm {

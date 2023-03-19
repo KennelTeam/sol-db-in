@@ -1,5 +1,6 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
+import datetime
 import json
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 
@@ -87,7 +88,7 @@ class Forms(Resource):
         if content['state'] not in FormState.items():
             return post_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
         form_state = FormState[content['state']]
-        return Forms._update_form_data(content, form_state, form_type, content['deleted'])
+        return Forms._update_form_data(content, form_state, form_type, content['deleted'], content['name'])
 
     @staticmethod
     def _prepare_table(forms: List[Form], question_ids: List[JSON]) -> List[JSON]:
@@ -187,7 +188,7 @@ class Forms(Resource):
         return True
 
     @staticmethod
-    def _update_form_data(content: JSON, form_state: FormState, form_type: FormType, deleted: bool) -> Response:
+    def _update_form_data(content: JSON, form_state: FormState, form_type: FormType, deleted: bool, form_name: str) -> Response:
         if content['id'] == -1:
             form = Form(form_type, content['name'], form_state)
             FlaskApp().add_database_item(form)
@@ -198,20 +199,20 @@ class Forms(Resource):
                 return post_failure(HTTPErrorCode.WRONG_ID, 404)
             form = options[0]
             form.deleted = deleted
+            form.state = form_state
+            form.name = form_name
         for answer in content['answers']:
-            status = Forms._check_answer_object_correctness(answer)
+            print(answer)
+            status = Forms._update_form_answer(form, answer)
             if status != HTTPErrorCode.SUCCESS:
                 return post_failure(status, 400)
-            for answer_item in answer['answers']:
-                status = Forms._update_form_answer(form, answer_item)
-                if status != HTTPErrorCode.SUCCESS:
-                    return post_failure(status, 400)
 
         FlaskApp().flush_to_database()
         return Response(str(form.id), status=200)
 
     @staticmethod
     def _check_answer_object_correctness(answer: JSON) -> HTTPErrorCode:
+        print(json.dumps(answer))
         if not isinstance(answer, dict):
             return HTTPErrorCode.INVALID_ARG_TYPE
         if 'question_id' not in answer or 'answers' not in answer:
@@ -236,6 +237,12 @@ class Forms(Resource):
             if current_ans.form_id != form.id or answer['row_question_id'] != current_ans.row_question_id \
                     or answer['question_id'] != current_ans.question_id:
                 return HTTPErrorCode.CONFLICTING_ARGUMENTS
+            try:
+                print(answer['value'])
+                dt = datetime.datetime.strptime(answer['value'], "%m-%d-%Y")
+                answer['value'] = dt
+            except:
+                pass
             current_ans.value = answer['value']
             current_ans.table_row = answer['table_row']
         else:

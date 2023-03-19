@@ -16,7 +16,7 @@ function BaseTable(baseTableData: BaseTableInterface): JSX.Element {
     return (
         <Box display="block" component={Paper} sx={{
             marginTop: "40px",
-            marginRight: "40%",
+            //marginRight: "40%",
             paddingTop: "1px"
         }}>
             {baseTableData.inputInfo.title ? <h3 style={{ marginLeft: "10px", marginBottom: 0 }}>{baseTableData.inputInfo.title}</h3> : null}
