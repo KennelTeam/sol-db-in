@@ -10,7 +10,6 @@ from flask_restful import Resource
 from .auxiliary import HTTPErrorCode, get_failure, get_request, create_id_reqparser
 from backend.app.database.form import Form
 from ..database import QuestionBlock
-from ..database.auxiliary import prettify_answer
 
 
 class FormPage(Resource):

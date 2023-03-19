@@ -2,9 +2,9 @@
 #  All rights reserved
 import datetime
 import json
-from base64 import urlsafe_b64decode, urlsafe_b64encode
+from base64 import urlsafe_b64decode
 
-from flask import Response, request
+from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 from typing import Set, List, Final
@@ -241,7 +241,7 @@ class Forms(Resource):
                 print(answer['value'])
                 dt = datetime.datetime.strptime(answer['value'], "%m-%d-%Y")
                 answer['value'] = dt
-            except:
+            except Exception as e:
                 pass
             current_ans.value = answer['value']
             current_ans.table_row = answer['table_row']
