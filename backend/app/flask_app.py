@@ -35,7 +35,7 @@ class FlaskApp(metaclass=Singleton):
         self._api = Api(self.app)
 
     def __init__(self):
-        self._app = Flask(__name__)
+        self._app = Flask(__name__, static_folder='../../frontend/build')
         self.app.config['SQLALCHEMY_POOL_RECYCLE'] = 8
         # self.app.config['SQLALCHEMY_ECHO'] = True
         CORS(self.app, supports_credentials=True)
