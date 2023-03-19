@@ -4,13 +4,14 @@ import { GetFormInfo} from "../Response/API2Front";
 import {useEffect, useState} from "react";
 import {ResponseDataInterface} from "../Response/ResponseData";
 import {Navigate, useParams} from "react-router-dom";
+import {useEffectOnce} from "./useEffectOnce";
 
 function Leader(): JSX.Element {
     const [loaded, setLoaded] = useState(false);
     const [data, setData] = useState(TEST_DATA);
     const params = useParams();
     console.log("rendering")
-    useEffect( () => {
+    useEffectOnce( () => {
         let id = params.id
         if (id !== undefined) {
             GetFormInfo(+id as number).then((responseData) => {
@@ -20,7 +21,7 @@ function Leader(): JSX.Element {
             })
         }
 
-    }, [])
+    });
     if (!loaded) {
         return <div>Loading...</div>
     }

@@ -31,6 +31,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
         console.log("ONSUBMIT")
         let answers = []
         for (let ans in resultData) {
+            console.log(resultData[ans])
             if (resultData[ans].value === undefined) {
                 // @ts-ignore
                 resultData[ans].value = resultData[ans].initialValue
@@ -38,10 +39,11 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
             if (resultData[ans].initialValue === false) {
                 resultData[ans].deleted = true
             } else if (resultData[ans].initialValue === true) {
-                console.log(resultData[ans])
+                resultData[ans].deleted = false
             }
             answers.push(resultData[ans])
         }
+        console.log(answers)
 
         let form_type = responseData.form_type.toString()
         let id = responseData.id

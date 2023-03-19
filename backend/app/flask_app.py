@@ -7,7 +7,8 @@ from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from cheroot.wsgi import Server, PathInfoDispatcher
 from backend.auxiliary.singleton import Singleton
-from backend.constants import DB_ENGINE, MODE, DB_CHARSET, PORT, NUM_THREADS, REQUEST_CONTEXT_USE_DELETED_ITEMS
+from backend.constants import DB_ENGINE, MODE, DB_CHARSET, PORT, NUM_THREADS, REQUEST_CONTEXT_USE_DELETED_ITEMS, \
+    DEFAULT_LANGUAGE
 from flask_cors import CORS
 
 
@@ -35,7 +36,7 @@ class FlaskApp(metaclass=Singleton):
 
     def __init__(self):
         self._app = Flask(__name__)
-        self.app.config['SQLALCHEMY_POOL_RECYCLE'] = 9
+        self.app.config['SQLALCHEMY_POOL_RECYCLE'] = 8
         # self.app.config['SQLALCHEMY_ECHO'] = True
         CORS(self.app, supports_credentials=True)
         self._configure_api()
@@ -53,7 +54,7 @@ class FlaskApp(metaclass=Singleton):
     # TableClassName.request(TableClassName).filter(...)... - very strange
     # Calls like FlaskApp().request(TableClassName).filter(...)... - seem more understandable
     def request(self, table) -> Query:
-        if g.get(REQUEST_CONTEXT_USE_DELETED_ITEMS, None):
+        if 'dev_variables' in g and g.dev_variables.get(REQUEST_CONTEXT_USE_DELETED_ITEMS, None):
             return table.query
         return table.query.filter_by(_deleted=False)
 
@@ -85,6 +86,17 @@ class FlaskApp(metaclass=Singleton):
         if 'dev_variables' not in g:
             g.dev_variables = {}
         g.dev_variables[REQUEST_CONTEXT_USE_DELETED_ITEMS] = True
+
+    def set_language(self, lang: str):
+        if 'dev_variables' not in g:
+            g.dev_variables = {}
+        g.dev_variables['language'] = lang
+
+    def get_language(self) -> str:
+        if 'dev_variables' not in g:
+            g.dev_variables = {}
+            return DEFAULT_LANGUAGE
+        return g.dev_variables['language']
 
     def add_database_item(self, item):
         return self.db.session.add(item)

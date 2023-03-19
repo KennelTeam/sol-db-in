@@ -29,6 +29,7 @@ class User(Editable, FlaskApp().db.Model):
 
     current_ip: str = ''
     selected_language: str = DEFAULT_LANGUAGE
+    current_language: str = DEFAULT_LANGUAGE
 
     _cached = None
 
