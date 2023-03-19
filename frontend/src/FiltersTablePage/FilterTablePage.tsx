@@ -289,9 +289,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
                         navigate(link, { replace: true })
                     })
                 }}>
-                    <Link to={formType === 'LEADER' ? "/leader/1" : "/project/1"}>
-                        {formType === 'LEADER' ? t('add_leader') : t('add_project')}
-                    </Link>
+                    {formType === 'LEADER' ? t('add_leader') : t('add_project')}
                 </Button>
             </Box>
             <h2>{t('table')}</h2>
