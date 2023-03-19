@@ -3,7 +3,7 @@ import { SERVER_ADDRESS } from '../types/global'
 
 
 export async function getRequest(endpoint: string, params: Object = {}): Promise<AxiosResponse<any, any>> {
-    let query = SERVER_ADDRESS + endpoint + "?"
+    let query = SERVER_ADDRESS + "/" + endpoint + "?"
     let key: keyof typeof params
     for (key in params) {
         query += key + "=" + params[key].toString() + "&"
@@ -14,7 +14,7 @@ export async function getRequest(endpoint: string, params: Object = {}): Promise
 }
 
 export async function postRequest(endpoint: string, params: Object): Promise<AxiosResponse<any, any>> {
-    let query = SERVER_ADDRESS + endpoint
+    let query = SERVER_ADDRESS + "/" + endpoint
     return await axios.post(query, params, {
         withCredentials: true
     })
