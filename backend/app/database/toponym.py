@@ -14,16 +14,34 @@ class Toponym(FlaskApp().db.Model):
     name = FlaskApp().db.Column('name', VARCHAR(MAX_TOPONYM_SIZE), unique=True)
     parent_id = FlaskApp().db.Column('parent_id', FlaskApp().db.ForeignKey('toponyms.id'), nullable=True, default=None)
 
+    _cached = None
+
+    @staticmethod
+    def upload_cache():
+        Toponym._cached = Toponym.query.all()
+
+    @staticmethod
+    def clear_cache():
+        Toponym._cached = None
+
     @staticmethod
     def get_all() -> List['Toponym']:
+        if Toponym._cached is not None:
+            return Toponym._cached
         return Toponym.query.all()
 
     @staticmethod
     def get_by_name(name: str) -> 'Toponym':
+        if Toponym._cached is not None:
+            res = list(filter(lambda x: x.name == name, Toponym._cached))
+            return None if len(res) == 0 else res[0]
         return Toponym.query.filter_by(name=name).first()
 
     @staticmethod
     def get_by_id(id: int) -> 'Toponym':
+        if Toponym._cached is not None:
+            res = list(filter(lambda x: x.id == id, Toponym._cached))
+            return None if len(res) == 0 else res[0]
         return Toponym.query.filter_by(id=id).first()
 
     def __init__(self, name: str, parent_id: int = None) -> None:

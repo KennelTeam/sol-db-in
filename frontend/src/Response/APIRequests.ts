@@ -9,8 +9,8 @@ export async function getRequest(endpoint: string, params: Object = {}): Promise
         query += key + "=" + params[key].toString() + "&"
     }
     return await axios.get(query, {
-        withCredentials: true
-    })
+        withCredentials: true,
+})
 }
 
 export async function postRequest(endpoint: string, params: Object): Promise<AxiosResponse<any, any>> {

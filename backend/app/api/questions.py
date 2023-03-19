@@ -4,7 +4,7 @@ from typing import Tuple, Final
 from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
-from typing_extensions import Any
+from typing import Any
 
 from .auxiliary import HTTPErrorCode, get_request, post_request, post_failure, check_json_format, \
     get_class_item_by_id_request

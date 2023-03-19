@@ -32,7 +32,8 @@ export async function GetFormInfo(id: number): Promise<ResponseDataInterface> {
         title: form.name,
         blocks: await Promise.all(form.answers.map(ProcessBlock)),
         id: form.id,
-        state: form.state
+        state: form.state,
+        form_type: form.form_type
     } as ResponseDataInterface
 }
 
@@ -68,15 +69,15 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
     let questionData: SimpleQuestionTypesList;
     let defaultObject = answers.length > 0 ? answers[0] : {
         question_id: question.id,
-        tags: []
+        tags: [],
+        id: answers.length > 0 ? answers[0].id : -1
     }
     switch (question.question_type) {
         case SimpleQuestionType.NUMBER: {
             let initialValue = answers.length > 0 ? answers[0].value : -1;
             questionData = {
                 label: question.text,
-                initialValue: initialValue as number,
-                id: question.id
+                initialValue: initialValue as number
             } as NumberQuestionInterface
             break;
         }
@@ -136,7 +137,6 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
                         ...cur_answer
                     } as SingleCheckboxQuestionInterface
                 }),
-                id: question.id,
                 label: question.text
             } as CheckboxQuestionInterface
             break;
@@ -146,7 +146,7 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
             questionData = {
                 initialValue: initialValue,
                 label: question.text,
-                id: question.id
+                id: answers.length > 0 ? answers[0].id : -1
             } as TextQuestionInterface
             break;
         }
@@ -155,7 +155,6 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
             questionData = {
                 initialValue: initialValue,
                 label: question.text,
-                id: question.id
             } as TextQuestionInterface
         }
     }
