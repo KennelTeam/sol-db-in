@@ -27,16 +27,6 @@ function Head({ columnGroups }: { columnGroups: { name: string, columns: string[
                     id
                 </StyledTableCell>
                 {columnGroups.map((group) => (
-                    <StyledTableCell colSpan={group.columns.length} style={{ fontWeight: "bold" }}>
-                        {group.name}
-                    </StyledTableCell>
-                ))}
-            </TableRow>
-            <TableRow>
-                <StyledTableCell style={{ fontWeight: "bold" }}>
-                    id
-                </StyledTableCell>
-                {columnGroups.map((group) => (
                     group.columns.map((columnName) => (
                     <StyledTableCell style={{ fontWeight: "bold" }}>
                         {columnName}

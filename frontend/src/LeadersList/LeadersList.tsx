@@ -1,5 +1,7 @@
+import FilterTablePage from "../FiltersTablePage";
+
 function LeadersList() {
-    return <h1>LeadersList component</h1>
+    return <FilterTablePage formType='LEADER'/>
 }
 
 export default LeadersList;

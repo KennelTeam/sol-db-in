@@ -1,11 +1,11 @@
 import { Stack } from "@mui/system";
-import { Card, Typography, IconButton, ListItem, List, TextField, TextFieldProps, Autocomplete, Button } from "@mui/material";
+import { Card, Typography, IconButton, ListItem, List, TextField, TextFieldProps, Autocomplete, Button, Box } from "@mui/material";
 import { AnswerType, SERVER_ADDRESS } from "../types/global"
 import ClearIcon from '@material-ui/icons/Clear'
 import AddIcon from '@material-ui/icons/Add'
 import * as Test from './_testFunctions'
 import { NumberFilter, TextFilter, CheckboxFilter, ChoiceFilter, AutocompleteChoiceFilter, DateFilter, AnswerFilter, AnswerVariant } from './TypedFilters'
-import { getUsersList, getAnswersList, getObjectsList, getToponymsList, getFilteredTableData, TableData } from "./requests";
+import { getUsersList, getAnswersList, getObjectsList, getToponymsList, getFilteredTableData, TableData, makeNewObject } from "./requests";
 import { useState, useEffect, useRef } from "react";
 import MainTable from "./MainTable";
 import { useImmer } from "use-immer"
@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next'
 import i18next from "i18next";
 import axios from "axios";
 import { Buffer } from "buffer";
+import { Link, useNavigate } from "react-router-dom";
 
 interface QuestionAttributes {
     id: number,
@@ -160,6 +161,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
         rows: []
     })
     const isInitialMount = useRef(true)
+    const navigate = useNavigate()
 
     function changeFilters(newValue: AnswerFilter, idx: number) {
         changeFiltersData(draft => { draft.splice(idx, 1, newValue) })
@@ -279,7 +281,19 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
                     </IconButton>
                 </Stack>
             </Card>
-            <Button variant="contained" onClick={handleSubmitFilter}>{t('submit_filter')}</Button>
+            <Box>
+                <Button variant="contained" onClick={handleSubmitFilter} sx={{ m: 2 }}>{t('submit_filter')}</Button>
+                <Button variant="outlined" sx={{ m: 2 }} onClick={(event: React.MouseEvent) => {
+                    makeNewObject(formType).then((id) => {
+                        const link = '/' + formType.toLowerCase() + '/' + id
+                        navigate(link, { replace: true })
+                    })
+                }}>
+                    <Link to={formType === 'LEADER' ? "/leader/1" : "/project/1"}>
+                        {formType === 'LEADER' ? t('add_leader') : t('add_project')}
+                    </Link>
+                </Button>
+            </Box>
             <h2>{t('table')}</h2>
             <Card>
                 <MainTable {...tableData}/>

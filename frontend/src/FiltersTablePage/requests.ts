@@ -102,6 +102,10 @@ export async function getFilteredTableData(data: FiltersRequestData) : Promise<T
         }
     }
 
+    function makeLink(id: number, relType: 'LEADER' | 'PROJECT') {
+        return '/' + relType.toLowerCase() + '/' + id
+    }
+
     console.log("Requesting /forms with data: ", data)
     return await axios.get(SERVER_ADDRESS + '/forms', { params: data, withCredentials: true })
         .then((response) => {
@@ -123,7 +127,9 @@ export async function getFilteredTableData(data: FiltersRequestData) : Promise<T
                     id: responseData.table[0].values[0].answers[0].id,
                     columns: responseData.table.map((column) => (
                         column.values[i].answers.map((ans) => ({
-                            data: stringify(ans.value)
+                            data: stringify(ans.value),
+                            link: ans.type === 'RELATION' ?
+                                makeLink(ans.id, ans.relation_settings.relation_type) : undefined
                         }))
                     ))
                 })
@@ -137,4 +143,21 @@ export async function getFilteredTableData(data: FiltersRequestData) : Promise<T
                 rows: []
             }
         })
+}
+
+export async function makeNewObject(formType: 'LEADER' | 'PROJECT') {
+    return await axios.post(SERVER_ADDRESS + '/forms', {
+        state: 'PLANNED',
+        name: "insert name here",
+        form_type: formType,
+        answers: []
+    }, { withCredentials: true })
+    .then((response) => (response.data))
+    .catch((error) => {
+        console.log("Error while requesting /forms by POST request:", error)
+        return {
+            column_groups: [],
+            rows: []
+        }
+    })
 }

@@ -128,7 +128,10 @@ export interface ColumnResponse {
         answers: {
             id: number,
             value: number | string | boolean,
-            type: string
+            type: string,
+            relation_settings: {
+                relation_type: 'LEADER' | 'PROJECT'
+            }
         }[]
     }[]
 }
