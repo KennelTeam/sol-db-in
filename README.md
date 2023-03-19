@@ -6,14 +6,16 @@ It is being developed by [KennelTeam](https://github.com/KennelTeam)
 
 You can participate in the development process or just star this repository.
 
+This code is distributed under [`Apache 2.0 License`](license)
+
 For participating peak any open issue, make your own branch or fork and then
 open a pull-request to the `develop` branch.
 
 For frontend we use [React styling guideline](https://github.com/airbnb/javascript/tree/master/react)
 
-You can also check out the [Backend documentation](backend/README.md)
-
-And the [API documentation](https://kennelteam.github.io/sol-db-in/)
+You can also check out:
+- [Backend documentation](backend/README.md)
+- [API endpoints documentation](https://kennelteam.github.io/sol-db-in/)
 
 ## Structure
 

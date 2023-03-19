@@ -1,6 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 from backend.app.flask_app import FlaskApp
+from backend.auxiliary.types import JSON
 from typing import List
 
 
@@ -16,19 +17,30 @@ class TagToAnswer(FlaskApp().db.Model):
         self._tag_id = tag_id
         self._answer_id = answer_id
 
+    def to_json(self) -> JSON:
+        return {
+            'id': self.id,
+            'tag_id': self.tag_id,
+            'answer_id': self.answer_id
+        }
+
     @staticmethod
     def count_tag_usage(tag_id: int) -> int:
         return TagToAnswer.query.filter_by(_tag_id=tag_id).count()
 
     @staticmethod
+    def get_answers_tags(answer_id: int) -> List[JSON]:
+        tags = TagToAnswer.query.filter_by(_answer_id=answer_id)
+        tags = tags.all()
+        return [item.to_json() for item in tags]
+
+    @staticmethod
     def get_answers_tag_ids(answer_id: int) -> List[int]:
-        tag_ids = TagToAnswer.query.filter_by(_answer_id=answer_id)
-        tag_ids = tag_ids.with_entities(TagToAnswer._tag_id)
-        return [item.tag_id for item in tag_ids.all()]
+        return [item['id'] for item in TagToAnswer.get_answers_tags(answer_id)]
 
     @staticmethod
     def add_tag(tag_id: int, answer_id: int) -> 'TagToAnswer':
-        item = TagToAnswer.query.filter(_tag_id=tag_id, _answer_id=answer_id).first()
+        item = TagToAnswer.query.filter_by(_tag_id=tag_id, _answer_id=answer_id).first()
         if item is None:
             item = TagToAnswer(tag_id, answer_id)
             FlaskApp().add_database_item(item)

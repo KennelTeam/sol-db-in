@@ -12,5 +12,8 @@ all_checks: clean typecheck lint
 run:
 	python3 -m backend
 
+import:
+	python3 -m backend --import_toponyms
+
 push: all_checks
 	git push

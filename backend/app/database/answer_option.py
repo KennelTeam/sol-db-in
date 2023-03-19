@@ -3,6 +3,8 @@
 from backend.app.flask_app import FlaskApp
 from typing import List
 import json
+
+from .localization import localize
 from .editable import Editable
 from backend.constants import MAX_ANSWER_OPTION_SIZE, MAX_LANGUAGES_COUNT, MAX_SHORT_ANSWER_OPTION_SIZE
 from backend.auxiliary import TranslatedText, JSON
@@ -24,10 +26,14 @@ class AnswerOption(Editable, FlaskApp().db.Model):
 
     def to_json(self) -> JSON:
         return super().to_json() | {
-            'name': self.name,
-            'short_name': self.short_name,
+            'name': localize(self.name),
+            'short_name': localize(self.short_name),
             'answer_block_id': self._answer_block_id
         }
+
+    @staticmethod
+    def get_by_id(id: int) -> 'AnswerOption':
+        return FlaskApp().request(AnswerOption).filter_by(id=id).first()
 
     @staticmethod
     def get_all_from_block(block_id: int) -> List[JSON]:

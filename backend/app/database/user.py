@@ -1,14 +1,15 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
-import bcrypt
 
-from backend.constants import MAX_LOGIN_SIZE, MAX_FULLNAME_SIZE, MAX_COMMENT_SIZE
+from backend.constants import MAX_LOGIN_SIZE, MAX_FULLNAME_SIZE, MAX_USER_COMMENT_SIZE, DEFAULT_LANGUAGE
 from backend.auxiliary import JSON
 from backend.app.flask_app import FlaskApp
 from .editable import Editable
+
 from sqlalchemy.dialects.mysql import VARCHAR
 from enum import Enum
 from typing import List
+import bcrypt
 
 
 class Role(Enum):
@@ -22,19 +23,20 @@ class User(Editable, FlaskApp().db.Model):
     __tablename__ = 'users'
     _login = FlaskApp().db.Column('login', VARCHAR(MAX_LOGIN_SIZE), unique=True)
     _name = FlaskApp().db.Column('name', FlaskApp().db.Text(MAX_FULLNAME_SIZE))
-    _comment = FlaskApp().db.Column('comment', FlaskApp().db.Text(MAX_COMMENT_SIZE))
+    _comment = FlaskApp().db.Column('comment', FlaskApp().db.Text(MAX_USER_COMMENT_SIZE))
     _password_hash = FlaskApp().db.Column('password', FlaskApp().db.Text(512 // 8))
     _role = FlaskApp().db.Column('role', FlaskApp().db.Enum(Role))
 
-    current_ip: str = ""
+    current_ip: str = ''
+    selected_language: str = DEFAULT_LANGUAGE
 
-    def __init__(self, login: str, name: str, comment: str, password: str, role: str) -> None:
+    def __init__(self, login: str, name: str, comment: str, password: str, role: Role) -> None:
         super().__init__()
         self.login = login
         self.name = name
         self.comment = comment
         self.password = password
-        self.role = Role[role]
+        self.role = role
 
     def to_json(self) -> JSON:
         return super().to_json() | {
@@ -104,17 +106,37 @@ class User(Editable, FlaskApp().db.Model):
         FlaskApp().add_database_item(self)
         FlaskApp().flush_to_database()
 
+    def update(self, login: str = None, name: str = None, comment: str = None,
+               password: str = None, role: Role = None) -> None:
+        if login is not None:
+            self.login = login
+        if name is not None:
+            self.name = name
+        if comment is not None:
+            self.comment = comment
+        if password is not None:
+            self.password = password
+        if role is not None:
+            self.role = role
+        FlaskApp().flush_to_database()
+
     @staticmethod
     def get_by_login(login: str) -> 'User':
         return FlaskApp().request(User).filter_by(_login=login).first()
 
     @staticmethod
+    def get_by_id(id: int) -> 'User':
+        return FlaskApp().request(User).filter_by(id=id).first()
+
+    @staticmethod
     def get_all_users() -> List['User']:
         return FlaskApp().request(User).all()
 
-    @staticmethod
-    def auth(login: str, password: str) -> 'User':
+    def check_password(self, password) -> bool:
+        return bcrypt.checkpw(password.encode(), self.password_hash.encode())
+
+    def auth(self, login: str, password: str) -> 'User':
         user = User.get_by_login(login)
-        if not user or not bcrypt.checkpw(password.encode(), user.password_hash.encode()):
+        if not user or not self.check_password(password):
             return None
         return user

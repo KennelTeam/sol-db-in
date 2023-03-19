@@ -21,7 +21,7 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
     _fixed_table_id = FlaskApp().db.Column('fixed_table_id', FlaskApp().db.ForeignKey('fixed_tables.id'), nullable=True,
                                            default=None)
 
-    def __init__(self, block_sorting: int, block_id: int, table_row: int = 0, table_id: int = None,
+    def __init__(self, block_sorting: int, block_id: int, table_row: int = None, table_id: int = None,
                  table_column: int = None, show_on_main_page: bool = False, fixed_table_id: int = None):
 
         super().__init__()
@@ -46,6 +46,20 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
         }
 
     @staticmethod
+    def json_format() -> JSON:
+        return {
+            'block_sorting': int,
+            'block_id': int,
+            'show_on_main_page': bool
+        }
+
+    def copy(self, other: 'FormattingSettings') -> None:
+        self.block_sorting = other.block_sorting
+        self.table_row = other.table_row
+        self.table_column = other.table_column
+        self.show_on_main_page = other.show_on_main_page
+
+    @staticmethod
     def get_by_id(id: int) -> 'FormattingSettings':
         return FlaskApp().request(FormattingSettings).filter_by(id=id).first()
 
@@ -62,11 +76,15 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
         return FlaskApp().request(FormattingSettings).filter_by(_fixed_table_id=fixed_table_id).all()
 
     @staticmethod
+    def get_main_page() -> List['FormattingSettings']:
+        return FlaskApp().request(FormattingSettings).filter_by(_show_on_main_page=True).all()
+
+    @staticmethod
     def filter_only_free_questions(query: Query, short_form: bool = False) -> List['FormattingSettings']:
         if short_form:
             query = query.filter(FormattingSettings._show_on_main_page is True)
-        return query.filter(FormattingSettings.table_id is None) \
-            .filter(FormattingSettings._fixed_table_id is None).all()
+        return query.filter(FormattingSettings._table_id == None) \
+            .filter(FormattingSettings._fixed_table_id == None).all()
 
     @staticmethod
     def filter_only_table_questions(query: Query) -> List['FormattingSettings']:

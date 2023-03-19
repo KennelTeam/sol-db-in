@@ -3,7 +3,9 @@
         "title": "Welcome to sol db indonesia",
         "login": "Login",
         "password": "Password",
-        "incorrect-credentials": "Incorrect login or password"
+        "incorrect-credentials": "Incorrect password",
+        "unknown-error": "Unknown error occurred, sorry :(",
+        "incorrect-login": "There is no user with this login"
     },
     "description": {
         "part1": "To get started, edit <1>src/App.js</1> and save to reload.",
@@ -14,7 +16,7 @@
         "leaders": "Leaders",
         "statistics": "Statistics",
         "settings": "Settings",
-        "users": "User's Settings",
+        "users": "Users Control",
         "tags": "Tags",
         "catalog": "Catalog",
         "questionnaire": "Questionnaire",
@@ -25,6 +27,7 @@
         "leaders-per-page": "Leaders per page",
         "projects-per-page": "Projects per page",
         "leader-comment-max-length": "Comment max length on leaders interviews",
+        "change-language": "Change language",
         "save": "Save"
     },
     "users": {
@@ -44,6 +47,7 @@
             "block-access": "Block access to the site"
         }
     },
+
     "filters": {
         "title": "Filters",
         "equals": "equals",
@@ -59,7 +63,16 @@
         "rows_per_page": "Rows per page",
         "choose_filter": "Choose filter...",
         "submit_filter": "Submit filter",
-        "add_leader": "Add leader",
-        "add_project": "Add project"
+        "add_leader": "Add leader"
+    },
+
+    "options": {
+        "title": "Options editing",
+        "dialog": {
+            "save": "Save",
+            "cancel": "Cancel",
+            "title": "Edit translations",
+            "add": "Add \"{}\" translation"
+        }
     }
 }

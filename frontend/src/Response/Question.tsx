@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import CheckboxQuestion, { CheckboxQuestionInterface } from "./SimpleQuestions/CheckboxQuestion";
 import { InputInfoInterface } from "./SimpleQuestions/InputInfo";
 import LabeledQuestion from "./SimpleQuestions/LabeledQuestion";
@@ -31,7 +32,7 @@ function Question(questionData: QuestionInterface): JSX.Element {
     } else {
         component = <h1>Question type not found</h1>
     }
-    return component;
+    return <Box display="block">{component}</Box>;
 }
 
 export default Question;

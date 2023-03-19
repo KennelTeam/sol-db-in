@@ -747,8 +747,12 @@ planned/started/finished
 - [AccessType](privacy_settings.py) The level of access 
 of some role to some question
 - [QuestionType](question_type.py) The type of the answer to the question
-- [RelationType](relation_type.py) LeaderToLeader, LeaderToProject, etc...
 - [TimestampRange](timestamp_range.py) A range from...to of datetime
 - [Role](user.py) A role of a user (ADMIN, GUEST, etc...)
 - [VisualizationType](visualization_type.py) How to show
 the rows of the question table in the other (linked) object?
+
+There is an auxiliary function [`prettify_answer(answer)`](auxiliary.py) 
+which searches for
+required references in the `Answer` object and creates a `JSON` with good
+readable answer information (not just some strange IDs) 

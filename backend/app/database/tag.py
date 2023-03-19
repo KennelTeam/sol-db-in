@@ -3,6 +3,7 @@
 from backend.constants import MAX_TAG_SIZE, MAX_LANGUAGES_COUNT
 from backend.auxiliary import JSON, TranslatedText
 from backend.app.flask_app import FlaskApp
+from .localization import localize
 from .editable import Editable
 from typing import List
 import json
@@ -22,10 +23,14 @@ class Tag(Editable, FlaskApp().db.Model):
 
     def to_json(self) -> JSON:
         return super().to_json() | {
-            'text': self.text,
+            'text': localize(self.text),
             'type_id': self.type_id,
             'parent_id': self.parent_id
         }
+
+    @staticmethod
+    def get_by_id(id: int) -> 'Tag':
+        return FlaskApp().request(Tag).filter_by(id=id).first()
 
     @property
     def text(self) -> JSON:

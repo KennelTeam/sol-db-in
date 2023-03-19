@@ -2,7 +2,7 @@
 #  All rights reserved
 import datetime
 from sqlalchemy.orm import Query
-from typing import Any, Type
+from typing import Any, Type, List
 from enum import Enum
 from datetime import datetime
 from backend.constants import INT_MIN, INT_MAX
@@ -16,30 +16,30 @@ class EditableValueHolder(ValueHolder, Editable):
     @ValueHolder.value.setter
     @Editable.on_edit
     def value(self, value: Any) -> None:
-        super().value = value
+        self.set_value(value)
 
     @staticmethod
-    def filter_by_value(table: Type[FlaskApp().db.Model], exact_value: Any = None, substring: str = None,
+    def filter_by_value(table: Type[FlaskApp().db.Model], exact_values: List[Any] = None, substring: str = None,
                         min_value: Any = None, max_value: Any = None) -> Query:
-        if exact_value is not None:
-            return EditableValueHolder.filter_exact_value(table, exact_value)
+        if exact_values is not None:
+            return EditableValueHolder.filter_exact_values(table, exact_values)
         if substring is not None:
             return EditableValueHolder.filter_substring(table, substring)
         return EditableValueHolder.filter_range(table, min_value, max_value)
 
     @staticmethod
-    def filter_exact_value(table: Type[FlaskApp().db.Model], exact_value: Any) -> Query:
-        if type(exact_value) == int or type(exact_value) == Enum:
-            return FlaskApp().request(table).filter(table.value_int == exact_value)
-        if type(exact_value) == str:
-            return FlaskApp().request(table).filter(table.value_text == exact_value)
-        if type(exact_value) == bool:
-            return FlaskApp().request(table).filter(table.value_bool == exact_value)
-        return FlaskApp().request(table).filter(table.value_datetime == exact_value)
+    def filter_exact_values(table: Type[FlaskApp().db.Model], exact_values: List[Any]) -> Query:
+        if isinstance(exact_values, bool):
+            return FlaskApp().request(table).filter(table.value_bool.in_(exact_values))
+        if isinstance(exact_values[0], (int, Enum)):
+            return FlaskApp().request(table).filter(table.value_int.in_(exact_values))
+        if isinstance(exact_values[0], str):
+            return FlaskApp().request(table).filter(table.value_text.in_(exact_values))
+        return FlaskApp().request(table).filter(table.value_datetime.in_(exact_values))
 
     @staticmethod
     def filter_range(table: Type[FlaskApp().db.Model], min_value: Any, max_value: Any) -> Query:
-        if type(min_value) == int or type(max_value) == int:
+        if isinstance(min_value, int) or isinstance(max_value, int):
             if min_value is None:
                 min_value = INT_MIN
             if max_value is None:

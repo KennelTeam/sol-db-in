@@ -22,16 +22,19 @@ class ValueHolder:
         if self.value_int is not None:
             return self.value_int
         return self.value_text
-    
+
+    def set_value(self, new_value: Any) -> None:
+        if isinstance(new_value, bool):
+            self.value_bool = new_value
+        elif isinstance(new_value, Enum):
+            self.value_int = new_value.value
+        elif isinstance(new_value, int):
+            self.value_int = new_value
+        elif isinstance(new_value, str):
+            self.value_text = new_value
+        elif isinstance(new_value, datetime):
+            self.value_datetime = new_value
+
     @value.setter
     def value(self, value: Any) -> None:
-        if type(value) == int:
-            self.value_int = value
-        elif type(value) == Enum:
-            self.value_int = value.value
-        elif type(value) == str:
-            self.value_text = value
-        elif type(value) == datetime:
-            self.value_datetime = value
-        elif type(value) == bool:
-            self.value_bool = value
+        self.set_value(value)

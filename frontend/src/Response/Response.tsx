@@ -1,11 +1,6 @@
 import { Box, Paper } from "@mui/material";
-import Block, { BlockInterface } from "./Block";
-
-
-export interface ResponseDataInterface {
-    title: string;
-    blocks: Array<BlockInterface>;
-}
+import Block from "./Block";
+import { ResponseDataInterface } from "./ResponseData";
 
 function Response(responseData: ResponseDataInterface): JSX.Element {
     const blocksComponents = responseData.blocks.map((blockData) => {return <Block {...blockData}/>})

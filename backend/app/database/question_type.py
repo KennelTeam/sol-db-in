@@ -1,6 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 from enum import Enum
+from typing import Set
 
 
 class QuestionType(Enum):
@@ -14,3 +15,7 @@ class QuestionType(Enum):
     NUMBER = 8
     BOOLEAN = 9
     RELATION = 10
+
+    @staticmethod
+    def items() -> Set[str]:
+        return set(QuestionType.__members__.keys())
