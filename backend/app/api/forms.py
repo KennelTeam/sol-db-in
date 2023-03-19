@@ -17,7 +17,7 @@ from backend.app.database.tag_to_answer import TagToAnswer
 from backend.app.database.tag import Tag
 from backend.auxiliary.string_dt import string_to_datetime
 from backend.auxiliary.types import JSON
-from backend.app.database import Question
+from backend.app.database import Question, FormattingSettings, PrivacySettings, User
 from backend.app.database.question import AnswerType
 from backend.app.database.auxiliary import prettify_answer
 from backend.app.database.question_type import QuestionType
@@ -52,6 +52,11 @@ class Forms(Resource):
 
         if arguments['form_type'] not in FormType.items():
             return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
+
+        Question.upload_cache()
+        FormattingSettings.upload_cache()
+        PrivacySettings.upload_cache()
+        User.upload_cache()
         form_type = FormType[arguments['form_type']]
         ids = Form.get_all_ids(form_type)
         for item in answer_filters:
@@ -65,6 +70,10 @@ class Forms(Resource):
         question_ids = Question.get_only_main_page(form_type)
 
         result = Forms._prepare_table(forms, question_ids)
+        Question.clear_cache()
+        FormattingSettings.clear_cache()
+        PrivacySettings.clear_cache()
+        User.clear_cache()
         return Response(json.dumps({'table': result}), 200)
 
     @staticmethod

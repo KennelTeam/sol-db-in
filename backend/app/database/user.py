@@ -30,6 +30,8 @@ class User(Editable, FlaskApp().db.Model):
     current_ip: str = ''
     selected_language: str = DEFAULT_LANGUAGE
 
+    _cached = None
+
     def __init__(self, login: str, name: str, comment: str, password: str, role: Role) -> None:
         super().__init__()
         self.login = login
@@ -45,6 +47,14 @@ class User(Editable, FlaskApp().db.Model):
             'comment': self.comment,
             'role': self.role.name
         }
+
+    @staticmethod
+    def upload_cache():
+        User._cached = FlaskApp().request(User).all()
+
+    @staticmethod
+    def clear_cache():
+        User._cached = None
 
     @property
     def login(self) -> str:
@@ -122,14 +132,22 @@ class User(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_by_login(login: str) -> 'User':
+        if User._cached is not None:
+            result = list(filter(lambda x: x.login == login, User._cached))
+            return None if len(result) == 0 else result[0]
         return FlaskApp().request(User).filter_by(_login=login).first()
 
     @staticmethod
     def get_by_id(id: int) -> 'User':
+        if User._cached is not None:
+            result = list(filter(lambda x: x.id == id, User._cached))
+            return None if len(result) == 0 else result[0]
         return FlaskApp().request(User).filter_by(id=id).first()
 
     @staticmethod
     def get_all_users() -> List['User']:
+        if User._cached is not None:
+            return User._cached
         return FlaskApp().request(User).all()
 
     def check_password(self, password) -> bool:

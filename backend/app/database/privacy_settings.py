@@ -25,6 +25,8 @@ class PrivacySettings(Editable, FlaskApp().db.Model):
     _intern_access = FlaskApp().db.Column('intern_access', FlaskApp().db.Enum(AccessType))
     _guest_access = FlaskApp().db.Column('guest_access', FlaskApp().db.Enum(AccessType))
 
+    _cached = None
+
     def __init__(self, editor_access: AccessType, intern_access: AccessType, guest_access: AccessType) -> None:
         super().__init__()
         self.editor_access = editor_access
@@ -44,6 +46,14 @@ class PrivacySettings(Editable, FlaskApp().db.Model):
         self.intern_access = other.intern_access
 
     @staticmethod
+    def upload_cache():
+        PrivacySettings._cached = FlaskApp().request(PrivacySettings).all()
+
+    @staticmethod
+    def clear_cache():
+        PrivacySettings._cached = None
+
+    @staticmethod
     def json_format() -> JSON:
         return {
             "editor_access": AccessType,
@@ -53,6 +63,9 @@ class PrivacySettings(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_by_id(id: int):
+        if PrivacySettings._cached is not None:
+            result = list(filter(lambda x: x.id == id, PrivacySettings._cached))
+            return None if len(result) == 0 else result[0]
         return FlaskApp().request(PrivacySettings).filter_by(id=id).first()
 
     @property
