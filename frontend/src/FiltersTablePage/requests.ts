@@ -124,7 +124,7 @@ export async function getFilteredTableData(data: FiltersRequestData) : Promise<T
             }
             for (let i = 0; i < responseData.table[0].values.length; i++) {
                 tableData.rows.push({
-                    id: responseData.table[0].values[0].answers[0].id,
+                    id: responseData.table[0].values[i].answers[0].id,
                     columns: responseData.table.map((column) => (
                         column.values[i].answers.map((ans) => ({
                             data: stringify(ans.value),
