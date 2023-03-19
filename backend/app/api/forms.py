@@ -1,9 +1,9 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 import json
-from base64 import urlsafe_b64decode, urlsafe_b64encode
+from base64 import urlsafe_b64decode
 
-from flask import Response, request
+from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 from typing import Set, List, Final
@@ -106,7 +106,7 @@ class Forms(Resource):
                 {
                     "answers": [{
                         'type': QuestionType.RELATION.name,
-                        'id': item.id,
+                        'ref_id': item.id,
                         'value': item.name,
                         'relation_type': item.form_type.name
                     }]

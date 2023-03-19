@@ -47,6 +47,25 @@
             "block-access": "Block access to the site"
         }
     },
+
+    "filters": {
+        "title": "Filters",
+        "equals": "equals",
+        "contains": "contains",
+        "contained_in": "contained in",
+        "filter_value": "Filter value",
+        "checked": "Checked",
+        "unchecked": "Unchecked",
+        "checked_one_of": "checked at least one of",
+        "from": "from",
+        "to": "to",
+        "table": "Table",
+        "rows_per_page": "Rows per page",
+        "choose_filter": "Choose filter...",
+        "submit_filter": "Submit filter",
+        "add_leader": "Add leader"
+    },
+
     "options": {
         "title": "Options editing",
         "dialog": {
