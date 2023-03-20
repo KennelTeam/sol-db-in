@@ -41,7 +41,7 @@ class QuestionTable(Editable, FlaskApp().db.Model):
         formats = FormattingSettings.get_from_question_table(self.id)
 
         results: List[Question] = Question.get_all_with_formattings(formats)
-        results_indexed = [(result, result.formatting_settings.table_row) for result in results]
+        results_indexed = [(result, result.formatting_settings.table_column) for result in results]
         results_indexed.sort(key=lambda x: x[1])
         return {
             "questions": [result[0].to_json(with_answers, form_id) for result in results_indexed]
