@@ -11,11 +11,12 @@ function TextQuestion(props: { questionData: TextQuestionInterface; onChange: (a
     let questionData: TextQuestionInterface = props.questionData
     const [value, setValue] = useState(questionData)
     const [text, setText] = useState(questionData.initialValue)
-    return <Box display="inline-block">
-    <TextareaAutosize
+    return <Box
+      component={TextareaAutosize}
+      display="inline-block"
+      sx={{width: "100%"}}
       value={text}
       minRows={3}
-      minLength={10}
       onChange={(event) => {
           let data = value
           data.initialValue = event.target.value
@@ -24,8 +25,7 @@ function TextQuestion(props: { questionData: TextQuestionInterface; onChange: (a
           setValue(data)
           props.onChange(value)
       }}
-    />
-  </Box>
+  />
 }
 
 export default TextQuestion;
