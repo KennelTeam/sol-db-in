@@ -1,6 +1,8 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 import os
+
+from sqlalchemy import NullPool
 from sqlalchemy.orm import Query
 from flask import Flask, g
 from flask_restful import Api
@@ -36,8 +38,9 @@ class FlaskApp(metaclass=Singleton):
 
     def __init__(self):
         self._app = Flask(__name__, static_folder='../../frontend/build')
-        self.app.config['SQLALCHEMY_POOL_RECYCLE'] = 8
-        # self.app.config['SQLALCHEMY_ECHO'] = True
+        self.app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+            'poolclass': NullPool,
+        }
         CORS(self.app, supports_credentials=True)
         self._configure_api()
         self._configure_db()
