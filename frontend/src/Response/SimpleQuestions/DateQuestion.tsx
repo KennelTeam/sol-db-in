@@ -13,7 +13,6 @@ export function DateQuestion(props: { questionData: TextQuestionInterface; onCha
             size="small"
             type="date"
             sx={{ display: "block" }}
-            label={questionData.label}
             value={questionData.initialValue}
             onChange={(event) => {
                 let data = value

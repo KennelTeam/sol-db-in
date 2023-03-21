@@ -16,11 +16,13 @@ function InputInfo(inputInfo: InputInfoInterface) {
   );
   const title = <p style={{ display: "inline-block" }}>{inputInfo.title}</p>
   return (
-    <Box display="inline-block" sx={{
+    <Box display="block" sx={{
       verticalAlign: "middle",
       paddingRight: "5px",
       margin: 0,
-      whiteSpace: "nowrap"
+      whiteSpace: "nowrap",
+      overflow: "auto",
+      maxWidth: "100%",
     }}>
       {inputInfo.title? title : null}
       {inputInfo.description? tooltip : null}

@@ -23,7 +23,9 @@ function LabeledQuestion(props: { questionData: SimpleQuestionTypesList; questio
                                               } />;
     return (
         <Box display="inline-block" sx={{
-            marginBottom: "10px"
+            marginBottom: "10px",
+            width: "100%",
+            display: "block"
         }}>
             <InputInfo {...inputInfo} />
             {questionComponent}
