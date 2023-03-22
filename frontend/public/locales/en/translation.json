@@ -75,5 +75,11 @@
             "title": "Edit translations",
             "add": "Add \"{}\" translation"
         }
+    },
+
+    "response": {
+        "name": "Name",
+        "surname": "Surname",
+        "other_name": "Other name parts"
     }
 }
