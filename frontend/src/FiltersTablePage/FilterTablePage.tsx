@@ -154,7 +154,12 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
 
     const [questions, setQuestions] = useState<QuestionAttributes[]>([])
     const [filtersList, setFiltersList] = useState<JSX.Element[]>([])
-    const [newQuestion, setNewQuestion] = useState<string>("")
+    const [newQuestion, setNewQuestion] = useState<QuestionAttributes>({
+        id: -1,
+        text: "Loading...",
+        type: AnswerType.Text,
+
+    })
     const [filtersData, changeFiltersData] = useImmer<AnswerFilter[]>([])
     const [tableData, setTableData] = useState<TableData>({
         column_groups: [],
@@ -168,7 +173,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
     }
 
     const handleAdd = () => {
-        const newQuestionData = questions.filter(question => (question.text === newQuestion))
+        const newQuestionData = questions.filter(question => (question.id === newQuestion.id))
         if (newQuestionData.length === 0) {
             return
         }
@@ -246,7 +251,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
                         })
                     })
                     setQuestions(newQuestions)
-                    setNewQuestion(newQuestions[0].text)
+                    setNewQuestion(newQuestions[0])
                 })
                 .catch((error) => {
                     console.log("Error while accessing to the /form: ", error)
@@ -254,6 +259,10 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
             // })
         handleSubmitFilter()
     }, [])
+
+    const isCorrectSelect = () => (
+        questions.filter((q) => (q.id === newQuestion.id)).length !== 0
+    )
 
     return (
         <Stack direction="column" spacing={1}>
@@ -266,18 +275,22 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
                     <Typography variant="caption">Add filter:</Typography>
                     <Autocomplete
                         disablePortal
-                        options={questions.map(question => question.text)}
+                        options={questions}
+                        getOptionLabel={(option) => (option.text)}
                         sx={{ width: 300 }}
                         value={newQuestion}
-                        onChange={(event: any, newValue: string | null) => {
+                        onChange={(event: any, newValue: QuestionAttributes | null) => {
                             if (newValue !== null) {
                                 setNewQuestion(newValue)
                             }
                         }}
+                        onOpen={() => {
+                            console.log("AUTOCOMPLETE:", newQuestion, questions)
+                        }}
                         renderInput={(params: TextFieldProps) => <TextField {...params} label={t('choose_filter')} />}
                     />
-                    <IconButton onClick={handleAdd}>
-                        <AddIcon htmlColor="green" fontSize="large"/>
+                    <IconButton onClick={handleAdd} disabled={!isCorrectSelect()}>
+                        <AddIcon htmlColor={isCorrectSelect() ? "green" : "gray"} fontSize="large"/>
                     </IconButton>
                 </Stack>
             </Card>
