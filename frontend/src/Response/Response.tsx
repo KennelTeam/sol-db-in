@@ -1,4 +1,4 @@
-import {Autocomplete, Box, Button, Checkbox, FormControlLabel, Paper, TextField} from "@mui/material";
+import {Autocomplete, Box, Button, Checkbox, FormControlLabel, makeStyles, Paper, TextField} from "@mui/material";
 import Block from "./Block";
 import { ResponseDataInterface } from "./ResponseData";
 import {SyntheticEvent, useState} from "react";
@@ -10,6 +10,7 @@ interface IndexedData {
     [key: number]: SimpleQuestionTypesList
 }
 
+
 function Response(responseData: ResponseDataInterface): JSX.Element {
     const [name, setName] = useState(responseData.title)
     const [state, setState] = useState(responseData.state.toString())
@@ -18,7 +19,13 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
     const onItemChanged = (changedAnswer: SimpleQuestionTypesList) => {
         console.log("ONITEMCHANGED")
         console.log(changedAnswer)
-        resultData[changedAnswer.uid] = changedAnswer
+        if (changedAnswer.initialValue !== false && changedAnswer.deleted === true) {
+            if (resultData[changedAnswer.uid] !== undefined) {
+                delete resultData[changedAnswer.uid]
+            }
+        } else {
+            resultData[changedAnswer.uid] = changedAnswer
+        }
     }
 
     const blocksComponents = responseData.blocks.map(
@@ -88,6 +95,11 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
                 }
             />
             <FormControlLabel
+                classes={{
+
+                    label: "width: 100%"
+                }
+                }
                 control={<Checkbox checked={deleted} onChange={(event) => {
                     setDeleted(event.target.checked)
                 }} />}

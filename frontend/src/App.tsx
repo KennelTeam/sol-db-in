@@ -27,13 +27,13 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Stack direction="row" alignItems="stretch" spacing={0}>
+      <Stack direction="row" alignItems="stretch" spacing={0} sx={{maxWidth: "unset"}}>
         { user !== UserType.None && // it makes NavigationMenu shown only when user isn't None
         <Box  sx={{ width: MENU_WIDTH}} visibility="visible">
           <NavigationMenu user={user}/>
         </Box> }
-        <Container sx={{ width: '100%', overflowX: "auto" }}>
-          <Routes>
+        <Container sx={{ width: '100%', overflowX: "auto", margin: "0", maxWidth: "unset"}}  maxWidth={false}>
+          <Routes >
             <Route path='/' element={<Navigate to={'/login'}/>}/>
           <Route path='/catalog' element={<Catalog />}/>
           <Route path='/leader/:id' element={<Leader />}/>
