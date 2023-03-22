@@ -32,5 +32,11 @@
         "submit_filter": "Применить",
         "add_leader": "Добавить лидера",
         "add_project": "Добавить проект"
+    },
+
+    "response": {
+        "name": "Имя",
+        "surname": "Фамилия",
+        "other_name": "Остальное имя"
     }
 }
