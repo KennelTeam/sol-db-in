@@ -83,7 +83,7 @@ class Forms(Resource):
         parser.add_argument('deleted', type=bool, location='json', required=False, default=False)
 
         content = parser.parse_args()
-
+        print(json.dumps(content, indent=4))
         if content['form_type'] not in FormType.items():
             return post_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
         form_type = FormType[content['form_type']]

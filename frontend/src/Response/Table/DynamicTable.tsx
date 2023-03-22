@@ -31,6 +31,9 @@ function DynamicTable(props: { dynamicTableData: DynamicTableInterface, inputInf
         console.log("here")
         let data = dynamicTableData
         data.questions.push(JSON.parse(JSON.stringify(dynamicTableData.sample)))
+        for (let i = 0; i < dynamicTableData.sample.length; ++i) {
+            data.questions[data.questions.length - 1][i].questionData.table_row = data.questions.length - 1
+        }
         setA(a + 1)
         setTable(data)
     }
