@@ -17,7 +17,7 @@ export default function RelationQuestion(props: {
         questionData: RelationQuestionProps,
         onChange: (arg0: RelationQuestionProps) => void
     }) {
-    const questionData : RelationQuestionProps = props.questionData
+    const [questionData, setData] = useState(props.questionData)
     const [variants, setVariants] = useState<AnswerVariant[]>([])
     const [value, setValue] = useState<AnswerVariant>(questionData.initialValue as AnswerVariant)
     const [inputValue, setInputValue] = useState<string>(questionData.initialValue ? questionData.initialValue.name : "")
@@ -51,6 +51,11 @@ export default function RelationQuestion(props: {
                     id: newId,
                     name: inputValue
                 }])
+                let data = questionData
+                data.initialValue = newId
+                data.value = newId
+                setData(data)
+                props.onChange(data)
                 setValue({
                     id: newId,
                     name: inputValue
