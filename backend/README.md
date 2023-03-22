@@ -10,7 +10,7 @@ provides only an API to the database and export logic
 `git clone https://github.com/KennelTeam/sol-db-in`
 2. Install python libraries:\
 `pip install -r backend/requirements.txt`
-3. Provide a `.env` file in the `backend` folder. 
+3. Provide a `.env` file in the root folder. 
 This `.env` file should have fields as in `example.env`
 4. Check the `config.json` and make sure that server is 
 configured as you want it to be

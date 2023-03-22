@@ -199,21 +199,25 @@ async function ProcessTable(table: APIQuestionTable): Promise<QuestionInterface>
             return await ProcessQuestionTableColumn(question, rows + 1)
         }
     ))
-
+    console.log(columns)
     let inputInfos = columns.map((pair) => {return pair.inputInfo})
     let questions: SimpleQuestionInterface[][] = [];
     for (let row = 0; row < rows; ++row) {
         questions.push(
             columns.map((column) => {
-                return column.answers[row]
+                // @ts-ignore
+                return column.answers.filter((item) => {return item.questionData.table_row == row})[0]
             })
         )
     }
+    console.log(questions)
+    console.log("THIS")
 
     let sample: SimpleQuestionInterface[] = []
     for (let column = 0; column < columns.length; ++column) {
-        sample.push(columns[column].answers[rows] as SimpleQuestionInterface)
+        sample.push(await ProcessQuestion(table.questions[column], []) as SimpleQuestionInterface)
     }
+    console.log(sample)
 
     return {
         questionType: TableType.DYNAMIC_TABLE,

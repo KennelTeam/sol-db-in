@@ -54,12 +54,6 @@ class Forms(Resource):
         if arguments['form_type'] not in FormType.items():
             return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
 
-        FormattingSettings.upload_cache()
-        Question.upload_cache()
-        PrivacySettings.upload_cache()
-        User.upload_cache()
-        Toponym.upload_cache()
-        QuestionBlock.upload_cache()
         form_type = FormType[arguments['form_type']]
         ids = Form.get_all_ids(form_type)
         for item in answer_filters:
@@ -73,12 +67,7 @@ class Forms(Resource):
         question_ids = Question.get_only_main_page(form_type)
 
         result = Forms._prepare_table(forms, question_ids)
-        # FormattingSettings.clear_cache()
-        # Question.clear_cache()
-        # PrivacySettings.clear_cache()
-        # User.clear_cache()
-        # Toponym.clear_cache()
-        # QuestionBlock.clear_cache()
+
         return Response(json.dumps({'table': result}), 200)
 
     @staticmethod
