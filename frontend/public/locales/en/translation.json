@@ -1,6 +1,6 @@
 {
     "login": {
-        "title": "Welcome to sol db indonesia",
+        "title": "Welcome to NSF database",
         "login": "Login",
         "password": "Password",
         "incorrect-credentials": "Incorrect password",
@@ -81,5 +81,8 @@
         "name": "Name",
         "surname": "Surname",
         "other_name": "Other name parts"
+    },
+    "main": {
+        "title": "NSF DB"
     }
 }

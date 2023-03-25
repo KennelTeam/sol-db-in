@@ -1,5 +1,5 @@
 
-const SERVER_ADDRESS = 'http://52.192.211.221:5000/api'
+const SERVER_ADDRESS = window.location.href.split('/').slice(0, 3).join('/') + "/api"
 
 enum UserType {
     Admin,
