@@ -1,5 +1,5 @@
 
-const SERVER_ADDRESS = 'http://127.0.0.1:5000/api'
+const SERVER_ADDRESS = window.location.origin + '/api'
 
 enum UserType {
     Admin,
