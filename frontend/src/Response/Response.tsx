@@ -5,6 +5,7 @@ import {SyntheticEvent, useState} from "react";
 import {SimpleQuestionTypesList} from "./SimpleQuestions/SimpleQuestion";
 import {postRequest} from "./APIRequests";
 import {APIFormState} from "./APIObjects";
+import { useNavigate } from "react-router-dom";
 
 interface IndexedData {
     [key: number]: SimpleQuestionTypesList
@@ -15,6 +16,8 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
     const [name, setName] = useState(responseData.title)
     const [state, setState] = useState(responseData.state.toString())
     const [deleted, setDeleted] = useState(false)
+
+    const navigate = useNavigate()
 
     const onItemChanged = (changedAnswer: SimpleQuestionTypesList) => {
         console.log("ONITEMCHANGED")
@@ -62,7 +65,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
             id: id,
             answers: answers,
             deleted: deleted
-        }).then((response: any) => {
+        }, navigate).then((response: any) => {
             console.log(response)
         })
     }

@@ -2,10 +2,11 @@ import React, {SyntheticEvent, useEffect, useState} from "react"
 import { Autocomplete, IconButton, TextField } from '@mui/material'
 import { Stack } from "@mui/system"
 import { AnswerVariant } from "../../FiltersTablePage/TypedFilters"
-import { getObjectsList, makeNewObject } from "../../FiltersTablePage/requests"
+import { getObjectsList, makeNewObject } from "../../FiltersTablePage/requests2API"
 import AddIcon from '@material-ui/icons/Add'
 import { CommonQuestionProperties } from "./common"
 import {APIOption} from "../APIObjects";
+import { useNavigate } from "react-router-dom"
 
 
 export interface RelationQuestionProps extends CommonQuestionProperties{
@@ -21,6 +22,8 @@ export default function RelationQuestion(props: {
     const [variants, setVariants] = useState<AnswerVariant[]>([])
     const [value, setValue] = useState<AnswerVariant>(questionData.initialValue as AnswerVariant)
     const [inputValue, setInputValue] = useState<string>(questionData.initialValue ? questionData.initialValue.name : "")
+    
+    const navigate = useNavigate()
 
     const handleChange = (event: SyntheticEvent, newValue: string | AnswerVariant | null) => {
         setValue(newValue as AnswerVariant)
@@ -39,20 +42,23 @@ export default function RelationQuestion(props: {
     }
 
     useEffect(() => {
-        getObjectsList(questionData.relType).then((response) => {
+        getObjectsList(questionData.relType, navigate).then((response) => {
             setVariants(response)
         })
     }, [])
 
     const handleAddObject = () => {
         if (variants.filter((v) => (v.name === inputValue)).length === 0) {
-            makeNewObject(questionData.relType, inputValue).then((newId) => {
+            makeNewObject(navigate, questionData.relType, inputValue).then((newId) => {
                 setVariants([...variants, {
                     id: newId,
                     name: inputValue
                 }])
                 let data = questionData
-                data.initialValue = newId
+                data.initialValue = {
+                    id: newId,
+                    name: inputValue
+                }
                 data.value = newId
                 setData(data)
                 props.onChange(data)

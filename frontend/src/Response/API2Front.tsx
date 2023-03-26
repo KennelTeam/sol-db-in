@@ -23,10 +23,11 @@ import {InputInfoInterface} from "./SimpleQuestions/InputInfo";
 import {DynamicTableInterface} from "./Table/DynamicTable";
 import {FixedTableInterface} from "./Table/FixedTable";
 import {RelationQuestionProps} from "./SimpleQuestions/RelationQuestion";
+import { NavigateFunction, useNavigate } from "react-router-dom";
 
-export async function GetFormInfo(id: number): Promise<ResponseDataInterface> {
+export async function GetFormInfo(id: number, navigate: NavigateFunction): Promise<ResponseDataInterface> {
     console.log("REQUEST")
-    const res_form = await getRequest("form_page", {id: id})
+    const res_form = await getRequest("form_page", {id: id}, navigate)
     const form = res_form.data as APIForm;
     console.log(form)
     return {
@@ -73,6 +74,9 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
         tags: [],
         id: answers.length > 0 ? answers[0].id : -1
     }
+
+    const navigate = useNavigate()
+
     switch (question.question_type) {
         case SimpleQuestionType.NUMBER: {
             let initialValue = answers.length > 0 ? answers[0].value : -1;
@@ -84,7 +88,8 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
         }
         case SimpleQuestionType.RELATION:
             const options_resp = await getRequest("forms_lightweight",
-                {form_type: question.relation_settings ? question.relation_settings.relation_type : "LEADER"})
+                {form_type: question.relation_settings ? question.relation_settings.relation_type : "LEADER"},
+                navigate)
             let options = options_resp.data as Array<APIOption>
             questionData = {
                 label: question.text,
@@ -99,14 +104,14 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
         case SimpleQuestionType.MULTIPLE_CHOICE: {
             let options: Array<APIOption>;
             if (question.question_type == SimpleQuestionType.MULTIPLE_CHOICE) {
-                const options_resp = await getRequest("answer_block", {id: question.answer_block_id})
+                const options_resp = await getRequest("answer_block", {id: question.answer_block_id}, navigate)
                 const block = options_resp.data as APIAnswerBlock
                 options = block.options.map((option) => {return option as APIOption})
             } else if (question.question_type == SimpleQuestionType.LOCATION) {
-                const options_resp = await getRequest("all_toponyms")
+                const options_resp = await getRequest("all_toponyms", {}, navigate)
                 options = options_resp.data as Array<APIOption>
             } else {
-                const options_resp = await getRequest("users")
+                const options_resp = await getRequest("users", {}, navigate)
                 options = options_resp.data as Array<APIOption>
             }
             console.log(options)
@@ -125,7 +130,8 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
             break;
         }
         case SimpleQuestionType.CHECKBOX: {
-            let options_resp = await getRequest("answer_block", {id: question.answer_block_id})
+            let options_resp = await getRequest("answer_block", {id: question.answer_block_id},
+                navigate)
             const block = options_resp.data as APIAnswerBlock
             const options = block.options
 

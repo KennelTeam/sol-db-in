@@ -5,7 +5,7 @@ import ClearIcon from '@material-ui/icons/Clear'
 import AddIcon from '@material-ui/icons/Add'
 import * as Test from './_testFunctions'
 import { NumberFilter, TextFilter, CheckboxFilter, ChoiceFilter, AutocompleteChoiceFilter, DateFilter, AnswerFilter, AnswerVariant } from './TypedFilters'
-import { getUsersList, getAnswersList, getObjectsList, getToponymsList, getFilteredTableData, TableData, makeNewObject } from "./requests";
+import { getUsersList, getAnswersList, getObjectsList, getToponymsList, getFilteredTableData, TableData, makeNewObject } from "./requests2API";
 import { useState, useEffect, useRef } from "react";
 import MainTable from "./MainTable";
 import { useImmer } from "use-immer"
@@ -49,33 +49,34 @@ function SingleFilter(props : SingleFilterProps) {
     const { id, text, type, answer_block_id, setFilter } = props
     const [active, setActive] = useState(true)
     const [variants, setVariants] = useState<AnswerVariant[]>([])
+    const navigate = useNavigate()
 
     useEffect(() => {
         switch (type) {
             case AnswerType.List :
                 if (answer_block_id !== undefined) {
-                    getAnswersList(answer_block_id).then((answers) => {
+                    getAnswersList(answer_block_id, navigate).then((answers) => {
                         setVariants(answers)
                     })
                 }
                 break
             case AnswerType.User :
-                getUsersList().then((users) => {
+                getUsersList(navigate).then((users) => {
                     setVariants(users)
                 })
                 break
             case AnswerType.Leader :
-                getObjectsList('LEADER').then((leaders) => {
+                getObjectsList('LEADER', navigate).then((leaders) => {
                     setVariants(leaders)
                 })
                 break
             case AnswerType.Project :
-                getObjectsList('PROJECT').then((leaders) => {
+                getObjectsList('PROJECT', navigate).then((leaders) => {
                     setVariants(leaders)
                 })
                 break
             case AnswerType.Location :
-                getToponymsList().then((toponyms) => {
+                getToponymsList(navigate).then((toponyms) => {
                     setVariants(toponyms)
                 })
         }
@@ -198,7 +199,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
             form_type: formType,
             answer_filters: buf.toString("base64")
         }
-        getFilteredTableData(body).then((data) => {
+        getFilteredTableData(body, navigate).then((data) => {
             console.log("New Table data:", data)
             setTableData(data)
         })
@@ -297,7 +298,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
             <Box>
                 <Button variant="contained" onClick={handleSubmitFilter} sx={{ m: 2 }}>{t('submit_filter')}</Button>
                 <Button variant="outlined" sx={{ m: 2 }} onClick={(event: React.MouseEvent) => {
-                    makeNewObject(formType).then((id) => {
+                    makeNewObject(navigate, formType).then((id) => {
                         const link = '/' + formType.toLowerCase() + '/' + id
                         navigate(link, { replace: true })
                     })
