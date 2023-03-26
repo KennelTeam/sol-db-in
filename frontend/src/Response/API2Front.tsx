@@ -32,7 +32,7 @@ export async function GetFormInfo(id: number, navigate: NavigateFunction): Promi
     console.log(form)
     return {
         title: form.name,
-        blocks: await Promise.all(form.answers.map(ProcessBlock)),
+        blocks: await Promise.all(form.answers.map((qbData) => (ProcessBlock(qbData, navigate)))),
         id: form.id,
         state: form.state,
         form_type: form.form_type
@@ -40,9 +40,11 @@ export async function GetFormInfo(id: number, navigate: NavigateFunction): Promi
 }
 
 
-async function ProcessBlock(block: APIQuestionBlock): Promise<BlockInterface> {
+async function ProcessBlock(block: APIQuestionBlock, navigate: NavigateFunction): Promise<BlockInterface> {
 
-    let questions = await Promise.all(block.questions.map(ProcessBlockElement));
+    let questions = await Promise.all(block.questions.map((bData) => (
+        ProcessBlockElement(bData, navigate)
+        )));
 
     return {
         title: block.name,
@@ -50,16 +52,16 @@ async function ProcessBlock(block: APIQuestionBlock): Promise<BlockInterface> {
     } as BlockInterface
 }
 
-async function ProcessBlockElement(element: APIQuestionElement): Promise<QuestionInterface | null> {
+async function ProcessBlockElement(element: APIQuestionElement, navigate: NavigateFunction): Promise<QuestionInterface | null> {
     switch (element.type) {
         case "question": {
-            return ProcessQuestion(element.value as APIQuestion, (element.value as APIQuestion).answers);
+            return ProcessQuestion(element.value as APIQuestion, (element.value as APIQuestion).answers, navigate);
         }
         case "table_question": {
-            return ProcessTable(element.value as APIQuestionTable);
+            return ProcessTable(element.value as APIQuestionTable, navigate);
         }
         case "fixed_table_question": {
-            return ProcessFixedTable(element.value as APIFixedTable);
+            return ProcessFixedTable(element.value as APIFixedTable, navigate);
         }
         default: {
             return null;
@@ -67,15 +69,13 @@ async function ProcessBlockElement(element: APIQuestionElement): Promise<Questio
     }
 }
 
-async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>): Promise<QuestionInterface> {
+async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>, navigate: NavigateFunction): Promise<QuestionInterface> {
     let questionData: SimpleQuestionTypesList;
     let defaultObject = answers.length > 0 ? answers[0] : {
         question_id: question.id,
         tags: [],
         id: answers.length > 0 ? answers[0].id : -1
     }
-
-    const navigate = useNavigate()
 
     switch (question.question_type) {
         case SimpleQuestionType.NUMBER: {
@@ -187,7 +187,7 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>)
     }
 }
 
-async function ProcessTable(table: APIQuestionTable): Promise<QuestionInterface> {
+async function ProcessTable(table: APIQuestionTable, navigate: NavigateFunction): Promise<QuestionInterface> {
     let rows = 1 + Math.max(...table.questions.map(
         (question) => {
             return Math.max(...question.answers.map(
@@ -202,7 +202,7 @@ async function ProcessTable(table: APIQuestionTable): Promise<QuestionInterface>
     ))
     let columns = await Promise.all(table.questions.map(
         async (question) => {
-            return await ProcessQuestionTableColumn(question, rows + 1)
+            return await ProcessQuestionTableColumn(question, rows + 1, navigate)
         }
     ))
     console.log(columns)
@@ -221,7 +221,7 @@ async function ProcessTable(table: APIQuestionTable): Promise<QuestionInterface>
 
     let sample: SimpleQuestionInterface[] = []
     for (let column = 0; column < columns.length; ++column) {
-        sample.push(await ProcessQuestion(table.questions[column], []) as SimpleQuestionInterface)
+        sample.push(await ProcessQuestion(table.questions[column], [], navigate) as SimpleQuestionInterface)
     }
     console.log(sample)
 
@@ -239,7 +239,7 @@ async function ProcessTable(table: APIQuestionTable): Promise<QuestionInterface>
     } as QuestionInterface
 }
 
-async function ProcessFixedTable(table: APIFixedTable): Promise<QuestionInterface> {
+async function ProcessFixedTable(table: APIFixedTable, navigate: NavigateFunction): Promise<QuestionInterface> {
     const questionToInputInfo = (question: APIQuestion) => {
         return {
             title: question.text,
@@ -256,7 +256,7 @@ async function ProcessFixedTable(table: APIFixedTable): Promise<QuestionInterfac
         let currentRow: SimpleQuestionTypesList[] = []
         for (let column = 0; column < inputsOnTop.length; ++column) {
             currentRow.push({
-                ...(await ProcessQuestion(table.columns[column], table.answers[row][column])).questionData,
+                ...(await ProcessQuestion(table.columns[column], table.answers[row][column], navigate)).questionData,
                 // @ts-ignore
                 row_question_id: table.rows[row].id
             } as SimpleQuestionTypesList)
@@ -279,7 +279,7 @@ async function ProcessFixedTable(table: APIFixedTable): Promise<QuestionInterfac
     } as QuestionInterface
 }
 
-async function ProcessQuestionTableColumn(column: APIQuestion, rows: number): Promise<{
+async function ProcessQuestionTableColumn(column: APIQuestion, rows: number, navigate: NavigateFunction): Promise<{
     inputInfo: InputInfoInterface,
     answers: Array<SimpleQuestionInterface>
 }> {
@@ -292,7 +292,7 @@ async function ProcessQuestionTableColumn(column: APIQuestion, rows: number): Pr
     let answers: Array<SimpleQuestionInterface> = [];
     for (let row = 0; row < rows; ++row) {
         const cur_answers = column.answers.filter((answer) => answer.table_row == row)
-        const res = await ProcessQuestion(column, cur_answers)
+        const res = await ProcessQuestion(column, cur_answers, navigate)
         answers.push({
             questionType: res.questionType,
             questionData: {

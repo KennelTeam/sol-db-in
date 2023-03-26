@@ -22,7 +22,7 @@ import ErrorPage from "./ErrorPage";
 
 function App() {
 
-  const [user, setUser] = React.useState(UserType.None)
+  const [user, setUser] = React.useState(UserType.Admin)
   // setUser later will be passed with props to the Login component for changing the user
   // at first when the site is loaded user must be UserType.None, and then it will be saved in cookies
 
@@ -50,6 +50,7 @@ function App() {
           <Route path='/users' element={<Users />}/>
           <Route path='/filters' element={<FilterTablePage formType="LEADER"/>}/> {/* route for testing FilterTablePage component */}
           <Route path='/error/:code' element={<ErrorPage/>}/>
+          <Route path='*' element={<Navigate to='/error/404_client'/>}/>
           </Routes>
         </Container>
       </Stack>

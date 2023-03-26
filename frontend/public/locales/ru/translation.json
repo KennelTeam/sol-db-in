@@ -58,6 +58,10 @@
         "page_Network": {
             "title": "Network Error",
             "text": "Check your internet connection, please"
+        },
+        "page_404_client": {
+            "title": "Not Found Page (404)",
+            "text": "Type another page address, or just go to the /login page"
         }
     }
 }
