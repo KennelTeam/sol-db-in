@@ -3,8 +3,10 @@ import InputInfo, { InputInfoInterface } from "../SimpleQuestions/InputInfo";
 import { WithInputInfoInterface } from "../SimpleQuestions/LabeledQuestion";
 import SimpleQuestion, { SimpleQuestionInterface, SimpleQuestionType } from "../SimpleQuestions/SimpleQuestion";
 import BaseTable from "./BaseTable";
-import {Box, Button} from "@mui/material";
+import {Box, Button, IconButton} from "@mui/material";
 import {useState} from "react";
+import AddIcon from "@material-ui/icons/Add"
+import DeleteIcon from "@material-ui/icons/Delete"
 
 
 export interface DynamicTableInterface {
@@ -53,8 +55,12 @@ function DynamicTable(props: { dynamicTableData: DynamicTableInterface, inputInf
 
     return <Box>
         <BaseTable inputInfo={props.inputInfo} rows={[inputInfoComponents].concat(questionComponents)} />
-        <Button onClick={addRow}>+</Button>
-        <Button onClick={removeRow}>-</Button>
+        <IconButton onClick={addRow}>
+            <AddIcon htmlColor="green"/>
+        </IconButton>
+        <IconButton disabled={questionComponents.length === 0} onClick={removeRow}>
+            <DeleteIcon htmlColor={questionComponents.length ? "red" : "grey"}/>
+        </IconButton>
     </Box>
 }
 

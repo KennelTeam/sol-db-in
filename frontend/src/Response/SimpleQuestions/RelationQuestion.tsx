@@ -90,7 +90,9 @@ export default function RelationQuestion(props: {
                 )}
             />
             <IconButton onClick={handleAddObject} disabled={variants.filter((v) => (v.name === inputValue)).length > 0}>
-                <AddIcon htmlColor="green" fontSize="small"/>
+                <AddIcon htmlColor={
+                    variants.filter((v) => (v.name === inputValue)).length > 0 ? "grey": "green"}
+                    fontSize="small"/>
             </IconButton>
         </Stack>
     )
