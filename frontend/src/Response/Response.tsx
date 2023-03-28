@@ -74,7 +74,6 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
             id: id,
             answers: answers,
             deleted: deleted
-        }).then((response: any) => {
         }, navigate).then((response: any) => {
             console.log(response)
         })
