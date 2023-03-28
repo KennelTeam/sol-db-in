@@ -22,6 +22,8 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
     _name = FlaskApp().db.Column('name', FlaskApp().db.Text(MAX_BLOCK_NAME_SIZE * MAX_LANGUAGES_COUNT))
     _sorting = FlaskApp().db.Column('sorting', FlaskApp().db.Integer)
 
+    _cached = None
+
     def __init__(self, name: TranslatedText, form: FormType, sorting: int = 0):
         super().__init__()
         self.name = name
@@ -37,7 +39,18 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
         }
 
     @staticmethod
+    def upload_cache():
+        QuestionBlock._cached = FlaskApp().request(QuestionBlock).all()
+
+    @staticmethod
+    def clear_cache():
+        QuestionBlock._cached = None
+
+    @staticmethod
     def get_by_id(id: int) -> 'QuestionBlock':
+        if QuestionBlock._cached is not None:
+            res = list(filter(lambda x: x.id == id, QuestionBlock._cached))
+            return None if len(res) == 0 else res[0]
         return FlaskApp().request(QuestionBlock).filter_by(id=id).first()
 
     @property
@@ -65,7 +78,10 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_form(form: FormType) -> List['QuestionBlock']:
-        blocks = FlaskApp().request(QuestionBlock).filter_by(_form=form).all()
+        if QuestionBlock._cached is not None:
+            blocks = list(filter(lambda x: x._form == form, QuestionBlock._cached))
+        else:
+            blocks = FlaskApp().request(QuestionBlock).filter_by(_form=form).all()
         return sorted(blocks, key=lambda x: x.sorting)
 
     def get_questions(self, with_answers=False, form_id: int = None) -> List[JSON]:

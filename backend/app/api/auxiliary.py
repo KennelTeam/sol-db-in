@@ -87,8 +87,14 @@ def check_rights(min_access_level: Role) -> bool:
 def get_request(min_access_level: Role = Role.GUEST):
     def decorator(func):
         def wrapper() -> Response:
+            try:
+                FlaskApp().db.session.begin_nested()
+                FlaskApp().db.session.rollback()
+            except Exception:
+                pass
             if not check_rights(min_access_level):
                 return Response({'error': HTTPErrorCode.NOT_ENOUGH_RIGHTS}, 403)
+            FlaskApp().set_language(current_user.selected_language)
             return func()
         return wrapper
     return decorator
@@ -97,9 +103,14 @@ def get_request(min_access_level: Role = Role.GUEST):
 def post_request(min_access_level: Role = Role.INTERN):
     def decorator(func):
         def wrapper():
+            try:
+                FlaskApp().db.session.commit()
+            except Exception:
+                pass
             if not check_rights(min_access_level):
                 return Response({'error': HTTPErrorCode.NOT_ENOUGH_RIGHTS}, 403)
             FlaskApp().db.session.begin_nested()
+            FlaskApp().use_deleted_items_in_this_request()
             return func()
         return wrapper
     return decorator

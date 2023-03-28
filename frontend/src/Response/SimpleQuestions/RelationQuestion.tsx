@@ -2,30 +2,36 @@ import React, {SyntheticEvent, useEffect, useState} from "react"
 import { Autocomplete, IconButton, TextField } from '@mui/material'
 import { Stack } from "@mui/system"
 import { AnswerVariant } from "../../FiltersTablePage/TypedFilters"
-import { getObjectsList, makeNewObject } from "../../FiltersTablePage/requests"
+import { getObjectsList, makeNewObject } from "../../FiltersTablePage/requests2API"
 import AddIcon from '@material-ui/icons/Add'
-import { useTranslation } from "react-i18next"
 import { CommonQuestionProperties } from "./common"
+import {APIOption} from "../APIObjects";
+import { useNavigate } from "react-router-dom"
 
 
 export interface RelationQuestionProps extends CommonQuestionProperties{
-    relType: 'LEADER' | 'PROJECT'
+    relType: 'LEADER' | 'PROJECT';
+    initialValue: APIOption;
 }
 
 export default function RelationQuestion(props: {
         questionData: RelationQuestionProps,
-        onChange: (arg0: number) => void
+        onChange: (arg0: RelationQuestionProps) => void
     }) {
-    const questionData : RelationQuestionProps = props.questionData
-    const { t } = useTranslation('translation', { keyPrefix: "filters" })
+    const [questionData, setData] = useState(props.questionData)
     const [variants, setVariants] = useState<AnswerVariant[]>([])
-    const [value, setValue] = useState<AnswerVariant>({ id: -1, name: ""})
-    const [inputValue, setInputValue] = useState<string>(value.name)
+    const [value, setValue] = useState<AnswerVariant>(questionData.initialValue as AnswerVariant)
+    const [inputValue, setInputValue] = useState<string>(questionData.initialValue ? questionData.initialValue.name : "")
+    
+    const navigate = useNavigate()
 
     const handleChange = (event: SyntheticEvent, newValue: string | AnswerVariant | null) => {
         setValue(newValue as AnswerVariant)
         if (newValue && typeof newValue !== 'string') {
-            props.onChange(newValue.id)
+            let data = questionData
+            data.initialValue = newValue
+            data.value = newValue.id
+            props.onChange(data)
         }
     }
 
@@ -36,18 +42,26 @@ export default function RelationQuestion(props: {
     }
 
     useEffect(() => {
-        getObjectsList(questionData.relType).then((response) => {
+        getObjectsList(questionData.relType, navigate).then((response) => {
             setVariants(response)
         })
     }, [])
 
     const handleAddObject = () => {
         if (variants.filter((v) => (v.name === inputValue)).length === 0) {
-            makeNewObject(questionData.relType).then((newId) => {
+            makeNewObject(navigate, questionData.relType, inputValue).then((newId) => {
                 setVariants([...variants, {
                     id: newId,
                     name: inputValue
                 }])
+                let data = questionData
+                data.initialValue = {
+                    id: newId,
+                    name: inputValue
+                }
+                data.value = newId
+                setData(data)
+                props.onChange(data)
                 setValue({
                     id: newId,
                     name: inputValue
@@ -75,13 +89,13 @@ export default function RelationQuestion(props: {
                         label={questionData.label}
                         inputProps={{
                             ...params.inputProps,
-                            autoComplete: 'new-password', // disable autocomplete and autofill
+                            autoComplete: 'new-password',
                         }}
                         >
                     </TextField>
                 )}
             />
-            <IconButton onClick={handleAddObject}>
+            <IconButton onClick={handleAddObject} disabled={variants.filter((v) => (v.name === inputValue)).length > 0}>
                 <AddIcon htmlColor="green" fontSize="small"/>
             </IconButton>
         </Stack>

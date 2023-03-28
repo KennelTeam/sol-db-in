@@ -5,7 +5,7 @@ import ClearIcon from '@material-ui/icons/Clear'
 import AddIcon from '@material-ui/icons/Add'
 import * as Test from './_testFunctions'
 import { NumberFilter, TextFilter, CheckboxFilter, ChoiceFilter, AutocompleteChoiceFilter, DateFilter, AnswerFilter, AnswerVariant } from './TypedFilters'
-import { getUsersList, getAnswersList, getObjectsList, getToponymsList, getFilteredTableData, TableData, makeNewObject } from "./requests";
+import { getUsersList, getAnswersList, getObjectsList, getToponymsList, getFilteredTableData, TableData, makeNewObject } from "./requests2API";
 import { useState, useEffect, useRef } from "react";
 import MainTable from "./MainTable";
 import { useImmer } from "use-immer"
@@ -49,33 +49,34 @@ function SingleFilter(props : SingleFilterProps) {
     const { id, text, type, answer_block_id, setFilter } = props
     const [active, setActive] = useState(true)
     const [variants, setVariants] = useState<AnswerVariant[]>([])
+    const navigate = useNavigate()
 
     useEffect(() => {
         switch (type) {
             case AnswerType.List :
                 if (answer_block_id !== undefined) {
-                    getAnswersList(answer_block_id).then((answers) => {
+                    getAnswersList(answer_block_id, navigate).then((answers) => {
                         setVariants(answers)
                     })
                 }
                 break
             case AnswerType.User :
-                getUsersList().then((users) => {
+                getUsersList(navigate).then((users) => {
                     setVariants(users)
                 })
                 break
             case AnswerType.Leader :
-                getObjectsList('LEADER').then((leaders) => {
+                getObjectsList('LEADER', navigate).then((leaders) => {
                     setVariants(leaders)
                 })
                 break
             case AnswerType.Project :
-                getObjectsList('PROJECT').then((leaders) => {
+                getObjectsList('PROJECT', navigate).then((leaders) => {
                     setVariants(leaders)
                 })
                 break
             case AnswerType.Location :
-                getToponymsList().then((toponyms) => {
+                getToponymsList(navigate).then((toponyms) => {
                     setVariants(toponyms)
                 })
         }
@@ -154,7 +155,12 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
 
     const [questions, setQuestions] = useState<QuestionAttributes[]>([])
     const [filtersList, setFiltersList] = useState<JSX.Element[]>([])
-    const [newQuestion, setNewQuestion] = useState<string>("")
+    const [newQuestion, setNewQuestion] = useState<QuestionAttributes>({
+        id: -1,
+        text: "Loading...",
+        type: AnswerType.Text,
+
+    })
     const [filtersData, changeFiltersData] = useImmer<AnswerFilter[]>([])
     const [tableData, setTableData] = useState<TableData>({
         column_groups: [],
@@ -168,7 +174,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
     }
 
     const handleAdd = () => {
-        const newQuestionData = questions.filter(question => (question.text === newQuestion))
+        const newQuestionData = questions.filter(question => (question.id === newQuestion.id))
         if (newQuestionData.length === 0) {
             return
         }
@@ -193,7 +199,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
             form_type: formType,
             answer_filters: buf.toString("base64")
         }
-        getFilteredTableData(body).then((data) => {
+        getFilteredTableData(body, navigate).then((data) => {
             console.log("New Table data:", data)
             setTableData(data)
         })
@@ -246,7 +252,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
                         })
                     })
                     setQuestions(newQuestions)
-                    setNewQuestion(newQuestions[0].text)
+                    setNewQuestion(newQuestions[0])
                 })
                 .catch((error) => {
                     console.log("Error while accessing to the /form: ", error)
@@ -254,6 +260,10 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
             // })
         handleSubmitFilter()
     }, [])
+
+    const isCorrectSelect = () => (
+        questions.filter((q) => (q.id === newQuestion.id)).length !== 0
+    )
 
     return (
         <Stack direction="column" spacing={1}>
@@ -266,32 +276,34 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
                     <Typography variant="caption">Add filter:</Typography>
                     <Autocomplete
                         disablePortal
-                        options={questions.map(question => question.text)}
+                        options={questions}
+                        getOptionLabel={(option) => (option.text)}
                         sx={{ width: 300 }}
                         value={newQuestion}
-                        onChange={(event: any, newValue: string | null) => {
+                        onChange={(event: any, newValue: QuestionAttributes | null) => {
                             if (newValue !== null) {
                                 setNewQuestion(newValue)
                             }
                         }}
+                        onOpen={() => {
+                            console.log("AUTOCOMPLETE:", newQuestion, questions)
+                        }}
                         renderInput={(params: TextFieldProps) => <TextField {...params} label={t('choose_filter')} />}
                     />
-                    <IconButton onClick={handleAdd}>
-                        <AddIcon htmlColor="green" fontSize="large"/>
+                    <IconButton onClick={handleAdd} disabled={!isCorrectSelect()}>
+                        <AddIcon htmlColor={isCorrectSelect() ? "green" : "gray"} fontSize="large"/>
                     </IconButton>
                 </Stack>
             </Card>
             <Box>
                 <Button variant="contained" onClick={handleSubmitFilter} sx={{ m: 2 }}>{t('submit_filter')}</Button>
                 <Button variant="outlined" sx={{ m: 2 }} onClick={(event: React.MouseEvent) => {
-                    makeNewObject(formType).then((id) => {
+                    makeNewObject(navigate, formType).then((id) => {
                         const link = '/' + formType.toLowerCase() + '/' + id
                         navigate(link, { replace: true })
                     })
                 }}>
-                    <Link to={formType === 'LEADER' ? "/leader/1" : "/project/1"}>
-                        {formType === 'LEADER' ? t('add_leader') : t('add_project')}
-                    </Link>
+                    {formType === 'LEADER' ? t('add_leader') : t('add_project')}
                 </Button>
             </Box>
             <h2>{t('table')}</h2>

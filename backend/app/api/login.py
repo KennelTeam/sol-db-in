@@ -18,6 +18,7 @@ class Login(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('login', type=str, location='json', required=True)
         parser.add_argument('password', type=str, location='json', required=True)
+        parser.add_argument('language', type=str, location='json', required=False, default=DEFAULT_LANGUAGE)
         arguments = parser.parse_args()
 
         user = User.get_by_login(arguments['login'])
@@ -29,7 +30,7 @@ class Login(Resource):
             return get_failure(HTTPErrorCode.WRONG_ID, 403)
 
         user.current_ip = request.remote_addr
-        user.selected_language = request.json.get('language', DEFAULT_LANGUAGE)
+        user.selected_language = arguments['language']
         access_token = create_access_token(identity=user)
         response = Response(json.dumps({'role': user.role.name}), 200)
         set_access_cookies(response, access_token)

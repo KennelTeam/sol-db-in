@@ -32,5 +32,36 @@
         "submit_filter": "Применить",
         "add_leader": "Добавить лидера",
         "add_project": "Добавить проект"
+    },
+
+    "errors": {
+        "page_500": {
+            "title": "Internal Server Error (500)",
+            "text": "Sorry, something went wrong with server.\nTry to reload site"
+        },
+        "page_400": {
+            "title": "Bad Request (400)",
+            "text": "Sorry, site have passed request with bad data.\nTry to reload site"
+        },
+        "page_404": {
+            "title": "Not Found Error (404)",
+            "text": "Sorry, server can't found requested data.\nTry to reload site"
+        },
+        "page_403": {
+            "title": "Forbidden (403)",
+            "text": "Sorry, you haven't enough rights to access this page.\nTry to reauthorize or ask admin about your rights."
+        },
+        "page_405": {
+            "title": "Method Not Allowed (405)",
+            "text": "Sorry, request is not allowed by server.\nTry to reload site"
+        },
+        "page_Network": {
+            "title": "Network Error",
+            "text": "Check your internet connection, please"
+        },
+        "page_404_client": {
+            "title": "Not Found Page (404)",
+            "text": "Type another page address, or just go to the /login page"
+        }
     }
 }

@@ -1,9 +1,9 @@
 import { AnswerVariant, AnswerFilter } from "./TypedFilters"
 import { SERVER_ADDRESS } from "../types/global"
-import { FormResponse } from './FilterTablePage'
 import { FormsResponse, ColumnGroup, Row } from './_testFunctions'
 import i18next, { i18n } from "i18next"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
+import { NavigateFunction, useNavigate } from "react-router-dom"
 
 interface TranslatedText {
     [language: string]: string
@@ -30,7 +30,15 @@ export function getLanguage() {
     return i18next.language.split('-', 1)[0]
 }
 
-export async function getUsersList() : Promise<AnswerVariant[]> {
+export function handleError(navigate: NavigateFunction, error: AxiosError) {
+    if (error.response)
+        navigate('/error/' + error.response.status, { replace: true })
+    else {
+        navigate('/error/Network', { replace: true })
+    }
+}
+
+export async function getUsersList(navigate: NavigateFunction) : Promise<AnswerVariant[]> {
     return await axios.get(SERVER_ADDRESS + '/users', { withCredentials: true })
         .then((response) => {
             console.log("Users response:", response.status, response.data)
@@ -38,11 +46,13 @@ export async function getUsersList() : Promise<AnswerVariant[]> {
         })
         .catch((error) => {
             console.log(error)
+            const navigate = useNavigate()
+            handleError(navigate, error)
             return []
         })
 }
 
-export async function getAnswersList(questionId: number) : Promise<AnswerVariant[]> {
+export async function getAnswersList(questionId: number, navigate: NavigateFunction) : Promise<AnswerVariant[]> {
     return await axios.get(SERVER_ADDRESS + '/answer_block',
         { withCredentials: true, params: { id: questionId } })
         .then((response) => {
@@ -54,11 +64,12 @@ export async function getAnswersList(questionId: number) : Promise<AnswerVariant
         })
         .catch((error) => {
             console.log(error)
+            handleError(navigate, error)
             return []
         })
 }
 
-export async function getObjectsList(type: 'LEADER' | 'PROJECT') : Promise<AnswerVariant[]> {
+export async function getObjectsList(type: 'LEADER' | 'PROJECT', navigate: NavigateFunction) : Promise<AnswerVariant[]> {
     return await axios.get(SERVER_ADDRESS + '/forms',
         { withCredentials: true, params: { form_type: type, answer_filters: [] } })
         .then((response) => {
@@ -73,11 +84,12 @@ export async function getObjectsList(type: 'LEADER' | 'PROJECT') : Promise<Answe
         .catch((error) => {
             console.log("EEERRORRRORRR!")
             console.log(error)
+            handleError(navigate, error)
             return []
         })
 }
 
-export async function getToponymsList() : Promise<AnswerVariant[]> {
+export async function getToponymsList(navigate: NavigateFunction) : Promise<AnswerVariant[]> {
     return await axios.get(SERVER_ADDRESS + '/all_toponyms',
         { withCredentials: true})
         .then((response) => {
@@ -87,11 +99,13 @@ export async function getToponymsList() : Promise<AnswerVariant[]> {
         })
         .catch((error) => {
             console.log(error)
+            handleError(navigate, error)
             return []
         })
 }
 
-export async function getFilteredTableData(data: FiltersRequestData) : Promise<TableData> {
+export async function getFilteredTableData(data: FiltersRequestData,
+                    navigate: NavigateFunction) : Promise<TableData> {
 
     function stringify(value: string | number | boolean) : string {
         switch (typeof value) {
@@ -140,6 +154,7 @@ export async function getFilteredTableData(data: FiltersRequestData) : Promise<T
         })
         .catch((error) => {
             console.log("Error while requesting /forms:", error)
+            handleError(navigate, error)
             return {
                 column_groups: [],
                 rows: []
@@ -147,19 +162,18 @@ export async function getFilteredTableData(data: FiltersRequestData) : Promise<T
         })
 }
 
-export async function makeNewObject(formType: 'LEADER' | 'PROJECT') {
+export async function makeNewObject(navigate: NavigateFunction,
+                formType: 'LEADER' | 'PROJECT', name?: string) : Promise<number> {
     return await axios.post(SERVER_ADDRESS + '/forms', {
         state: 'PLANNED',
-        name: "insert name here",
+        name: name ? name : "insert name here",
         form_type: formType,
         answers: []
     }, { withCredentials: true })
-    .then((response) => (response.data))
+    .then((response) => (response.data as number))
     .catch((error) => {
         console.log("Error while requesting /forms by POST request:", error)
-        return {
-            column_groups: [],
-            rows: []
-        }
+        handleError(navigate, error)
+        return -1
     })
 }

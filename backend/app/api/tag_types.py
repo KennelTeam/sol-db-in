@@ -21,10 +21,8 @@ class TagTypes(Resource):
     @jwt_required()
     @get_request()
     def get():
-        old_lang = current_user.selected_language
-        current_user.selected_language = ALL_LANGUAGES_TAG
+        FlaskApp().set_language(ALL_LANGUAGES_TAG)
         result = get_class_item_by_id_request(TagType)
-        current_user.selected_language = old_lang
         return result
 
     @staticmethod

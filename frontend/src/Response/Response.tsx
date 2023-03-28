@@ -1,24 +1,34 @@
-import {Autocomplete, Box, Button, Checkbox, FormControlLabel, Paper, TextField} from "@mui/material";
+import {Autocomplete, Box, Button, Checkbox, FormControlLabel, makeStyles, Paper, TextField} from "@mui/material";
 import Block from "./Block";
 import { ResponseDataInterface } from "./ResponseData";
 import {SyntheticEvent, useState} from "react";
 import {SimpleQuestionTypesList} from "./SimpleQuestions/SimpleQuestion";
 import {postRequest} from "./APIRequests";
 import {APIFormState} from "./APIObjects";
+import { useNavigate } from "react-router-dom";
 
 interface IndexedData {
     [key: number]: SimpleQuestionTypesList
 }
+
 
 function Response(responseData: ResponseDataInterface): JSX.Element {
     const [name, setName] = useState(responseData.title)
     const [state, setState] = useState(responseData.state.toString())
     const [deleted, setDeleted] = useState(false)
 
+    const navigate = useNavigate()
+
     const onItemChanged = (changedAnswer: SimpleQuestionTypesList) => {
         console.log("ONITEMCHANGED")
         console.log(changedAnswer)
-        resultData[changedAnswer.uid] = changedAnswer
+        if (changedAnswer.initialValue !== false && changedAnswer.deleted === true) {
+            if (resultData[changedAnswer.uid] !== undefined) {
+                delete resultData[changedAnswer.uid]
+            }
+        } else {
+            resultData[changedAnswer.uid] = changedAnswer
+        }
     }
 
     const blocksComponents = responseData.blocks.map(
@@ -31,6 +41,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
         console.log("ONSUBMIT")
         let answers = []
         for (let ans in resultData) {
+            console.log(resultData[ans])
             if (resultData[ans].value === undefined) {
                 // @ts-ignore
                 resultData[ans].value = resultData[ans].initialValue
@@ -38,10 +49,11 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
             if (resultData[ans].initialValue === false) {
                 resultData[ans].deleted = true
             } else if (resultData[ans].initialValue === true) {
-                console.log(resultData[ans])
+                resultData[ans].deleted = false
             }
             answers.push(resultData[ans])
         }
+        console.log(answers)
 
         let form_type = responseData.form_type.toString()
         let id = responseData.id
@@ -53,7 +65,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
             id: id,
             answers: answers,
             deleted: deleted
-        }).then((response) => {
+        }, navigate).then((response: any) => {
             console.log(response)
         })
     }
@@ -86,6 +98,11 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
                 }
             />
             <FormControlLabel
+                classes={{
+
+                    label: "width: 100%"
+                }
+                }
                 control={<Checkbox checked={deleted} onChange={(event) => {
                     setDeleted(event.target.checked)
                 }} />}

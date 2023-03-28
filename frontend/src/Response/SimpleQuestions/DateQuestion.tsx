@@ -7,13 +7,13 @@ export function DateQuestion(props: { questionData: TextQuestionInterface; onCha
     let questionData: TextQuestionInterface = props.questionData
     const [value, setValue] = useState(questionData)
     const [text, setText] = useState(questionData.initialValue)
+    console.log(text)
     return <Box display="inline-block">
         <TextField
             size="small"
             type="date"
             sx={{ display: "block" }}
-            label={questionData.label}
-            value={text}
+            value={questionData.initialValue}
             onChange={(event) => {
                 let data = value
                 data.initialValue = event.target.value
