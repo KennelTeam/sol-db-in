@@ -1,4 +1,4 @@
-import {Autocomplete, Box, Button, Checkbox, FormControlLabel, TextField} from "@mui/material";
+import {Autocomplete, Box, Button, Checkbox, FormControlLabel, makeStyles, Paper, TextField} from "@mui/material";
 import Block from "./Block";
 import {ResponseDataInterface} from "./ResponseData";
 import {SyntheticEvent, useState} from "react";
@@ -6,6 +6,8 @@ import {SimpleQuestionTypesList} from "./SimpleQuestions/SimpleQuestion";
 import {postRequest} from "./APIRequests";
 import {APIFormState, APIFormType} from "./APIObjects";
 import {useTranslation} from "react-i18next";
+import { useNavigate } from "react-router-dom";
+
 
 interface IndexedData {
     [key: number]: SimpleQuestionTypesList
@@ -23,6 +25,8 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
     ])
     const [state, setState] = useState(responseData.state.toString())
     const [deleted, setDeleted] = useState(false)
+
+    const navigate = useNavigate()
 
     const onItemChanged = (changedAnswer: SimpleQuestionTypesList) => {
         console.log("ONITEMCHANGED")
@@ -71,6 +75,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
             answers: answers,
             deleted: deleted
         }).then((response: any) => {
+        }, navigate).then((response: any) => {
             console.log(response)
         })
     }

@@ -1,5 +1,4 @@
-
-const SERVER_ADDRESS = window.location.href.split('/').slice(0, 3).join('/') + "/api"
+const SERVER_ADDRESS = window.location.origin + '/api'
 
 enum UserType {
     Admin,

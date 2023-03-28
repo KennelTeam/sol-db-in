@@ -5,7 +5,7 @@ import { Row, _getRows, _getColumns } from './_testFunctions'
 import { Box, styled } from '@mui/system'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TableData } from './requests'
+import { TableData } from './requests2API'
 
 const StyledTableCell = styled(TableCell)({
     fontSize: '11px',

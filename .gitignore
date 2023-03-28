@@ -1,5 +1,4 @@
 frontend/package-lock.json
-
 *.sql
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -8,7 +7,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+frontend/package-lock.json
 # Distribution / packaging
 .Python
 build/
