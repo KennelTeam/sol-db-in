@@ -75,5 +75,14 @@
             "title": "Edit translations",
             "add": "Add \"{}\" translation"
         }
+    },
+
+    "dynamic_table": {
+        "confirm_delete": {
+            "title": "Confirm deleting",
+            "description": "Are you sure to delete last relation?",
+            "cancel": "Cancel",
+            "confirm": "Delete"
+        }
     }
 }
