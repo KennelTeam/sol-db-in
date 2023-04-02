@@ -29,7 +29,7 @@ function Login({ changeUser } : { changeUser: (userType: UserType) => void }) {
       switch (res.status) {
           case 200: {
               setStatus(Status.SuccessfulLogIn)
-              changeUser(UserType.Admin) // later must be set by response
+              changeUser(UserType.Admin)
               break;
           }
           case 400: {
