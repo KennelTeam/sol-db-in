@@ -93,7 +93,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
                     nameParts[1],
                     nameParts[2]
                 ])
-                setName(nameParts[0] + ' ' +
+                setName(event.target.value + ' ' +
                     nameParts[1] + ' ' +
                     nameParts[2])
             }}
@@ -111,7 +111,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
                     nameParts[2]
                 ])
                 setName(nameParts[0] + ' ' +
-                    nameParts[1] + ' ' +
+                    event.target.value + ' ' +
                     nameParts[2])
             }}
         />
@@ -129,7 +129,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
                 ])
                 setName(nameParts[0] + ' ' +
                     nameParts[1] + ' ' +
-                    nameParts[2])
+                    event.target.value)
             }}
         /></Box>
     } else {
