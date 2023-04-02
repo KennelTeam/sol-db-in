@@ -5,8 +5,8 @@
         "part2": "Хаю хай Switch language between english and german using buttons above."
     },
     "menu": {
-        "projects": "Проекты",
-        "leaders": "Лидеры",
+        "projects": "Projects",
+        "leaders": "Leaders",
         "statistics": "Статистика",
         "settings": "Настройки",
         "users": "Управление пользователями",

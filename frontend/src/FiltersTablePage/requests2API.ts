@@ -70,16 +70,11 @@ export async function getAnswersList(questionId: number, navigate: NavigateFunct
 }
 
 export async function getObjectsList(type: 'LEADER' | 'PROJECT', navigate: NavigateFunction) : Promise<AnswerVariant[]> {
-    return await axios.get(SERVER_ADDRESS + '/forms',
-        { withCredentials: true, params: { form_type: type, answer_filters: [] } })
+    return await axios.get(SERVER_ADDRESS + '/forms_lightweight',
+        { withCredentials: true, params: { form_type: type } })
         .then((response) => {
-            console.log("WEEEEEEEEEEEEEEE")
             console.log(type, " response:", response.status, response.data)
-            const data = <FormsResponse>response.data
-            return data.table[0].values.map((cell) => ({
-                id: cell.answers[0].ref_id,
-                name: <string>cell.answers[0].value
-            }))
+            return response.data as AnswerVariant[];
         })
         .catch((error) => {
             console.log("EEERRORRRORRR!")
