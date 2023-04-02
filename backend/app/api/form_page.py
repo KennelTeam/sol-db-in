@@ -9,7 +9,7 @@ from flask_restful import Resource
 
 from .auxiliary import HTTPErrorCode, get_failure, get_request, create_id_reqparser
 from backend.app.database.form import Form
-from ..database import QuestionBlock, FormattingSettings, Question, Answer, PrivacySettings, User, Toponym
+from ..database import QuestionBlock, FormattingSettings, Question, PrivacySettings, User, Toponym
 
 
 class FormPage(Resource):
@@ -30,7 +30,6 @@ class FormPage(Resource):
         QuestionBlock.upload_cache()
         FormattingSettings.upload_cache()
         Question.upload_cache()
-        # Answer.upload_cache()
         PrivacySettings.upload_cache()
         User.upload_cache()
         Toponym.upload_cache()
@@ -43,7 +42,6 @@ class FormPage(Resource):
         QuestionBlock.clear_cache()
         FormattingSettings.clear_cache()
         Question.clear_cache()
-        # Answer.clear_cache()
         PrivacySettings.clear_cache()
         User.clear_cache()
         Toponym.clear_cache()
