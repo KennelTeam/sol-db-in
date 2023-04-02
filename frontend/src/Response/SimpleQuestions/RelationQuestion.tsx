@@ -8,7 +8,6 @@ import { CommonQuestionProperties } from "./common"
 import {APIOption} from "../APIObjects";
 import { useNavigate } from "react-router-dom"
 
-
 export interface RelationQuestionProps extends CommonQuestionProperties{
     relType: 'LEADER' | 'PROJECT';
     initialValue: APIOption;
@@ -22,7 +21,6 @@ export default function RelationQuestion(props: {
     const [variants, setVariants] = useState<AnswerVariant[]>([])
     const [value, setValue] = useState<AnswerVariant>(questionData.initialValue as AnswerVariant)
     const [inputValue, setInputValue] = useState<string>(questionData.initialValue ? questionData.initialValue.name : "")
-    
     const navigate = useNavigate()
 
     const handleChange = (event: SyntheticEvent, newValue: string | AnswerVariant | null) => {

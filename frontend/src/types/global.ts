@@ -1,4 +1,3 @@
-
 const SERVER_ADDRESS = window.location.origin + '/api'
 
 enum UserType {

@@ -5,8 +5,8 @@
         "part2": "Хаю хай Switch language between english and german using buttons above."
     },
     "menu": {
-        "projects": "Проекты",
-        "leaders": "Лидеры",
+        "projects": "Projects",
+        "leaders": "Leaders",
         "statistics": "Статистика",
         "settings": "Настройки",
         "users": "Управление пользователями",
@@ -34,6 +34,11 @@
         "add_project": "Добавить проект"
     },
 
+    "response": {
+        "name": "Имя",
+        "surname": "Фамилия",
+        "other_name": "Остальное имя"
+    },
     "errors": {
         "page_500": {
             "title": "Internal Server Error (500)",

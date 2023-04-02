@@ -18,14 +18,15 @@ import { Stack } from "@mui/system";
 import React from "react";
 import { MENU_WIDTH } from "./types/global";
 import FilterTablePage from "./FiltersTablePage";
+import {useTranslation} from "react-i18next";
 import ErrorPage from "./ErrorPage";
 
 function App() {
-
+  const {t} = useTranslation('translation', { keyPrefix: 'main' });
   const [user, setUser] = React.useState(UserType.Admin)
   // setUser later will be passed with props to the Login component for changing the user
   // at first when the site is loaded user must be UserType.None, and then it will be saved in cookies
-
+  document.title = t('title')
   return (
     <BrowserRouter>
       <Stack direction="row" alignItems="stretch" spacing={0} sx={{maxWidth: "unset"}}>

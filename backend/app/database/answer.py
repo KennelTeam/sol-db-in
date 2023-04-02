@@ -10,7 +10,7 @@ from enum import Enum
 from typing import Any, List, Set
 from .question_type import QuestionType
 from backend.auxiliary import JSON
-from ...auxiliary.string_dt import datetime_to_string, date_to_string
+from ...auxiliary.string_dt import date_to_string
 
 
 class ExtremumType(Enum):

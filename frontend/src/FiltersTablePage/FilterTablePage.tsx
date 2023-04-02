@@ -110,7 +110,7 @@ function SingleFilter(props : SingleFilterProps) {
             filter = <DateFilter setFilter={setFilter}/>
             break
         case AnswerType.Location :
-            filter = <AutocompleteChoiceFilter variants={Test._getLocationsList()} setFilter={setFilter}/>
+            filter = <AutocompleteChoiceFilter variants={variants} setFilter={setFilter}/>
             break
         default :
             filter = <Typography color="error" variant="h3">Wrong AnswerType</Typography>
