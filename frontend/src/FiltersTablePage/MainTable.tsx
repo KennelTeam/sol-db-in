@@ -78,7 +78,7 @@ function RenderRow(props: Row) {
 export default function MainTable(props: TableData) {
     const { t } = useTranslation('translation', { keyPrefix: "filters" })
 
-    const [rowsPerPage, setRowsPerPage] = useState(10)
+    const [rowsPerPage, setRowsPerPage] = useState(50)
     const [page, setPage] = useState<number>(0)
 
     const handleChangePage = (event: unknown, newPage: number) => {
