@@ -67,11 +67,11 @@ export default function RelationQuestion(props: {
             })
         }
     }
-
+    let found = variants.filter((v) => (v.name === inputValue)).length > 0
     return (
         <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-start">
             <Autocomplete
-                sx={{ width: 300 }}
+                sx={{ width: 200 }}
                 options={variants}
                 disableCloseOnSelect
                 getOptionLabel={(option) => (typeof option === 'string' ? option : option.name)}
@@ -84,6 +84,7 @@ export default function RelationQuestion(props: {
                     <TextField
                         {...params}
                         size="small"
+                        sx={{input: {color: found ? 'black' : 'red'}}}
                         label={questionData.label}
                         inputProps={{
                             ...params.inputProps,
@@ -93,7 +94,7 @@ export default function RelationQuestion(props: {
                     </TextField>
                 )}
             />
-            <IconButton onClick={handleAddObject} disabled={variants.filter((v) => (v.name === inputValue)).length > 0}>
+            <IconButton onClick={handleAddObject} style={{display: found ? 'none' : 'block'}}>
                 <AddIcon htmlColor="green" fontSize="small"/>
             </IconButton>
         </Stack>

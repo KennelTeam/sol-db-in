@@ -76,6 +76,8 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
             deleted: deleted
         }, navigate).then((response: any) => {
             console.log(response)
+        }).then((_) => {
+            window.location.reload();
         })
     }
 
