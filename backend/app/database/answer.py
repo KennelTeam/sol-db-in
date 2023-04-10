@@ -119,7 +119,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
     @staticmethod
     def count_distinct_answers(query: Query, question_id: int):
         query = query.filter_by(_question_id=question_id)
-        return query.distinct().count()
+        return query.distinct(Answer._table_row).count()
 
     @staticmethod
     def filter(question_id: int = None, row_question_id: int = None, form_id: int = None,
