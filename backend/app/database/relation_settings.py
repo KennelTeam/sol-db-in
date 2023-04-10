@@ -106,6 +106,8 @@ class RelationSettings(Editable, FlaskApp().db.Model):
 
     @property
     def main_page_count_title(self) -> TranslatedText:
+        if self._main_page_count_title is None:
+            return None
         return json.loads(self._main_page_count_title)
 
     @main_page_count_title.setter
@@ -116,6 +118,8 @@ class RelationSettings(Editable, FlaskApp().db.Model):
 
     @property
     def inverse_main_page_count_title(self) -> TranslatedText:
+        if self._inverse_main_page_count_title is None:
+            return None
         return json.loads(self._inverse_main_page_count_title)
 
     @inverse_main_page_count_title.setter
