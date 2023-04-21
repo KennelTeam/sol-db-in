@@ -1,10 +1,13 @@
 import {Autocomplete, Box, Button, Checkbox, FormControlLabel, makeStyles, Paper, TextField} from "@mui/material";
 import Block from "./Block";
-import { ResponseDataInterface } from "./ResponseData";
+import {ResponseDataInterface} from "./ResponseData";
 import {SyntheticEvent, useState} from "react";
 import {SimpleQuestionTypesList} from "./SimpleQuestions/SimpleQuestion";
 import {postRequest} from "./APIRequests";
-import {APIFormState} from "./APIObjects";
+import {APIFormState, APIFormType} from "./APIObjects";
+import {useTranslation} from "react-i18next";
+import { useNavigate } from "react-router-dom";
+
 
 interface IndexedData {
     [key: number]: SimpleQuestionTypesList
@@ -12,9 +15,18 @@ interface IndexedData {
 
 
 function Response(responseData: ResponseDataInterface): JSX.Element {
+    const { t } = useTranslation('translation', { keyPrefix: "response" })
+
     const [name, setName] = useState(responseData.title)
+    const [nameParts, setNameParts] = useState([
+        name.split(' ')[0],
+        name.split(' ')[1],
+        name.split(' ').slice(2).join(' ')
+    ])
     const [state, setState] = useState(responseData.state.toString())
     const [deleted, setDeleted] = useState(false)
+
+    const navigate = useNavigate()
 
     const onItemChanged = (changedAnswer: SimpleQuestionTypesList) => {
         console.log("ONITEMCHANGED")
@@ -62,23 +74,80 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
             id: id,
             answers: answers,
             deleted: deleted
-        }).then((response: any) => {
+        }, navigate).then((response: any) => {
             console.log(response)
         })
     }
 
+    let nameInput = null
+    if (responseData.form_type == APIFormType.LEADER) {
+        nameInput = <Box><TextField
+            size="medium"
+            type="text"
+            sx={{ display: "block", m: 2 }}
+            label={t('name')}
+            value={nameParts[0]}
+            onChange={(event) => {
+                setNameParts([
+                    event.target.value,
+                    nameParts[1],
+                    nameParts[2]
+                ])
+                setName(nameParts[0] + ' ' +
+                    nameParts[1] + ' ' +
+                    nameParts[2])
+            }}
+        />
+        <TextField
+            size="medium"
+            type="text"
+            sx={{ display: "block", m: 2 }}
+            label={t('surname')}
+            value={nameParts[1]}
+            onChange={(event) => {
+                setNameParts([
+                    nameParts[0],
+                    event.target.value,
+                    nameParts[2]
+                ])
+                setName(nameParts[0] + ' ' +
+                    nameParts[1] + ' ' +
+                    nameParts[2])
+            }}
+        />
+        <TextField
+            size="medium"
+            type="text"
+            sx={{ display: "block", m: 2 }}
+            label={t('other_name')}
+            value={nameParts[2]}
+            onChange={(event) => {
+                setNameParts([
+                    nameParts[0],
+                    nameParts[1],
+                    event.target.value
+                ])
+                setName(nameParts[0] + ' ' +
+                    nameParts[1] + ' ' +
+                    nameParts[2])
+            }}
+        /></Box>
+    } else {
+        nameInput = <Box><TextField
+            size="medium"
+            type="text"
+            sx={{ display: "block", m: 2 }}
+            label={t('name')}
+            value={name}
+            onChange={(event) => {
+                setName(event.target.value)
+            }}
+        /></Box>
+    }
+
     return (<Box>
         <Box>
-            <TextField
-                size="medium"
-                type="text"
-                sx={{ display: "block" }}
-                label={""}
-                value={name}
-                onChange={(event) => {
-                    setName(event.target.value)
-                }}
-            />
+            {nameInput}
             <Autocomplete
                 disablePortal
                 options={[APIFormState.PLANNED.toString(), APIFormState.STARTED.toString(), APIFormState.FINISHED.toString()]}

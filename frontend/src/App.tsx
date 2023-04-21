@@ -18,13 +18,15 @@ import { Stack } from "@mui/system";
 import React from "react";
 import { MENU_WIDTH } from "./types/global";
 import FilterTablePage from "./FiltersTablePage";
+import {useTranslation} from "react-i18next";
+import ErrorPage from "./ErrorPage";
 
 function App() {
-
+  const {t} = useTranslation('translation', { keyPrefix: 'main' });
   const [user, setUser] = React.useState(UserType.Admin)
   // setUser later will be passed with props to the Login component for changing the user
   // at first when the site is loaded user must be UserType.None, and then it will be saved in cookies
-
+  document.title = t('title')
   return (
     <BrowserRouter>
       <Stack direction="row" alignItems="stretch" spacing={0} sx={{maxWidth: "unset"}}>
@@ -38,7 +40,7 @@ function App() {
           <Route path='/catalog' element={<Catalog />}/>
           <Route path='/leader/:id' element={<Leader />}/>
           <Route path='/leaders' element={<LeadersList />}/>
-          <Route path='/login' element={<Login />}/>
+          <Route path='/login' element={<Login changeUser={setUser}/>}/>
           <Route path='/project/:id' element={<Project />}/>
           <Route path='/projects' element={<ProjectsList />}/>
           <Route path='/settings' element={<Settings />}/>
@@ -48,6 +50,8 @@ function App() {
           <Route path='/options' element={<Options />}/>
           <Route path='/users' element={<Users />}/>
           <Route path='/filters' element={<FilterTablePage formType="LEADER"/>}/> {/* route for testing FilterTablePage component */}
+          <Route path='/error/:code' element={<ErrorPage/>}/>
+          <Route path='*' element={<Navigate to='/error/404_client'/>}/>
           </Routes>
         </Container>
       </Stack>

@@ -1,8 +1,6 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 
-from flask_jwt_extended import current_user
-
 from backend.app.flask_app import FlaskApp
 from backend.auxiliary import TranslatedText
 from backend.constants import ALL_LANGUAGES_TAG, DEFAULT_LANGUAGE

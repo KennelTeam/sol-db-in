@@ -46,6 +46,5 @@ def serve(path):
     print(path)
     if path != "" and os.path.exists(FlaskApp().app.static_folder + '/' + path):
         return send_from_directory(FlaskApp().app.static_folder, path)
-    else:
-        return send_from_directory(FlaskApp().app.static_folder, 'index.html')
+    return send_from_directory(FlaskApp().app.static_folder, 'index.html')
 

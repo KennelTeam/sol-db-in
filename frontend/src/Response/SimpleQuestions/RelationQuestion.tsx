@@ -8,7 +8,7 @@ import AddIcon from '@material-ui/icons/Add'
 import { CommonQuestionProperties } from "./common"
 import {APIOption} from "../APIObjects";
 import { useTranslation } from "react-i18next"
-
+import { useNavigate } from "react-router-dom"
 
 export interface RelationQuestionProps extends CommonQuestionProperties{
     relType: 'LEADER' | 'PROJECT';
@@ -26,6 +26,7 @@ export default function RelationQuestion(props: {
     const [addDialogOpen, setOpen] = useState(false)
 
     const {t} = useTranslation("translation", { keyPrefix: "dynamic_table" })
+    const navigate = useNavigate()
 
     const handleChange = (event: SyntheticEvent, newValue: string | AnswerVariant | null) => {
         setValue(newValue as AnswerVariant)
@@ -44,20 +45,23 @@ export default function RelationQuestion(props: {
     }
 
     useEffect(() => {
-        getObjectsList(questionData.relType).then((response) => {
+        getObjectsList(questionData.relType, navigate).then((response) => {
             setVariants(response)
         })
     }, [])
 
     const handleAddObject = () => {
         if (variants.filter((v) => (v.name === inputValue)).length === 0) {
-            makeNewObject(questionData.relType, inputValue).then((newId) => {
+            makeNewObject(navigate, questionData.relType, inputValue).then((newId) => {
                 setVariants([...variants, {
                     id: newId,
                     name: inputValue
                 }])
                 let data = questionData
-                data.initialValue = newId
+                data.initialValue = {
+                    id: newId,
+                    name: inputValue
+                }
                 data.value = newId
                 setData(data)
                 props.onChange(data)

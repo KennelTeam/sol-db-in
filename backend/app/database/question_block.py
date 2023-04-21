@@ -79,7 +79,7 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
     @staticmethod
     def get_form(form: FormType) -> List['QuestionBlock']:
         if QuestionBlock._cached is not None:
-            blocks = list(filter(lambda x: x._form == form, QuestionBlock._cached))
+            blocks = list(filter(lambda x: x._form == form, QuestionBlock._cached))  # pylint: disable=protected-access
         else:
             blocks = FlaskApp().request(QuestionBlock).filter_by(_form=form).all()
         return sorted(blocks, key=lambda x: x.sorting)
@@ -111,7 +111,6 @@ class QuestionBlock(Editable, FlaskApp().db.Model):
         free_questions_formattings = FormattingSettings.filter_only_free_questions(
             FormattingSettings.query_from_block(self.id)
         )
-        # fqf = free questions formattings values
         fqf_dict = {item.id: item for item in free_questions_formattings}
         free_questions = Question.get_all_with_formattings(free_questions_formattings)
         return [(question, fqf_dict[question.formatting_settings.id].block_sorting) for question in free_questions]

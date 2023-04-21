@@ -5,7 +5,7 @@ import json
 from base64 import urlsafe_b64decode
 
 from flask import Response
-from flask_jwt_extended import jwt_required, current_user
+from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 from typing import Set, List, Final
 
@@ -17,7 +17,7 @@ from backend.app.database.tag_to_answer import TagToAnswer
 from backend.app.database.tag import Tag
 from backend.auxiliary.string_dt import string_to_datetime
 from backend.auxiliary.types import JSON
-from backend.app.database import Question, FormattingSettings, PrivacySettings, User, Toponym, QuestionBlock
+from backend.app.database import Question
 from backend.app.database.question import AnswerType
 from backend.app.database.auxiliary import prettify_answer
 from backend.app.database.question_type import QuestionType

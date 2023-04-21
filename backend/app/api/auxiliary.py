@@ -90,7 +90,7 @@ def get_request(min_access_level: Role = Role.GUEST):
             try:
                 FlaskApp().db.session.begin_nested()
                 FlaskApp().db.session.rollback()
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 pass
             if not check_rights(min_access_level):
                 return Response({'error': HTTPErrorCode.NOT_ENOUGH_RIGHTS}, 403)
@@ -105,7 +105,7 @@ def post_request(min_access_level: Role = Role.INTERN):
         def wrapper():
             try:
                 FlaskApp().db.session.commit()
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 pass
             if not check_rights(min_access_level):
                 return Response({'error': HTTPErrorCode.NOT_ENOUGH_RIGHTS}, 403)

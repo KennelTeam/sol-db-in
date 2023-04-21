@@ -2,10 +2,12 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { Box, Button, IconButton, InputAdornment, TextField } from '@mui/material';
 import { SyntheticEvent, useState} from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { SERVER_ADDRESS } from '../types/global'
 import axios, {AxiosResponse} from "axios";
 import i18n from "../i18n";
+import { UserType } from '../types/global';
+import { handleError } from '../FiltersTablePage/requests2API'
 
 
 enum Status {
@@ -16,15 +18,18 @@ enum Status {
     SuccessfulLogIn
 }
 
-function Login() {
+function Login({ changeUser } : { changeUser: (userType: UserType) => void }) {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [status, setStatus] = useState(Status.Nothing);
   const {t} = useTranslation('translation', { keyPrefix: 'login' });
+
+  const navigate = useNavigate()
 
   function processResponse(res: AxiosResponse) {
       switch (res.status) {
           case 200: {
               setStatus(Status.SuccessfulLogIn)
+              changeUser(UserType.Admin)
               break;
           }
           case 400: {
@@ -65,6 +70,11 @@ function Login() {
       }
 
       axios.post(SERVER_ADDRESS + "/login", request, config).then(processResponse)
+        .catch((error) => {
+          console.log(error)
+          handleError(navigate, error)
+          return error
+        })
   }
 
   function errorBox(text: string, statusCode: Status) {

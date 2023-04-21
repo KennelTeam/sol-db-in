@@ -44,7 +44,7 @@ class Toponyms(Resource):
     @post_request(Role.EDITOR)
     def post() -> Response:
         parser = reqparse.RequestParser()
-        parser.add_argument('parent_id', type=int, location='json', required=True)
+        parser.add_argument('parent_id', type=int, location='json', required=False, default=None)
         parser.add_argument('name', type=str, location='json', required=True)
         arguments = parser.parse_args()
         if Toponym.get_by_id(arguments['parent_id']) is None:
