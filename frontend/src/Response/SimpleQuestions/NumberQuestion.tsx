@@ -9,7 +9,7 @@ export interface NumberQuestionInterface extends CommonQuestionProperties {
 function NumberQuestion(props: { questionData: NumberQuestionInterface; onChange: (arg0: any) => void; }): JSX.Element {
     let questionData: NumberQuestionInterface = props.questionData
     const [value, setValue] = useState(questionData)
-    const [ans, setAns] = useState(questionData.initialValue ? questionData.initialValue : 0)
+    const [ans, setAns] = useState(questionData.initialValue || '')
     return <Box display="inline-block">
         <TextField
         type="number"
