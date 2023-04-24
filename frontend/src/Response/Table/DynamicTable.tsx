@@ -3,8 +3,12 @@ import InputInfo, { InputInfoInterface } from "../SimpleQuestions/InputInfo";
 import { WithInputInfoInterface } from "../SimpleQuestions/LabeledQuestion";
 import SimpleQuestion, { SimpleQuestionInterface, SimpleQuestionType } from "../SimpleQuestions/SimpleQuestion";
 import BaseTable from "./BaseTable";
-import {Box, Button} from "@mui/material";
+import {Box, Button, IconButton} from "@mui/material";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material"
 import {useState} from "react";
+import AddIcon from "@material-ui/icons/Add"
+import DeleteIcon from "@material-ui/icons/Delete"
+import { useTranslation } from "react-i18next";
 
 
 export interface DynamicTableInterface {
@@ -18,6 +22,10 @@ interface DynamicTableWithInputInfoInterface extends DynamicTableInterface, With
 function DynamicTable(props: { dynamicTableData: DynamicTableInterface, inputInfo: InputInfoInterface, onChange: (arg0: any) => void; }): JSX.Element {
     const [dynamicTableData, setTable] = useState(props.dynamicTableData as DynamicTableWithInputInfoInterface)
     const [a, setA] = useState(dynamicTableData.questions.length)
+    const [deleteDialogOpen, setOpen] = useState(false)
+
+    const {t} = useTranslation("translation", { keyPrefix: "dynamic_table" })
+
     console.log("REDRAW")
 
     let inputInfoComponents = dynamicTableData.inputInfos.map((inputInfo) => {
@@ -53,8 +61,42 @@ function DynamicTable(props: { dynamicTableData: DynamicTableInterface, inputInf
 
     return <Box>
         <BaseTable inputInfo={props.inputInfo} rows={[inputInfoComponents].concat(questionComponents)} />
-        <Button onClick={addRow}>+</Button>
-        <Button onClick={removeRow}>-</Button>
+        <IconButton onClick={addRow}>
+            <AddIcon htmlColor="green"/>
+        </IconButton>
+        <IconButton disabled={questionComponents.length === 0} onClick={() => {
+            setOpen(true)
+        }}>
+            <DeleteIcon htmlColor={questionComponents.length ? "red" : "grey"}/>
+        </IconButton>
+        <Dialog
+        open={deleteDialogOpen}
+        onClose={() => {
+            setOpen(false)
+        }}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {t("confirm_delete.title")}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {t("confirm_delete.description")}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setOpen(false)
+          }}>{t("confirm_delete.cancel")}</Button>
+          <Button onClick={() => {
+            setOpen(false)
+            removeRow()
+          }} autoFocus>
+            {t("confirm_delete.confirm")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
 }
 
