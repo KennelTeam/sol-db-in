@@ -156,9 +156,14 @@ class Questions(Resource):
             fixed_table_id, table_row, table_column, fail_response = Questions._check_fixed_table_args(formatting_json)
             if fail_response is not None:
                 return None, fail_response
+        default_filter = False
+        if 'default_filter' in formatting_json:
+            if not isinstance(formatting_json['default_filter'], bool):
+                return None, post_failure(HTTPErrorCode.INVALID_ARG_TYPE, 400)
+            default_filter = formatting_json['default_filter']
 
         return FormattingSettings(block_sorting, block_id, table_row, table_id, table_column,
-                                  show_on_main_page, fixed_table_id), None
+                                  show_on_main_page, fixed_table_id, default_filter), None
 
     @staticmethod
     def _check_fixed_table_args(formatting_json: JSON) -> Tuple[int | None, int | None, int | None, Response | None]:

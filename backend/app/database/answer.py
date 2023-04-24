@@ -119,7 +119,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
     @staticmethod
     def count_distinct_inverse_answers(query: Query, question_id: int):
         query = query.filter_by(_question_id=question_id).with_entities(Answer._form_id).distinct(Answer._form_id)
-        return query.group_by(Answer._table_row).count()
+        return query.group_by(Answer._form_id).count()
 
     @staticmethod
     def count_distinct_answers(query: Query, question_id: int):

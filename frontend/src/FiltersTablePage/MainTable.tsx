@@ -18,7 +18,7 @@ const StyledTableCell = styled(TableCell)({
     textAlign: "center"
 })
 
-function Head({ columnGroups }: { columnGroups: { name: string, columns: string[] }[] }) {
+function Head({ columnGroups, callBack }: { columnGroups: { name: string, columns: string[] }[], callBack:(index: number)=>void }) {
 
     return (
         <TableHead>
@@ -26,9 +26,9 @@ function Head({ columnGroups }: { columnGroups: { name: string, columns: string[
                 <StyledTableCell style={{ fontWeight: "bold" }}>
                     id
                 </StyledTableCell>
-                {columnGroups.map((group) => (
-                    group.columns.map((columnName) => (
-                    <StyledTableCell style={{ fontWeight: "bold" }}>
+                {columnGroups.map((group, group_index) => (
+                    group.columns.map(columnName => (
+                    <StyledTableCell style={{ fontWeight: "bold" }} onClick={(item) => {callBack(group_index)}}>
                         {columnName}
                     </StyledTableCell>
                 ))))}
@@ -46,6 +46,15 @@ function RenderRow(props: Row) {
             return <>{props.data === "*yes*" ? <CheckIcon fontSize="small" htmlColor="green"/> : props.data }</>
         }
     }
+
+    props.columns = props.columns.map(col => col.filter((value, index) => {
+        for (let i = 0; i < index; ++i) {
+            if (col[i].data == value.data) {
+                return false;
+            }
+        }
+        return true;
+    }))
 
     return (
         <TableRow>
@@ -89,13 +98,42 @@ export default function MainTable(props: TableData) {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     }
+
+    let sortTable = (index: number) => {
+        /*console.log("sorting")
+        console.log(props.rows)
+        props.rows.sort((rowl ,rowr) => {
+            console.log(rowl)
+            console.log(rowr)
+            if (rowl === undefined) {
+                return 1
+            }
+            if (rowr === undefined) {
+                return -1
+            }
+            // @ts-ignore
+            console.log(rowl[index])
+            // @ts-ignore
+            console.log(rowr[index])
+            // @ts-ignore
+            if (rowl[index].data < rowr[index].data) {
+                return -1;
+                // @ts-ignore
+            } else if (rowl[index] === rowr[index]) {
+                return 0;
+            }
+            return 1;
+        })
+        console.log(props.rows)*/
+    }
+
     console.log(props.rows)
     console.log(props.column_groups)
     return (
         <Box component={Card}>
             <TableContainer>
                 <Table size="small" stickyHeader>
-                    <Head columnGroups={props.column_groups}/>
+                    <Head columnGroups={props.column_groups} callBack={sortTable}/>
                     <TableBody>
                         {props.rows
                             .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
