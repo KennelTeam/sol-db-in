@@ -157,6 +157,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             query = query.filter_by(_row_question_id=row_question_id)
         if form_id is not None:
             query = query.filter_by(_form_id=form_id)
+
         return query
 
     @property
