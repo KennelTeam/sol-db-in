@@ -212,12 +212,17 @@ export function ChoiceFilter({ setFilter, variants } : MultipleFilterProps) {
     const { t } = useTranslation('translation', { keyPrefix: "filters" })
 
     const [checked, setChecked] = React.useState<string[]>([])
-
+    console.log("checked")
+    console.log(checked)
+    console.log(variants)
     const handleChange = (event: SelectChangeEvent<string[]>) => {
         setChecked(event.target.value as string[])
     }
     
     useEffect(() => {
+        if (checked.length == 0) {
+            setChecked(variants.map(item => item.name))
+        }
         setFilter({
             question_id: 0,
             exact_values: checked.map((name: string) => (

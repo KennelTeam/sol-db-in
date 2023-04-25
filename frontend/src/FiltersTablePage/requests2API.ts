@@ -121,8 +121,8 @@ export async function getFilteredTableData(data: FiltersRequestData,
             const tableData : TableData = {
                 headColumns: responseData.table.map((column, idx) => ({
                     name: column.column_name,
-                    numeric: column.values[0].answers.length > 0 &&
-                        column.values[0].answers[0].type === 'NUMBER',
+                    numeric: column.values.length > 0 && column.values[0].answers.length > 0
+                        && column.values[0].answers[0].type === 'NUMBER',
                     id: idx
                 })),
                 rows: []

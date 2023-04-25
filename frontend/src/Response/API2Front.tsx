@@ -79,7 +79,7 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>,
 
     switch (question.question_type) {
         case SimpleQuestionType.NUMBER: {
-            let initialValue = answers.length > 0 ? answers[0].value : -1;
+            let initialValue = answers.length > 0 ? answers[0].value : undefined;
             questionData = {
                 label: question.text,
                 initialValue: initialValue as number

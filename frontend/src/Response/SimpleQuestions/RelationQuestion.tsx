@@ -2,7 +2,7 @@ import React, {SyntheticEvent, useEffect, useState} from "react"
 import { Autocomplete, IconButton, TextField } from '@mui/material'
 import { Stack } from "@mui/system"
 import { AnswerVariant } from "../../FiltersTablePage/TypedFilters"
-import { getObjectsList, makeNewObject } from "../../FiltersTablePage/requests"
+import { getObjectsList, makeNewObject } from "../../FiltersTablePage/requests2API"
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material"
 import AddIcon from '@material-ui/icons/Add'
 import { CommonQuestionProperties } from "./common"
@@ -72,11 +72,11 @@ export default function RelationQuestion(props: {
             })
         }
     }
-
+    let found = variants.filter((v) => (v.name === inputValue)).length > 0
     return (
         <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-start">
             <Autocomplete
-                sx={{ width: 300 }}
+                sx={{ width: 200 }}
                 options={variants}
                 disableCloseOnSelect
                 getOptionLabel={(option) => (typeof option === 'string' ? option : option.name)}

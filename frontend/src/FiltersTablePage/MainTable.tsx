@@ -17,22 +17,23 @@ const StyledTableCell = styled(TableCell)({
     margin: 3,
     textAlign: "center"
 })
-
 function descendingComparator(a: Row, b: Row, orderBy: number) {
+    let a_n: number | string = 0;
+    let b_n: number | string = 0;
     try {
-        const a_n = a.columns[orderBy].length > 0 ? Number(a.columns[orderBy][0].data) : 0,
-            b_n = b.columns[orderBy].length > 0 ? Number(b.columns[orderBy][0].data) : 0
-        if (b_n < a_n) {
-            return -1;
-        }
-        if (b_n > a_n) {
-            return 1;
-        }
-        return 0
+        a_n = a.columns[orderBy].length > 0 ? Number(a.columns[orderBy][0].data) : 0
+        b_n = b.columns[orderBy].length > 0 ? Number(b.columns[orderBy][0].data) : 0
     } catch(e) {
-        console.log("Comparing exception:", e)
-        return 0
+        a_n = a.columns[orderBy].length > 0 ? a.columns[orderBy][0].data : ""
+        b_n = b.columns[orderBy].length > 0 ? b.columns[orderBy][0].data : ""
     }
+    if (b_n < a_n) {
+        return -1;
+    }
+    if (b_n > a_n) {
+        return 1;
+    }
+    return 0
 }
   
 type Order = 'asc' | 'desc';
@@ -97,7 +98,6 @@ function Head(props: HeadProps) {
     (newOrderBy: number) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, newOrderBy);
     }
-
     return (
         <TableHead>
             <TableRow>
@@ -139,6 +139,18 @@ function RenderRow(props: Row) {
         }
     }
 
+    props.columns = props.columns.map(col => col.filter((value, index) => {
+        if (col[index].data == "DELETED") {
+            return false;
+        }
+        for (let i = 0; i < index; ++i) {
+            if (col[i].data == value.data) {
+                return false;
+            }
+        }
+        return true;
+    }))
+
     return (
         <TableRow>
             <StyledTableCell>{props.id}</StyledTableCell>
@@ -170,7 +182,7 @@ function RenderRow(props: Row) {
 export default function MainTable(props: TableData) {
     const { t } = useTranslation('translation', { keyPrefix: "filters" })
 
-    const [rowsPerPage, setRowsPerPage] = useState(10)
+    const [rowsPerPage, setRowsPerPage] = useState(50)
     const [page, setPage] = useState<number>(0)
     const [order, setOrder] = useState<Order>('asc');
     const [orderBy, setOrderBy] = useState<number>(0)
@@ -184,7 +196,6 @@ export default function MainTable(props: TableData) {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     }
-    console.log(visibleRows)
     console.log(props.headColumns)
 
     const handleRequestSort = (event: React.MouseEvent<unknown>, newOrderBy: number) => {

@@ -33,7 +33,8 @@ def prettify_answer(answer: Answer) -> JSON:
     elif question.question_type == QuestionType.RELATION:
         if isinstance(answer.value, int):
             result['ref_id'] = answer.value
-            result['value'] = Form.get_by_ids({answer.value})[0].name
+            items = Form.get_by_ids({answer.value})
+            result['value'] = items[0].name if len(items) > 0 else "DELETED"
             result['relation_type'] = question.relation_settings.relation_type.name
         else:
             result['value'] = answer.value

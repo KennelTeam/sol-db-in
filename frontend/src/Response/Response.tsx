@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 
 interface IndexedData {
-    [key: number]: SimpleQuestionTypesList
+    [key: string]: SimpleQuestionTypesList
 }
 
 
@@ -31,23 +31,26 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
     const onItemChanged = (changedAnswer: SimpleQuestionTypesList) => {
         console.log("ONITEMCHANGED")
         console.log(changedAnswer)
-        if (changedAnswer.initialValue !== false && changedAnswer.deleted === true) {
-            if (resultData[changedAnswer.uid] !== undefined) {
-                delete resultData[changedAnswer.uid]
+        let key = changedAnswer.uid.toString() + "/" + changedAnswer.table_row?.toString()
+        console.log(key)
+        if (changedAnswer.initialValue !== false && changedAnswer.deleted) {
+            if (changedAnswer.deleted === true && resultData[key] !== undefined) {
+                delete resultData[key]
             }
         } else {
-            resultData[changedAnswer.uid] = changedAnswer
+            resultData[key] = changedAnswer
         }
     }
 
     const blocksComponents = responseData.blocks.map(
         (blockData) => {return <Block onChange={onItemChanged} blockData={blockData} />}
     )
-    let resultData: IndexedData = []
+    let resultData: IndexedData = {}
 
     const onSubmit = (e: SyntheticEvent) => {
         e.preventDefault()
         console.log("ONSUBMIT")
+        console.log(resultData)
         let answers = []
         for (let ans in resultData) {
             console.log(resultData[ans])
@@ -76,6 +79,8 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
             deleted: deleted
         }, navigate).then((response: any) => {
             console.log(response)
+        }).then((_) => {
+            window.location.reload();
         })
     }
 
@@ -93,7 +98,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
                     nameParts[1],
                     nameParts[2]
                 ])
-                setName(nameParts[0] + ' ' +
+                setName(event.target.value + ' ' +
                     nameParts[1] + ' ' +
                     nameParts[2])
             }}
@@ -111,7 +116,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
                     nameParts[2]
                 ])
                 setName(nameParts[0] + ' ' +
-                    nameParts[1] + ' ' +
+                    event.target.value + ' ' +
                     nameParts[2])
             }}
         />
@@ -129,7 +134,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
                 ])
                 setName(nameParts[0] + ' ' +
                     nameParts[1] + ' ' +
-                    nameParts[2])
+                    event.target.value)
             }}
         /></Box>
     } else {

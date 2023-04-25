@@ -20,11 +20,13 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
                                      default=None)
     _fixed_table_id = FlaskApp().db.Column('fixed_table_id', FlaskApp().db.ForeignKey('fixed_tables.id'), nullable=True,
                                            default=None)
+    _default_filter = FlaskApp().db.Column('default_filter', FlaskApp().db.Boolean(), default=False)
 
     _cached = None
 
     def __init__(self, block_sorting: int, block_id: int, table_row: int = None, table_id: int = None,
-                 table_column: int = None, show_on_main_page: bool = False, fixed_table_id: int = None):
+                 table_column: int = None, show_on_main_page: bool = False, fixed_table_id: int = None,
+                 default_filter: bool = None):
 
         super().__init__()
         self.block_sorting = block_sorting
@@ -35,6 +37,7 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
         self._block_id = block_id
         self._table_id = table_id
         self._fixed_table_id = fixed_table_id
+        self._default_filter = default_filter
 
     def to_json(self) -> JSON:
         return super().to_json() | {
@@ -44,7 +47,8 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
             'show_on_main_page': self.show_on_main_page,
             'block_id': self.block_id,
             'table_id': self.table_id,
-            'fixed_table_id': self.fixed_table_id
+            'fixed_table_id': self.fixed_table_id,
+            'default_filter': self.default_filter
         }
 
     @staticmethod
@@ -144,6 +148,14 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
     @property
     def block_id(self) -> int:
         return self._block_id
+
+    @property
+    def default_filter(self) -> bool:
+        return self._default_filter
+
+    @default_filter.setter
+    def default_filter(self, new_val: bool) -> None:
+        self._default_filter = new_val
 
     @property
     def block_sorting(self) -> int:

@@ -153,8 +153,8 @@ class Question(Editable, FlaskApp().db.Model):
             return q.form_type == form_type
 
         questions = filter(form_type_filter, questions)
-        counted_questions_inverse = filter(form_type_filter, counted_questions_inverse)
-        counted_questions_forward = filter(form_type_filter, counted_questions_forward)
+        counted_questions_inverse = list(filter(form_type_filter, counted_questions_inverse))
+        counted_questions_forward = list(filter(form_type_filter, counted_questions_forward))
 
         result = [{
             'type': AnswerType.VALUE,
