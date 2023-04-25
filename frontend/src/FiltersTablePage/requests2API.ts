@@ -4,6 +4,7 @@ import { FormsResponse, ColumnGroup, Row } from './_testFunctions'
 import i18next, { i18n } from "i18next"
 import axios, { AxiosError } from "axios"
 import { NavigateFunction, useNavigate } from "react-router-dom"
+import { TableData, HeadColumn } from "./MainTable"
 
 interface TranslatedText {
     [language: string]: string
@@ -19,11 +20,6 @@ interface AnswerBlockResponse {
 interface FiltersRequestData {
     form_type: 'LEADER' | 'PROJECT',
     answer_filters: string
-}
-
-export interface TableData {
-    column_groups: ColumnGroup[]
-    rows: Row[]
 }
 
 export function getLanguage() {
@@ -123,9 +119,11 @@ export async function getFilteredTableData(data: FiltersRequestData,
             console.log("Forms request with data:", data, "returns", response.status, response.data)
             const responseData = <FormsResponse>response.data
             const tableData : TableData = {
-                column_groups: responseData.table.map((column) => ({
+                headColumns: responseData.table.map((column, idx) => ({
                     name: column.column_name,
-                    columns: [column.column_name]
+                    numeric: column.values[0].answers.length > 0 &&
+                        column.values[0].answers[0].type === 'NUMBER',
+                    id: idx
                 })),
                 rows: []
             }
@@ -151,7 +149,7 @@ export async function getFilteredTableData(data: FiltersRequestData,
             console.log("Error while requesting /forms:", error)
             handleError(navigate, error)
             return {
-                column_groups: [],
+                headColumns: [],
                 rows: []
             }
         })

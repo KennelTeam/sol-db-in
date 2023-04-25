@@ -5,9 +5,9 @@ import ClearIcon from '@material-ui/icons/Clear'
 import AddIcon from '@material-ui/icons/Add'
 import * as Test from './_testFunctions'
 import { NumberFilter, TextFilter, CheckboxFilter, ChoiceFilter, AutocompleteChoiceFilter, DateFilter, AnswerFilter, AnswerVariant } from './TypedFilters'
-import { getUsersList, getAnswersList, getObjectsList, getToponymsList, getFilteredTableData, TableData, makeNewObject } from "./requests2API";
+import { getUsersList, getAnswersList, getObjectsList, getToponymsList, getFilteredTableData, makeNewObject } from "./requests2API";
 import { useState, useEffect, useRef } from "react";
-import MainTable from "./MainTable";
+import MainTable, { TableData } from "./MainTable";
 import { useImmer } from "use-immer"
 import { useTranslation } from 'react-i18next'
 import i18next from "i18next";
@@ -163,7 +163,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
     })
     const [filtersData, changeFiltersData] = useImmer<AnswerFilter[]>([])
     const [tableData, setTableData] = useState<TableData>({
-        column_groups: [],
+        headColumns: [],
         rows: []
     })
     const isInitialMount = useRef(true)
@@ -308,7 +308,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
             </Box>
             <h2>{t('table')}</h2>
             <Card>
-                <MainTable {...tableData}/>
+                <MainTable {...JSON.parse(JSON.stringify(tableData))}/>
             </Card>
         </Stack>
     )
