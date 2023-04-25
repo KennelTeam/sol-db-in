@@ -49,6 +49,7 @@
     },
 
     "filters": {
+        "name_search": "Name search",
         "title": "Filters",
         "equals": "equals",
         "contains": "contains",

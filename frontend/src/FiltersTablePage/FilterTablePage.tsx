@@ -6,7 +6,7 @@ import AddIcon from '@material-ui/icons/Add'
 import * as Test from './_testFunctions'
 import { NumberFilter, TextFilter, CheckboxFilter, ChoiceFilter, AutocompleteChoiceFilter, DateFilter, AnswerFilter, AnswerVariant } from './TypedFilters'
 import { getUsersList, getAnswersList, getObjectsList, getToponymsList, getFilteredTableData, TableData, makeNewObject } from "./requests2API";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import MainTable from "./MainTable";
 import { useImmer } from "use-immer"
 import { useTranslation } from 'react-i18next'
@@ -164,6 +164,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
         type: AnswerType.Text,
         default_filter: false
     })
+    const [name_substr, setNameSubstr] = useState<string>("")
     const [filtersData, changeFiltersData] = useImmer<AnswerFilter[]>([])
     const [tableData, setTableData] = useState<TableData>({
         column_groups: [],
@@ -214,7 +215,8 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
                 "utf8")
         const body = {
             form_type: formType,
-            answer_filters: buf.toString("base64")
+            answer_filters: buf.toString("base64"),
+            name_substr: name_substr
         }
         getFilteredTableData(body, navigate).then((data) => {
             console.log("New Table data:", data)
@@ -296,6 +298,15 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
             <List disablePadding>
                 {filtersList}
             </List>
+            <TextField
+                size="small"
+                label={t('name_search')}
+                value={name_substr}
+                onChange={(event) => {setNameSubstr(event.target.value)}}
+                InputLabelProps={{
+                    shrink: true,
+                }}
+            />
             <Card>
                 <Stack direction="row" spacing={1} padding={2} alignItems="center">
                     <Typography variant="caption">Add filter:</Typography>

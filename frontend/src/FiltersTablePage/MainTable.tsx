@@ -48,6 +48,9 @@ function RenderRow(props: Row) {
     }
 
     props.columns = props.columns.map(col => col.filter((value, index) => {
+        if (col[index].data == "DELETED") {
+            return false;
+        }
         for (let i = 0; i < index; ++i) {
             if (col[i].data == value.data) {
                 return false;
