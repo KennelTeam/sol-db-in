@@ -31,7 +31,7 @@ class FormState(Enum):
 class Form(Editable, FlaskApp().db.Model):
     __tablename__ = 'forms'
     _state = FlaskApp().db.Column('state', FlaskApp().db.Enum(FormState))
-    _name = FlaskApp().db.Column('name', VARCHAR(MAX_NAME_SIZE), unique=True)
+    _name = FlaskApp().db.Column('name', VARCHAR(MAX_NAME_SIZE))
     _form_type = FlaskApp().db.Column('form_type', FlaskApp().db.Enum(FormType))
 
     _cached = None
@@ -67,6 +67,8 @@ class Form(Editable, FlaskApp().db.Model):
         name_pattern = f"%{name_substr}%"
         name_condition = Form._name.like(name_pattern)
         name_search = FlaskApp().request(Form).filter(name_condition)
+        if question_id == -1:
+            return {item.id for item in name_search.all()}
 
         ids = Answer.get_distinct_filtered(question_id, exact_values, min_value, max_value, substring, row_question_id)
         query = name_search.filter(Form.id.in_(ids))
