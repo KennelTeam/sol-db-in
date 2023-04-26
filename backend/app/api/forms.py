@@ -55,7 +55,7 @@ class Forms(Resource):
             return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
 
         form_type = FormType[arguments['form_type']]
-        ids = Form.filter(arguments['name_substr'], -1)
+        ids = Form.get_all_ids(form_type) & Form.filter(arguments['name_substr'], -1)
         for item in answer_filters:
             if not isinstance(item, dict):
                 return get_failure(HTTPErrorCode.INVALID_ARG_LOCATION, 400)
