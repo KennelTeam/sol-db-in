@@ -1,6 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 import os
+from pathlib import Path
 
 from sqlalchemy import NullPool
 from sqlalchemy.orm import Query
@@ -41,6 +42,8 @@ class FlaskApp(metaclass=Singleton):
         self.app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
             'poolclass': NullPool,
         }
+        self.app.config['UPLOAD_FOLDER'] = 'uploads'
+        Path(os.path.join(self.app.root_path, self.app.config['UPLOAD_FOLDER'])).mkdir(exist_ok=True)
         CORS(self.app, supports_credentials=True)
         self._configure_api()
         self._configure_db()
