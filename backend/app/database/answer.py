@@ -114,12 +114,17 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
 
     @staticmethod
     def count_inverse_answers(form_id: int, question_id: int) -> int:
-        return Answer.count_distinct_answers(FlaskApp().request(Answer).filter_by(value_int=form_id), question_id)
+        return Answer.count_distinct_inverse_answers(FlaskApp().request(Answer).filter_by(value_int=form_id), question_id)
+
+    @staticmethod
+    def count_distinct_inverse_answers(query: Query, question_id: int):
+        query = query.filter_by(_question_id=question_id).with_entities(Answer._form_id).distinct(Answer._form_id)
+        return query.group_by(Answer._form_id).count()
 
     @staticmethod
     def count_distinct_answers(query: Query, question_id: int):
-        query = query.filter_by(_question_id=question_id)
-        return query.distinct().count()
+        query = query.filter_by(_question_id=question_id).with_entities(Answer._table_row).distinct(Answer._table_row)
+        return query.group_by(Answer._table_row).count()
 
     @staticmethod
     def filter(question_id: int = None, row_question_id: int = None, form_id: int = None,
@@ -152,6 +157,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             query = query.filter_by(_row_question_id=row_question_id)
         if form_id is not None:
             query = query.filter_by(_form_id=form_id)
+
         return query
 
     @property

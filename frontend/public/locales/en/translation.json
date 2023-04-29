@@ -49,6 +49,7 @@
     },
 
     "filters": {
+        "name_search": "Name search",
         "title": "Filters",
         "equals": "equals",
         "contains": "contains",
@@ -76,7 +77,22 @@
             "add": "Add \"{}\" translation"
         }
     },
-
+    
+    "dynamic_table": {
+        "confirm_delete": {
+            "title": "Confirm deleting",
+            "description": "Are you sure to delete last relation?",
+            "cancel": "Cancel",
+            "confirm": "Delete"
+        },
+        "confirm_add_object": {
+            "title": "Confirm adding",
+            "description": "Are you sure to add new leader/project to the database?",
+            "cancel": "Cancel",
+            "confirm": "Add"
+        }
+    },
+    
     "response": {
         "name": "Name",
         "surname": "Surname",

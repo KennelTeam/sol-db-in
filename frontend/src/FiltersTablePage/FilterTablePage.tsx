@@ -5,9 +5,9 @@ import ClearIcon from '@material-ui/icons/Clear'
 import AddIcon from '@material-ui/icons/Add'
 import * as Test from './_testFunctions'
 import { NumberFilter, TextFilter, CheckboxFilter, ChoiceFilter, AutocompleteChoiceFilter, DateFilter, AnswerFilter, AnswerVariant } from './TypedFilters'
-import { getUsersList, getAnswersList, getObjectsList, getToponymsList, getFilteredTableData, TableData, makeNewObject } from "./requests2API";
+import { getUsersList, getAnswersList, getObjectsList, getToponymsList, getFilteredTableData, makeNewObject } from "./requests2API";
 import { useState, useEffect, useRef } from "react";
-import MainTable from "./MainTable";
+import MainTable, { TableData } from "./MainTable";
 import { useImmer } from "use-immer"
 import { useTranslation } from 'react-i18next'
 import i18next from "i18next";
@@ -16,6 +16,7 @@ import { Buffer } from "buffer";
 import { Link, useNavigate } from "react-router-dom";
 
 interface QuestionAttributes {
+    default_filter: boolean | null,
     id: number,
     text: string,
     type: AnswerType
@@ -31,6 +32,7 @@ export interface FormResponse {
         questions: {
             type: string,
             value: {
+                formatting_settings: object;
                 id: number,
                 question_type: 'DATE' | 'USER' | 'LONG_TEXT' | 'SHORT_TEXT' | 
                 'MULTIPLE_CHOICE' |'CHECKBOX' | 'LOCATION' | 'NUMBER' | 'BOOLEAN' | 'RELATION',
@@ -38,7 +40,8 @@ export interface FormResponse {
                 relation_settings: {
                     relation_type: 'LEADER' | 'PROJECT'
                 } | any,
-                answer_block_id: number
+                answer_block_id: number,
+                default_filter: boolean
             }
         }[]
     }[]
@@ -159,11 +162,12 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
         id: -1,
         text: "Loading...",
         type: AnswerType.Text,
-
+        default_filter: false
     })
+    const [name_substr, setNameSubstr] = useState<string>("")
     const [filtersData, changeFiltersData] = useImmer<AnswerFilter[]>([])
     const [tableData, setTableData] = useState<TableData>({
-        column_groups: [],
+        headColumns: [],
         rows: []
     })
     const isInitialMount = useRef(true)
@@ -173,8 +177,18 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
         changeFiltersData(draft => { draft.splice(idx, 1, newValue) })
     }
 
-    const handleAdd = () => {
-        const newQuestionData = questions.filter(question => (question.id === newQuestion.id))
+    const add = (nQuestions: QuestionAttributes[], questions: QuestionAttributes[]) => {
+        console.log("ADDING")
+        const newQuestionData = questions.filter(question => {
+            for (let q of nQuestions) {
+                if (q.id === question.id) {
+                    return true;
+                }
+            }
+            return false;
+        })
+        console.log(newQuestionData)
+        console.log(questions)
         if (newQuestionData.length === 0) {
             return
         }
@@ -183,13 +197,17 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
         console.log(filtersData)
 
         setFiltersList([...filtersList,
-            <SingleFilter {...newQuestionData[0]} setFilter={(newValue: AnswerFilter) => {
+        ...newQuestionData.map(item => <SingleFilter {...item} setFilter={(newValue: AnswerFilter) => {
                 if (newValue.question_id !== -1) {
-                    newValue.question_id = newQuestionData[0].id
+                    newValue.question_id = item.id
                 }
                 changeFilters(newValue, idx)
-            }}/>
+            }}/>)
         ])
+    }
+
+    const handleAdd = () => {
+        add([newQuestion], questions)
     }
 
     const handleSubmitFilter = () => {
@@ -197,7 +215,8 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
                 "utf8")
         const body = {
             form_type: formType,
-            answer_filters: buf.toString("base64")
+            answer_filters: buf.toString("base64"),
+            name_substr: name_substr
         }
         getFilteredTableData(body, navigate).then((data) => {
             console.log("New Table data:", data)
@@ -246,13 +265,21 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
                                     id: questionResponse.value.id,
                                     text: questionResponse.value.text[i18next.language.split('-', 1)[0]],
                                     type: qType,
-                                    answer_block_id: questionResponse.value.answer_block_id
+                                    answer_block_id: questionResponse.value.answer_block_id,
+                                    // @ts-ignore
+                                    default_filter: questionResponse.value.formatting_settings.default_filter
                                 })
                             }
                         })
                     })
                     setQuestions(newQuestions)
+
                     setNewQuestion(newQuestions[0])
+                    console.log("THERETHERE")
+                    add(newQuestions.filter((q) => {
+                        console.log(q)
+                        return q.default_filter}), newQuestions)
+
                 })
                 .catch((error) => {
                     console.log("Error while accessing to the /form: ", error)
@@ -271,6 +298,15 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
             <List disablePadding>
                 {filtersList}
             </List>
+            <TextField
+                size="small"
+                label={t('name_search')}
+                value={name_substr}
+                onChange={(event) => {setNameSubstr(event.target.value)}}
+                InputLabelProps={{
+                    shrink: true,
+                }}
+            />
             <Card>
                 <Stack direction="row" spacing={1} padding={2} alignItems="center">
                     <Typography variant="caption">Add filter:</Typography>
@@ -308,7 +344,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
             </Box>
             <h2>{t('table')}</h2>
             <Card>
-                <MainTable {...tableData}/>
+                <MainTable {...JSON.parse(JSON.stringify(tableData))}/>
             </Card>
         </Stack>
     )

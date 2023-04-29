@@ -24,6 +24,7 @@ class FormSchema(Resource):
         FlaskApp().set_language(ALL_LANGUAGES_TAG)
         parser = GetRequestParser()
         parser.add_argument('form_type', type=str, required=True)
+        parser.add_argument('filter_only', type=bool, required=False, default=False)
         if parser.error is not None:
             return parser.error
         form_type = parser.parse_args()['form_type']

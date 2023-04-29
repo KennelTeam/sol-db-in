@@ -3,9 +3,11 @@ import { Autocomplete, IconButton, TextField } from '@mui/material'
 import { Stack } from "@mui/system"
 import { AnswerVariant } from "../../FiltersTablePage/TypedFilters"
 import { getObjectsList, makeNewObject } from "../../FiltersTablePage/requests2API"
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material"
 import AddIcon from '@material-ui/icons/Add'
 import { CommonQuestionProperties } from "./common"
 import {APIOption} from "../APIObjects";
+import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 
 export interface RelationQuestionProps extends CommonQuestionProperties{
@@ -21,6 +23,9 @@ export default function RelationQuestion(props: {
     const [variants, setVariants] = useState<AnswerVariant[]>([])
     const [value, setValue] = useState<AnswerVariant>(questionData.initialValue as AnswerVariant)
     const [inputValue, setInputValue] = useState<string>(questionData.initialValue ? questionData.initialValue.name : "")
+    const [addDialogOpen, setOpen] = useState(false)
+
+    const {t} = useTranslation("translation", { keyPrefix: "dynamic_table" })
     const navigate = useNavigate()
 
     const handleChange = (event: SyntheticEvent, newValue: string | AnswerVariant | null) => {
@@ -67,11 +72,11 @@ export default function RelationQuestion(props: {
             })
         }
     }
-
+    let found = variants.filter((v) => (v.name === inputValue)).length > 0
     return (
         <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-start">
             <Autocomplete
-                sx={{ width: 300 }}
+                sx={{ width: 200 }}
                 options={variants}
                 disableCloseOnSelect
                 getOptionLabel={(option) => (typeof option === 'string' ? option : option.name)}
@@ -84,6 +89,9 @@ export default function RelationQuestion(props: {
                     <TextField
                         {...params}
                         size="small"
+                        sx={{ input: {
+                            color: (variants.filter((v) => (v.name === inputValue)).length === 0) ? 'red' : 'inherit'
+                        } }}
                         label={questionData.label}
                         inputProps={{
                             ...params.inputProps,
@@ -93,9 +101,39 @@ export default function RelationQuestion(props: {
                     </TextField>
                 )}
             />
-            <IconButton onClick={handleAddObject} disabled={variants.filter((v) => (v.name === inputValue)).length > 0}>
-                <AddIcon htmlColor="green" fontSize="small"/>
+            <IconButton onClick={() => { setOpen(true) }} disabled={variants.filter((v) => (v.name === inputValue)).length > 0}>
+                <AddIcon htmlColor={
+                    variants.filter((v) => (v.name === inputValue)).length > 0 ? "grey": "green"}
+                    fontSize="small"/>
             </IconButton>
+            <Dialog
+                open={addDialogOpen}
+                onClose={() => {
+                    setOpen(false)
+                }}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                {t("confirm_add_object.title")}
+                </DialogTitle>
+                <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                    {t("confirm_add_object.description")}
+                </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={() => {
+                    setOpen(false)
+                }}>{t("confirm_add_object.cancel")}</Button>
+                <Button onClick={() => {
+                    setOpen(false)
+                    handleAddObject()
+                }} autoFocus>
+                    {t("confirm_add_object.confirm")}
+                </Button>
+                </DialogActions>
+            </Dialog>
         </Stack>
     )
 }

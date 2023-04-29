@@ -16,7 +16,7 @@ class Users(Resource):
 
     @staticmethod
     @jwt_required()
-    @get_request(Role.ADMIN)
+    @get_request(Role.INTERN)
     def get() -> Response:
         return Response(json.dumps([user.to_json() for user in User.get_all_users()]), 200)
 

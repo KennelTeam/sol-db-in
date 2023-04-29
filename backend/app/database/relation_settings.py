@@ -81,12 +81,11 @@ class RelationSettings(Editable, FlaskApp().db.Model):
 
     @staticmethod
     def get_main_page_count_presented(form_type: FormType) -> Tuple[List[int], List[int]]:
-        forward_query = FlaskApp().request(RelationSettings).filter(RelationSettings._main_page_count_title is not None)
-        forward_query = forward_query.with_entities(RelationSettings.id)
+        forward_query = FlaskApp().request(RelationSettings).filter(RelationSettings._main_page_count_title.is_not(None))
         forward = [item.id for item in forward_query.all()]
 
         inverse_query = FlaskApp().request(RelationSettings).filter_by(_relation_type=form_type)\
-            .filter(RelationSettings._inverse_main_page_count_title is not None).with_entities(RelationSettings.id)
+            .filter(RelationSettings._inverse_main_page_count_title.is_not(None)).with_entities(RelationSettings.id)
         inverse = [item.id for item in inverse_query.all()]
         return forward, inverse
 
@@ -107,6 +106,8 @@ class RelationSettings(Editable, FlaskApp().db.Model):
 
     @property
     def main_page_count_title(self) -> TranslatedText:
+        if self._main_page_count_title is None:
+            return None
         return json.loads(self._main_page_count_title)
 
     @main_page_count_title.setter
@@ -117,6 +118,8 @@ class RelationSettings(Editable, FlaskApp().db.Model):
 
     @property
     def inverse_main_page_count_title(self) -> TranslatedText:
+        if self._inverse_main_page_count_title is None:
+            return None
         return json.loads(self._inverse_main_page_count_title)
 
     @inverse_main_page_count_title.setter
