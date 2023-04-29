@@ -4,7 +4,7 @@ from typing import Final
 
 import numpy as np
 import pandas as pd
-from flask import send_from_directory
+from flask import send_from_directory, Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 from pandas import DataFrame
@@ -25,9 +25,9 @@ class DatabaseExcelExport(Resource):
     @staticmethod
     @jwt_required()
     @get_request(Role.ADMIN)
-    def get():
-        leaders_export_df = DatabaseExcelExport.export_form(form_type=FormType.LEADER)
-        projects_export_df = DatabaseExcelExport.export_form(form_type=FormType.PROJECT)
+    def get() -> Response:
+        leaders_export_df = DatabaseExcelExport._export_form(form_type=FormType.LEADER)
+        projects_export_df = DatabaseExcelExport._export_form(form_type=FormType.PROJECT)
 
         uploads_path = os.path.join(FlaskApp().app.root_path, FlaskApp().app.config['UPLOAD_FOLDER'])
         file_name = 'forms.xlsx'
@@ -38,7 +38,7 @@ class DatabaseExcelExport(Resource):
         return send_from_directory(directory=uploads_path, path=file_name)
 
     @staticmethod
-    def export_form(form_type: FormType) -> DataFrame:
+    def _export_form(form_type: FormType) -> DataFrame:
         connection = FlaskApp().db.session.connection()
 
         answers_query = FlaskApp().request(Answer).filter(Answer._form_id.in_(Form.get_all_ids(form_type=form_type)))
@@ -94,7 +94,7 @@ class DatabaseExcelExport(Resource):
         answers_df['export_value'].loc[answers_df['question_type'] == QuestionType.MULTIPLE_CHOICE] = answers_df['localized_answer_option']
         answers_df['export_value'].loc[answers_df['question_type'] == QuestionType.RELATION] = answers_df['related_form_name']
 
-        cross_table = pd.crosstab(answers_df['form_id'], answers_df['localized_text'],values=answers_df['export_value'], aggfunc=lambda x: ', '.join(map(str, x)))
+        cross_table = pd.crosstab(answers_df['form_id'], answers_df['localized_text'], values=answers_df['export_value'], aggfunc=lambda x: ', '.join(map(str, x)))
 
         sorting_df = answers_df[['localized_text', 'block_sorting', 'sorting']].drop_duplicates(subset='localized_text')
         sorting_df.sort_values(['sorting', 'block_sorting'], inplace=True)
