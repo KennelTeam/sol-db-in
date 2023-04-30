@@ -4,9 +4,14 @@ import requests
 import json
 from tqdm import tqdm
 
+from backend.auxiliary.misc import get_sol_db_logger
+
 from .toponym import Toponym
 from backend.constants import TOPONYMS_TABLE_URL, TOPONYMS_REQUEST_TIMEOUT
 from backend.app.flask_app import FlaskApp
+
+
+logger = get_sol_db_logger('flask-server')
 
 
 def import_toponyms():
@@ -22,12 +27,12 @@ def import_toponyms():
 
         names = {city['admin_name'] for city in cities}
         regions = {name: Toponym(name, indonesia.id) for name in names}
-        print("Creating regions...")
+        logger.debug('Creating regions...')
         for region in tqdm(regions.values()):
             FlaskApp().add_database_item(region)
         FlaskApp().flush_to_database()
         total_count = len(regions)
-        print("Creating cities...")
+        logger.debug('Creating cities...')
         for city in tqdm(cities):
             if city['city'] not in names:
                 new_city = Toponym(city['city'], regions[city['admin_name']].id)
@@ -35,4 +40,4 @@ def import_toponyms():
                 names.add(city['city'])
                 total_count += 1
         FlaskApp().flush_to_database()
-        print(f"Successfully imported {total_count} toponyms")
+        logger.debug(f'Successfully imported {total_count} toponyms')

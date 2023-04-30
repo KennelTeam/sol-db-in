@@ -145,7 +145,6 @@ class Questions(Resource):
         block_id = formatting_json['block_id']
         show_on_main_page = formatting_json['show_on_main_page']
         if QuestionBlock.get_by_id(block_id) is None:
-            print("TTT")
             return None, post_failure(HTTPErrorCode.WRONG_ID, 404)
         table_id, table_column, fail_response = Questions._parse_table_info(formatting_json)
         if fail_response is not None:

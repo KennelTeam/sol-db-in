@@ -1,18 +1,22 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 import os
+from uuid import uuid4
 
 from sqlalchemy import NullPool
 from sqlalchemy.orm import Query
-from flask import Flask, g
+from flask import Flask, g, request
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from cheroot.wsgi import Server, PathInfoDispatcher
+from backend.auxiliary.misc import get_sol_db_logger
 from backend.auxiliary.singleton import Singleton
 from backend.constants import DB_ENGINE, MODE, DB_CHARSET, PORT, NUM_THREADS, REQUEST_CONTEXT_USE_DELETED_ITEMS, \
     DEFAULT_LANGUAGE
 from flask_cors import CORS
 
+
+logger = get_sol_db_logger('flask-server')
 
 class FlaskApp(metaclass=Singleton):
     _app: Flask = None
@@ -49,8 +53,7 @@ class FlaskApp(metaclass=Singleton):
         with self.app.app_context():
             self.db.create_all()
             self.db.session.commit()  # pylint: disable=no-member
-            print("Database initialized")
-        print("init finished")
+        logger.info('Database initialized')
 
     # Request query from editable table
     # I thought to place it in the Editable class, but then realized that calls will be like:
@@ -68,7 +71,7 @@ class FlaskApp(metaclass=Singleton):
         dispatcher = PathInfoDispatcher({'/': self.app})
         server = Server(('0.0.0.0', PORT), dispatcher, numthreads=NUM_THREADS)
         try:
-            print(f"the server is working at http://127.0.0.1:{PORT}")
+            logger.info(f"the server is working at http://127.0.0.1:{PORT}")
             server.start()
         except KeyboardInterrupt:
             server.stop()
@@ -108,11 +111,17 @@ class FlaskApp(metaclass=Singleton):
         return self.db.session.commit()
 
 
+@FlaskApp().app.before_request
+def before_request():
+    logger.info(f'Endpoint {request.method} {request.endpoint} was called')
+
+
 # https://stackoverflow.com/questions/22256862/flask-how-to-store-and-retrieve-a-value-bound-to-the-request
 @FlaskApp().app.after_request
-def pre_request_callbacks(response):
+def after_request(response):
     # clear the dev variables associated with current request
     values = g.get('dev_variables', {})
     values.clear()
+    logger.info(f'Endpoint {request.method} {request.endpoint} was finished with status {response.status_code}')
 
     return response
