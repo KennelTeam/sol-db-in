@@ -84,7 +84,6 @@ class DatabaseExcelExport(Resource):
         ).merge(all_forms_df, left_on='value_int', right_on='id', how='left')
 
         answers_df['localized_text'].loc[answers_df['localized_text_2'].notna()] += ' [' + answers_df['localized_text_2'] + ']'
-        answers_df['localized_text'].loc[answers_df['table_id'].notna()] += ' [' + answers_df['answer_table_row'].astype('Int64').astype(str) + ']'
 
         answers_df['export_value'] = answers_df['value_text']
         answers_df['export_value'].loc[answers_df['question_type'] == QuestionType.USER] = answers_df['user_name']
@@ -93,8 +92,10 @@ class DatabaseExcelExport(Resource):
         answers_df['export_value'].loc[answers_df['question_type'] == QuestionType.CHECKBOX] = answers_df['localized_answer_option']
         answers_df['export_value'].loc[answers_df['question_type'] == QuestionType.MULTIPLE_CHOICE] = answers_df['localized_answer_option']
         answers_df['export_value'].loc[answers_df['question_type'] == QuestionType.RELATION] = answers_df['related_form_name']
+        answers_df['export_value'].loc[answers_df['table_id'].notna()] = answers_df['answer_table_row'].astype('Int64').astype(str) + '. ' + answers_df['export_value'].astype(str)
 
-        cross_table = pd.crosstab(answers_df['form_id'], answers_df['localized_text'], values=answers_df['export_value'], aggfunc=lambda x: ', '.join(map(str, x)))
+        cross_table = pd.crosstab(answers_df['form_id'], answers_df['localized_text'], values=answers_df['export_value'],
+                                  aggfunc=lambda export_value: ', '.join(sorted(map(str, export_value))))
 
         sorting_df = answers_df[['localized_text', 'block_sorting', 'sorting']].drop_duplicates(subset='localized_text')
         sorting_df.sort_values(['sorting', 'block_sorting'], inplace=True)
