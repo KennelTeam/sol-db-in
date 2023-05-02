@@ -4,7 +4,7 @@ frontend/package-lock.json
 __pycache__/
 *.py[cod]
 *$py.class
-
+logs/
 # C extensions
 *.so
 frontend/package-lock.json
