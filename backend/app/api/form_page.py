@@ -7,9 +7,13 @@ from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 
+from backend.auxiliary.misc import get_sol_db_logger
+
 from .auxiliary import HTTPErrorCode, get_failure, get_request, create_id_reqparser
 from backend.app.database.form import Form
 from ..database import QuestionBlock, FormattingSettings, Question, PrivacySettings, User, Toponym
+
+logger = get_sol_db_logger('flask-server')
 
 
 class FormPage(Resource):
@@ -33,7 +37,7 @@ class FormPage(Resource):
         PrivacySettings.upload_cache()
         User.upload_cache()
         Toponym.upload_cache()
-        print('successfully cached')
+        logger.debug('Successfully cached form_page data (wtf why is the cache cleared a few lines below?)')
         blocks = QuestionBlock.get_form(options[0].form_type)
         values = [block.to_json(with_answers=True, form_id=arguments['id']) for block in blocks]
         result = options[0].to_json(with_answers=False) | {
