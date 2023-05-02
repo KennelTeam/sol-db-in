@@ -1,5 +1,6 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved.
+from pathlib import Path
 from typing import Final
 
 
@@ -47,3 +48,4 @@ ALL_LANGUAGES_TAG: Final[str] = 'all'
 MAX_LEADERS_PAGE_SIZE: int = 200
 MAX_PROJECTS_PAGE_SIZE: int = 200
 MAX_COMMENT_SIZE_IN_LEADERS_LIST: int = 10
+LOGS_DIRECTORY = Path(__file__).resolve().parent.parent / 'logs'
