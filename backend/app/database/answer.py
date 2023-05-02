@@ -98,6 +98,14 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
         return item.value_datetime if question_type == QuestionType.DATE else item.value_int
 
     @staticmethod
+    def count_answered_questions(form_id: int) -> int:
+        return FlaskApp().request(Answer).filter_by(_form_id=form_id).with_entities(Answer._question_id).distinct(Answer._question_id).count()
+
+    @staticmethod
+    def count_answered_forms(question_id: int) -> int:
+        return FlaskApp().request(Answer).filter_by(_question_id=question_id).with_entities(Answer._form_id).distinct(Answer._form_id).count()
+
+    @staticmethod
     def get_form_answers(form_id: int, question_id: int = -1) -> List['Answer']:
         if Answer._cached is not None:
             if question_id == -1:

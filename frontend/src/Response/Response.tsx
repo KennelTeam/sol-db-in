@@ -34,12 +34,17 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
         let key = changedAnswer.uid.toString() + "/" + changedAnswer.table_row?.toString()
         console.log(key)
         if (changedAnswer.initialValue !== false && changedAnswer.deleted) {
-            if (changedAnswer.deleted === true && resultData[key] !== undefined) {
-                delete resultData[key]
+            if (changedAnswer.deleted === true) {
+                if (changedAnswer.id != -1) {
+                    resultData[key] = changedAnswer
+                } else if (resultData[key] !== undefined) {
+                    delete resultData[key]
+                }
             }
         } else {
             resultData[key] = changedAnswer
         }
+        console.log(resultData)
     }
 
     const blocksComponents = responseData.blocks.map(

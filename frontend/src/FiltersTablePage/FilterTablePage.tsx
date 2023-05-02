@@ -211,7 +211,18 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
     }
 
     const handleSubmitFilter = () => {
-        const buf = Buffer.from(JSON.stringify(filtersData.filter((filter) => (filter.question_id != -1))),
+        let filters = filtersData.filter((item) => {
+            if (item.exact_values) {
+                if (item.exact_values.length == 0) {
+                    return false;
+                }
+            }
+            return true;
+        })
+        console.log(filters)
+        console.log("FILTERS")
+        console.log(name_substr)
+        const buf = Buffer.from(JSON.stringify(filters.filter((filter) => (filter.question_id != -1))),
                 "utf8")
         const body = {
             form_type: formType,

@@ -221,7 +221,7 @@ export function ChoiceFilter({ setFilter, variants } : MultipleFilterProps) {
     
     useEffect(() => {
         if (checked.length == 0) {
-            setChecked(variants.map(item => item.name))
+            //setChecked(variants.map(item => item.name))
         }
         setFilter({
             question_id: 0,
