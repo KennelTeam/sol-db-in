@@ -12,7 +12,7 @@ info:
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.1
 servers:
-  - url: http://52.192.211.221:5000
+  - url: http:/nsfdb.com/api
 paths:
   /actions:
     get:
@@ -62,6 +62,55 @@ paths:
                 type: array
                 items:
                   $ref: '#components/schemas/Action'
+  /fullness_statistics:
+    get:
+      tags:
+        - statistics
+      description:
+        Statistics about what part of questions are answered
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+            properties:
+              report_type:
+                type: string
+                enum:
+                  - BY_FORM
+                  - BY_QUESTION
+              form_type:
+                type: string
+                enum:
+                  - LEADER
+                  - PROJECT
+            required:
+              - report_type
+              - form_type
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  max_count:
+                    type: number
+                  statistics:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        name:
+                          type: string
+                        count:
+                          type: number
+        400:
+          description: Request parsing error
+
   /login:
     post:
       tags:

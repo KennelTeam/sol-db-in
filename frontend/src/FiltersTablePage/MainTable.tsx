@@ -28,10 +28,10 @@ function descendingComparator(a: Row, b: Row, orderBy: number) {
         b_n = b.columns[orderBy].length > 0 ? b.columns[orderBy][0].data : ""
     }
     if (b_n < a_n) {
-        return -1;
+        return 1;
     }
     if (b_n > a_n) {
-        return 1;
+        return -1;
     }
     return 0
 }
@@ -164,9 +164,9 @@ function RenderRow(props: Row) {
                 } else {
                     return (
                         <StyledTableCell>
-                            <List disablePadding>
+                            <List>
                                 {col.map((element: {data: string, link?: string}) => (
-                                    <ListItem disablePadding>
+                                    <ListItem>
                                         <SingleElement {...element}/>
                                     </ListItem>
                                 ))}
@@ -184,7 +184,7 @@ export default function MainTable(props: TableData) {
 
     const [rowsPerPage, setRowsPerPage] = useState(50)
     const [page, setPage] = useState<number>(0)
-    const [order, setOrder] = useState<Order>('asc');
+    const [order, setOrder] = useState<Order>('desc');
     const [orderBy, setOrderBy] = useState<number>(0)
     const [visibleRows, setVisibleRows] = useState<Row[]>([])
 

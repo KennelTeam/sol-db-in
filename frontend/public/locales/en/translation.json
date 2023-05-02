@@ -92,6 +92,15 @@
             "confirm": "Add"
         }
     },
+
+    "select_question": {
+        "confirm_add_object": {
+            "title": "Confirm adding",
+            "description": "Are you sure to add new option for answer to the database?",
+            "cancel": "Cancel",
+            "confirm": "Add"
+        }
+    },
     
     "response": {
         "name": "Name",

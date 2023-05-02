@@ -61,6 +61,10 @@ class Form(Editable, FlaskApp().db.Model):
         Form._cached = None
 
     @staticmethod
+    def count_of_type(form_type: FormType) -> int:
+        return FlaskApp().request(Form).filter_by(_form_type=form_type).count()
+
+    @staticmethod
     def filter(name_substr: str, question_id: int, exact_values: List[Any] = None, min_value: Any = None,
                max_value: Any = None, substring: str = None, row_question_id: int = None) -> Set[int]:
 
@@ -87,6 +91,12 @@ class Form(Editable, FlaskApp().db.Model):
             return set(map(lambda x: x.id, filter(lambda f: f.form_type == form_type, Form._cached)))
         return {item.id for item in FlaskApp().request(Form).filter_by(_form_type=form_type)
                 .with_entities(Form.id).all()}
+
+    @staticmethod
+    def get_all_forms(form_type: FormType) -> List['Form']:
+        if Form._cached is not None:
+            return list(filter(lambda f: f.form_type == form_type, Form._cached))
+        return FlaskApp().request(Form).filter_by(_form_type=form_type).all()
 
     @staticmethod
     def prepare_statistics(question_id: int, min_value: int | datetime = None, max_value: int | datetime = None,

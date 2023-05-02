@@ -119,6 +119,7 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>,
             let value = options.find((opt) => opt.id == initialValue)
             questionData = {
                 label: question.text,
+                answer_block_id: question.answer_block_id,
                 initialValue: value ? value.name : null,
                 dataToChooseFrom: options.map((option) => {
                     return {
