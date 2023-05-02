@@ -4,6 +4,8 @@ import os
 
 from flask import send_from_directory
 
+from backend.auxiliary.misc import get_sol_db_logger
+
 from .api.actions import Actions
 from .api.forms_lightweight import FormsLightweight
 from .api.language import Language
@@ -39,11 +41,12 @@ for resource in resources:
     FlaskApp().api.add_resource(resource, "/api" + resource.route)
 
 
+logger = get_sol_db_logger('flask-server')
+
 @FlaskApp().app.route('/', defaults={'path': ''})
 @FlaskApp().app.route('/<path:path>')
 def serve(path):
-    print(FlaskApp().app.static_folder)
-    print(path)
+    logger.debug(f'Sending a static file at path {path}. Static folder is {FlaskApp().app.static_folder}')
     if path != "" and os.path.exists(FlaskApp().app.static_folder + '/' + path):
         return send_from_directory(FlaskApp().app.static_folder, path)
     return send_from_directory(FlaskApp().app.static_folder, 'index.html')
