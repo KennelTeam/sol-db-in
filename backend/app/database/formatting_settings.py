@@ -20,8 +20,8 @@ class FormattingSettings(Editable, FlaskApp().db.Model):
                                      default=None)
     _fixed_table_id = FlaskApp().db.Column('fixed_table_id', FlaskApp().db.ForeignKey('fixed_tables.id'), nullable=True,
                                            default=None)
-    _default_filter = FlaskApp().db.Column('default_filter', FlaskApp().db.Boolean(), default=False)
-
+    # _default_filter = FlaskApp().db.Column('default_filter', FlaskApp().db.Boolean(), default=False)
+    _default_filter = False
     _cached = None
 
     def __init__(self, block_sorting: int, block_id: int, table_row: int = None, table_id: int = None,

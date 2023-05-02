@@ -31,7 +31,23 @@
         "choose_filter": "Новый фильтр...",
         "submit_filter": "Применить",
         "add_leader": "Добавить лидера",
-        "add_project": "Добавить проект"
+        "add_project": "Добавить проект",
+        "add_leader_dialog": {
+            "title": "Добавление лидера",
+            "body": "Введите имя нового лидера",
+            "exists": "Лидер с таким именем уже есть в базе данных",
+            "input_label": "Имя нового лидера",
+            "cancel": "Отмена",
+            "create": "Создать"
+        },
+        "add_project_dialog": {
+            "title": "Добавление проекта",
+            "body": "Введите название нового проекта",
+            "exists": "Проект с таким названием уже есть в базе данных",
+            "input_label": "Название нового проекта",
+            "cancel": "Отмена",
+            "create": "Создать"
+        }
     },
 
     "dynamic_table": {
@@ -78,5 +94,4 @@
             "text": "Type another page address, or just go to the /login page"
         }
     }
-}
 }
