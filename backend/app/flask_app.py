@@ -2,7 +2,6 @@
 #  All rights reserved
 import os
 from pathlib import Path
-from uuid import uuid4
 
 from sqlalchemy import NullPool
 from sqlalchemy.orm import Query
@@ -13,7 +12,7 @@ from cheroot.wsgi import Server, PathInfoDispatcher
 from backend.auxiliary.misc import get_sol_db_logger
 from backend.auxiliary.singleton import Singleton
 from backend.constants import DB_ENGINE, MODE, DB_CHARSET, PORT, NUM_THREADS, REQUEST_CONTEXT_USE_DELETED_ITEMS, \
-    DEFAULT_LANGUAGE
+    DEFAULT_LANGUAGE, UPLOADS_DIRECTORY
 from flask_cors import CORS
 
 
@@ -46,8 +45,7 @@ class FlaskApp(metaclass=Singleton):
         self.app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
             'poolclass': NullPool,
         }
-        self.app.config['UPLOAD_FOLDER'] = 'uploads'
-        Path(os.path.join(self.app.root_path, self.app.config['UPLOAD_FOLDER'])).mkdir(exist_ok=True)
+        Path(UPLOADS_DIRECTORY).mkdir(exist_ok=True)
         CORS(self.app, supports_credentials=True)
         self._configure_api()
         self._configure_db()

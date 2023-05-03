@@ -17,6 +17,7 @@ from backend.app.database.form_type import FormType
 from backend.app.database.localization import localize
 from backend.app.database.question_type import QuestionType
 from backend.app.database.user import Role, User
+from backend.constants import UPLOADS_DIRECTORY
 
 
 class DatabaseExcelExport(Resource):
@@ -30,14 +31,13 @@ class DatabaseExcelExport(Resource):
         projects_export_df = DatabaseExcelExport._export_form(form_type=FormType.PROJECT)
         recommendations_df = DatabaseExcelExport._export_recommendations()
 
-        uploads_path = os.path.join(FlaskApp().app.root_path, FlaskApp().app.config['UPLOAD_FOLDER'])
         file_name = 'forms.xlsx'
-        with pd.ExcelWriter(os.path.join(os.path.join(uploads_path, file_name))) as writer:
+        with pd.ExcelWriter(os.path.join(os.path.join(UPLOADS_DIRECTORY, file_name))) as writer:
             leaders_export_df.to_excel(writer, sheet_name='leaders')
             projects_export_df.to_excel(writer, sheet_name='projects')
             recommendations_df.to_excel(writer, sheet_name='recommendations')
 
-        return send_from_directory(directory=uploads_path, path=file_name)
+        return send_from_directory(directory=UPLOADS_DIRECTORY, path=file_name)
 
     @staticmethod
     def _get_all_answers_df(form_type: FormType) -> DataFrame:
