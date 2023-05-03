@@ -40,7 +40,7 @@ class DatabaseExcelExport(Resource):
         return send_from_directory(directory=uploads_path, path=file_name)
 
     @staticmethod
-    def _get_all_answers_df(form_type: FormType):
+    def _get_all_answers_df(form_type: FormType) -> DataFrame:
         connection = FlaskApp().db.session.connection()
 
         answers_query = FlaskApp().request(Answer).filter(Answer._form_id.in_(Form.get_all_ids(form_type=form_type)))
