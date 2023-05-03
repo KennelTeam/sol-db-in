@@ -32,7 +32,7 @@ class DatabaseExcelExport(Resource):
         recommendations_df = DatabaseExcelExport._export_recommendations()
 
         file_name = 'forms.xlsx'
-        with pd.ExcelWriter(os.path.join(os.path.join(UPLOADS_DIRECTORY, file_name))) as writer:
+        with pd.ExcelWriter(os.path.join(UPLOADS_DIRECTORY, file_name)) as writer:
             leaders_export_df.to_excel(writer, sheet_name='leaders')
             projects_export_df.to_excel(writer, sheet_name='projects')
             recommendations_df.to_excel(writer, sheet_name='recommendations')
