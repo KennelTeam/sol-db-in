@@ -170,3 +170,23 @@ export async function makeNewObject(navigate: NavigateFunction,
         return -1
     })
 }
+
+export async function makeNewAnswerOption(navigate: NavigateFunction,
+                                          answerBlockId: number, name: string | null): Promise<number> {
+    console.log(name)
+    return await axios.post(SERVER_ADDRESS + '/answer_options', {
+        name: {
+            en: name
+        },
+        short_name: {
+            en: name
+        },
+        answer_block_id: answerBlockId
+    }, { withCredentials: true })
+        .then((response) => (response.data as number))
+        .catch((error) => {
+            console.log("Error while requesting /forms by POST request:", error)
+            handleError(navigate, error)
+            return -1
+        })
+}

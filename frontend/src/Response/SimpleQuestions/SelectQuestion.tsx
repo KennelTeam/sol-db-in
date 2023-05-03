@@ -1,46 +1,133 @@
-import { Autocomplete, Box, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Box, Button, Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  TextField
+} from "@mui/material";
 import { CommonQuestionProperties } from "./common";
-import {useState} from "react";
+import React, {ReactElement, SyntheticEvent, useState} from "react";
+import {makeNewAnswerOption, makeNewObject} from "../../FiltersTablePage/requests2API";
+import {useNavigate} from "react-router-dom";
+import AddIcon from "@material-ui/icons/Add";
+import {useTranslation} from "react-i18next";
+import {Stack} from "@mui/system";
 
 export interface SingleSelectItemInterface {
   id: number;
-  name: string;
+  name: string | null;
 }
 
 export interface SelectQuestionInterface extends CommonQuestionProperties {
   initialValue: string | null; // value
   dataToChooseFrom: Array<SingleSelectItemInterface>;
+  answer_block_id: number
 }
 
 function SelectQuestion(props: { questionData: SelectQuestionInterface; onChange: (arg0: SelectQuestionInterface) => void; }): JSX.Element {
   let questionData: SelectQuestionInterface = props.questionData
   const [value, setValue] = useState(questionData)
   const [ans, setAns] = useState(questionData.initialValue)
+  const [variants, setVariants] = useState(questionData.dataToChooseFrom)
+  const navigate = useNavigate()
+  const [open, setOpen] = useState(false)
+  const {t} = useTranslation("translation", { keyPrefix: "select_question" })
 
-  return <Box display="inline-block" sx={{ verticalAlign: "middle" }}>
-    <Box display="block">
+  const handleAddObject = () => {
+    console.log(ans)
+    console.log(value)
+    console.log("THIS")
+      makeNewAnswerOption(navigate, questionData.answer_block_id, ans).then((newId) => {
+        setVariants([...variants, {
+          id: newId,
+          name: ans
+        }])
+        let data = questionData
+        data.initialValue = ans
+        data.value = newId
+        setValue(data)
+        props.onChange(data)
+      })
+  }
+
+  let creationalBlock: ReactElement
+  if (questionData.answer_block_id != null) {
+    creationalBlock = <div><IconButton onClick={() => { setOpen(true) }} disabled={variants.filter((v) => (v.name === ans)).length > 0}>
+      <AddIcon htmlColor={
+        variants.filter((v) => (v.name === ans)).length > 0 ? "grey": "green"}
+               fontSize="small"/>
+    </IconButton>
+    <Dialog
+        open={open}
+        onClose={() => {
+          setOpen(false)
+        }}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+    >
+      <DialogTitle id="alert-dialog-title">
+        {t("confirm_add_object.title")}
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText id="alert-dialog-description">
+          {t("confirm_add_object.description")}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => {
+          setOpen(false)
+        }}>{t("confirm_add_object.cancel")}</Button>
+        <Button onClick={() => {
+
+          handleAddObject()
+          setOpen(false)
+        }} autoFocus>
+          {t("confirm_add_object.confirm")}
+        </Button>
+      </DialogActions>
+    </Dialog></div>
+  } else {
+    creationalBlock = <div/>
+  }
+
+  return <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-start">
       <Autocomplete
+        sx={{ width: 200 }}
+        disableCloseOnSelect
         disablePortal
-        options={questionData.dataToChooseFrom.map((x) => x.name)}
+        options={variants.map((x) => x.name)}
         value={ans}
+        inputValue={ans ? ans : ""}
+        freeSolo
         size="small"
-        sx={{ display: "block", minWidth: "300px" }}
         renderInput={(params) => <TextField {...params}
           label={questionData.label}
+          sx={{ input: {
+              color: (variants.filter((v) => (v.name === ans)).length === 0) ? 'red' : 'inherit'
+            } }}
         />}
         onChange={(e, val) => {
           e.preventDefault()
           let data = value
           data.initialValue = val
           data.value = data.dataToChooseFrom.find((item) => item.name == val)?.id
+
           setAns(val)
           setValue(data)
           props.onChange(value)
         }
         }
+        onInputChange={(event: SyntheticEvent, newInputValue: string | null) => {
+          setAns(newInputValue)
+        }
+        }
       />
-    </Box>
-  </Box>
+
+      {creationalBlock}
+  </Stack>
 }
 
 export default SelectQuestion;

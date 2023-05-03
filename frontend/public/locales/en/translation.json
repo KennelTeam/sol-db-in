@@ -65,7 +65,23 @@
         "choose_filter": "Choose filter...",
         "submit_filter": "Submit filter",
         "add_leader": "Add leader",
-        "add_project": "Add project"
+        "add_project": "Add project",
+        "add_leader_dialog": {
+            "title": "Adding leader",
+            "body": "Enter new leader's name",
+            "exists": "This leader already exists in database",
+            "input_label": "New leader's name",
+            "cancel": "Cancel",
+            "create": "Create"
+        },
+        "add_project_dialog": {
+            "title": "Adding project",
+            "body": "Enter new lprojects's name",
+            "exists": "This project already exists in database",
+            "input_label": "New project's name",
+            "cancel": "Cancel",
+            "create": "Create"
+        }
     },
 
     "options": {
@@ -88,6 +104,15 @@
         "confirm_add_object": {
             "title": "Confirm adding",
             "description": "Are you sure to add new leader/project to the database?",
+            "cancel": "Cancel",
+            "confirm": "Add"
+        }
+    },
+
+    "select_question": {
+        "confirm_add_object": {
+            "title": "Confirm adding",
+            "description": "Are you sure to add new option for answer to the database?",
             "cancel": "Cancel",
             "confirm": "Add"
         }

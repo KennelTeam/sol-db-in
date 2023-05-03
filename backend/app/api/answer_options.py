@@ -2,6 +2,7 @@
 #  All rights reserved
 from typing import Final
 
+import flask
 from flask import Response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
@@ -26,6 +27,7 @@ class AnswerOptionsPage(Resource):
     @jwt_required()
     @post_request(Role.ADMIN)
     def post() -> Response:
+        print(flask.request)
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, location='json', required=False, default=-1)
         parser.add_argument('name', type=dict, location='json', required=True)
@@ -33,7 +35,7 @@ class AnswerOptionsPage(Resource):
         parser.add_argument('answer_block_id', type=int, location='json', required=True)
         parser.add_argument('deleted', type=bool, location='json', required=False, default=False)
         arguments = parser.parse_args()
-
+        print(arguments)
         if AnswerBlock.get_by_id(arguments['answer_block_id']) is None:
             return post_failure(HTTPErrorCode.WRONG_ID, 404)
 

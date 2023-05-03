@@ -28,10 +28,10 @@ function descendingComparator(a: Row, b: Row, orderBy: number) {
         b_n = b.columns[orderBy].length > 0 ? b.columns[orderBy][0].data : ""
     }
     if (b_n < a_n) {
-        return -1;
+        return 1;
     }
     if (b_n > a_n) {
-        return 1;
+        return -1;
     }
     return 0
 }
@@ -52,7 +52,6 @@ function getComparator(
 
 function stableSort(array: readonly Row[], comparator: (a: Row, b: Row) => number) {
     const stabilizedThis = array.map((el, index) => [el, index] as [Row, number]);
-    console.log("stabilizedThis:", array, stabilizedThis)
     stabilizedThis.sort((a, b) => {
       const order = comparator(a[0], b[0])
       if (order !== 0) {
@@ -60,7 +59,6 @@ function stableSort(array: readonly Row[], comparator: (a: Row, b: Row) => numbe
       }
       return a[1] - b[1];
     })
-    console.log("stabilizedThis sorted:", stabilizedThis)
     return stabilizedThis.map((el) => el[0]);
 }
 
@@ -139,7 +137,7 @@ function RenderRow(props: Row) {
         }
     }
 
-    props.columns = props.columns.map(col => col.filter((value, index) => {
+    const columns = props.columns.map(col => col.filter((value, index) => {
         if (col[index].data == "DELETED") {
             return false;
         }
@@ -154,7 +152,7 @@ function RenderRow(props: Row) {
     return (
         <TableRow>
             <StyledTableCell>{props.id}</StyledTableCell>
-            {props.columns.map((col) => {
+            {columns.map((col) => {
                 if (col.length === 1) {
                     return (
                         <StyledTableCell>
@@ -164,9 +162,9 @@ function RenderRow(props: Row) {
                 } else {
                     return (
                         <StyledTableCell>
-                            <List disablePadding>
+                            <List>
                                 {col.map((element: {data: string, link?: string}) => (
-                                    <ListItem disablePadding>
+                                    <ListItem>
                                         <SingleElement {...element}/>
                                     </ListItem>
                                 ))}
@@ -184,7 +182,7 @@ export default function MainTable(props: TableData) {
 
     const [rowsPerPage, setRowsPerPage] = useState(50)
     const [page, setPage] = useState<number>(0)
-    const [order, setOrder] = useState<Order>('asc');
+    const [order, setOrder] = useState<Order>('desc');
     const [orderBy, setOrderBy] = useState<number>(0)
     const [visibleRows, setVisibleRows] = useState<Row[]>([])
 
@@ -204,15 +202,9 @@ export default function MainTable(props: TableData) {
           setOrder(toggledOrder)
           setOrderBy(newOrderBy)
 
-          console.log("handleRequestSort:", visibleRows)
           const sortedRows = stableSort(visibleRows,
             getComparator(toggledOrder, newOrderBy));
-          const updatedRows = sortedRows.slice(
-            page * rowsPerPage,
-            page * rowsPerPage + rowsPerPage,
-          );
-          console.log("Sorted Rows:", sortedRows)
-          setVisibleRows(updatedRows);
+          setVisibleRows(sortedRows);
         }
 
     const head : HeadProps = {
@@ -223,15 +215,12 @@ export default function MainTable(props: TableData) {
     }
 
     useEffect(() => {
-        console.log("useEffect:", props.rows)
         const newRows : Row[] = props.rows.map(
             (row) => (JSON.parse(JSON.stringify(row)))
             )
         if (props.rows.length > 0) {
-            console.log("New Rows:", JSON.parse(JSON.stringify(props.rows)))
             setVisibleRows(JSON.parse(JSON.stringify(props.rows)))
         }
-        console.log("visibleRows:", visibleRows)
     }, [props.rows])
 
     return (
@@ -240,9 +229,9 @@ export default function MainTable(props: TableData) {
                 <Table size="small" stickyHeader>
                     <Head {...head}/>
                     <TableBody>
-                        {visibleRows
+                        {JSON.parse(JSON.stringify(visibleRows))
                             .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
-                            .map((row: Row) => (<RenderRow {...row}/>))}
+                            .map((row: Row, index: number) => <RenderRow {...row}/>)}
                     </TableBody>
                 </Table>
             </TableContainer>

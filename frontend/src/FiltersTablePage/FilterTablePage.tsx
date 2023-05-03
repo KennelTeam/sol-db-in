@@ -1,5 +1,5 @@
 import { Stack } from "@mui/system";
-import { Card, Typography, IconButton, ListItem, List, TextField, TextFieldProps, Autocomplete, Button, Box } from "@mui/material";
+import { Card, Typography, IconButton, ListItem, List, TextField, TextFieldProps, Autocomplete, Button, Box, Dialog } from "@mui/material";
 import { AnswerType, SERVER_ADDRESS } from "../types/global"
 import ClearIcon from '@material-ui/icons/Clear'
 import AddIcon from '@material-ui/icons/Add'
@@ -14,6 +14,7 @@ import i18next from "i18next";
 import axios from "axios";
 import { Buffer } from "buffer";
 import { Link, useNavigate } from "react-router-dom";
+import AddObjectPopup from "./AddObjectPopup";
 
 interface QuestionAttributes {
     default_filter: boolean | null,
@@ -170,6 +171,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
         headColumns: [],
         rows: []
     })
+    const [addDialogOpen, setAddDialogOpen] = useState<boolean>(false)
     const isInitialMount = useRef(true)
     const navigate = useNavigate()
 
@@ -211,7 +213,18 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
     }
 
     const handleSubmitFilter = () => {
-        const buf = Buffer.from(JSON.stringify(filtersData.filter((filter) => (filter.question_id != -1))),
+        let filters = filtersData.filter((item) => {
+            if (item.exact_values) {
+                if (item.exact_values.length == 0) {
+                    return false;
+                }
+            }
+            return true;
+        })
+        console.log(filters)
+        console.log("FILTERS")
+        console.log(name_substr)
+        const buf = Buffer.from(JSON.stringify(filters.filter((filter) => (filter.question_id != -1))),
                 "utf8")
         const body = {
             form_type: formType,
@@ -334,10 +347,7 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
             <Box>
                 <Button variant="contained" onClick={handleSubmitFilter} sx={{ m: 2 }}>{t('submit_filter')}</Button>
                 <Button variant="outlined" sx={{ m: 2 }} onClick={(event: React.MouseEvent) => {
-                    makeNewObject(navigate, formType).then((id) => {
-                        const link = '/' + formType.toLowerCase() + '/' + id
-                        navigate(link, { replace: true })
-                    })
+                    setAddDialogOpen(true)
                 }}>
                     {formType === 'LEADER' ? t('add_leader') : t('add_project')}
                 </Button>
@@ -346,6 +356,17 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
             <Card>
                 <MainTable {...JSON.parse(JSON.stringify(tableData))}/>
             </Card>
+            <Dialog open={addDialogOpen}>
+                <AddObjectPopup onCancel={() => {
+                    setAddDialogOpen(false)
+                }} onSubmit={(name: string) => {
+                    setAddDialogOpen(false)
+                    makeNewObject(navigate, formType, name).then((id) => {
+                        const link = '/' + formType.toLowerCase() + '/' + id
+                        navigate(link, { replace: true })
+                    })
+                }} formType={formType}/>
+            </Dialog>
         </Stack>
     )
 }

@@ -87,6 +87,14 @@ class Question(Editable, FlaskApp().db.Model):
         }
 
     @staticmethod
+    def count_form_type_questions(form_type: FormType) -> int:
+        return FlaskApp().request(Question).filter_by(_form_type=form_type).count()
+
+    @staticmethod
+    def get_of_form_type(form_type: FormType) -> List['Question']:
+        return FlaskApp().request(Question).filter_by(_form_type=form_type).all()
+
+    @staticmethod
     def upload_cache():
         Question._cached = FlaskApp().request(Question).all()
 

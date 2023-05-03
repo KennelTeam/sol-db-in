@@ -9,6 +9,8 @@ from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 from typing import Set, List, Final
 
+from backend.auxiliary.misc import get_sol_db_logger
+
 from .auxiliary import HTTPErrorCode, get_failure, post_failure, check_json_format, get_request, post_request, \
     GetRequestParser
 from backend.app.database.form import Form, FormType, FormState
@@ -24,6 +26,9 @@ from backend.app.database.question_type import QuestionType
 from backend.app.flask_app import FlaskApp
 from backend.constants import NAME_COLUMN_NAME
 from ..database.localization import localize
+
+
+logger = get_sol_db_logger('flask-server')
 
 
 class Forms(Resource):
@@ -55,7 +60,7 @@ class Forms(Resource):
             return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
 
         form_type = FormType[arguments['form_type']]
-        ids = Form.get_all_ids(form_type)
+        ids = Form.get_all_ids(form_type) & Form.filter(arguments['name_substr'], -1)
         for item in answer_filters:
             if not isinstance(item, dict):
                 return get_failure(HTTPErrorCode.INVALID_ARG_LOCATION, 400)
@@ -83,7 +88,6 @@ class Forms(Resource):
         parser.add_argument('deleted', type=bool, location='json', required=False, default=False)
 
         content = parser.parse_args()
-        print(json.dumps(content, indent=4))
         if content['form_type'] not in FormType.items():
             return post_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
         form_type = FormType[content['form_type']]
@@ -205,18 +209,15 @@ class Forms(Resource):
             form.state = form_state
             form.name = form_name
         for answer in content['answers']:
-            print(answer)
             status = Forms._update_form_answer(form, answer)
             if status != HTTPErrorCode.SUCCESS:
                 return post_failure(status, 400)
 
-        print("FLUSHING TO DATABASE")
         FlaskApp().flush_to_database()
         return Response(str(form.id), status=200)
 
     @staticmethod
     def _check_answer_object_correctness(answer: JSON) -> HTTPErrorCode:
-        print(json.dumps(answer))
         if not isinstance(answer, dict):
             return HTTPErrorCode.INVALID_ARG_TYPE
         if 'question_id' not in answer or 'answers' not in answer:
