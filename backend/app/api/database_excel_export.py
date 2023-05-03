@@ -28,24 +28,25 @@ class DatabaseExcelExport(Resource):
     def get() -> Response:
         leaders_export_df = DatabaseExcelExport._export_form(form_type=FormType.LEADER)
         projects_export_df = DatabaseExcelExport._export_form(form_type=FormType.PROJECT)
+        recommendations_df = DatabaseExcelExport._export_recommendations()
 
         uploads_path = os.path.join(FlaskApp().app.root_path, FlaskApp().app.config['UPLOAD_FOLDER'])
         file_name = 'forms.xlsx'
         with pd.ExcelWriter(os.path.join(os.path.join(uploads_path, file_name))) as writer:
             leaders_export_df.to_excel(writer, sheet_name='leaders')
             projects_export_df.to_excel(writer, sheet_name='projects')
+            recommendations_df.to_excel(writer, sheet_name='recommendations')
 
         return send_from_directory(directory=uploads_path, path=file_name)
 
     @staticmethod
-    def _export_form(form_type: FormType) -> DataFrame:
+    def _get_all_answers_df(form_type: FormType):
         connection = FlaskApp().db.session.connection()
 
         answers_query = FlaskApp().request(Answer).filter(Answer._form_id.in_(Form.get_all_ids(form_type=form_type)))
         questions_query = FlaskApp().request(Question).filter_by(_form_type=form_type)
         questions_blocks_query = FlaskApp().request(QuestionBlock).filter_by(_form=form_type)
         formatting_settings_query = FlaskApp().request(FormattingSettings)
-        forms_query = FlaskApp().request(Form).filter_by(_form_type=form_type)
         all_forms_query = FlaskApp().request(Form)
         users_query = FlaskApp().request(User)
         toponyms_query = Toponym.query
@@ -56,7 +57,6 @@ class DatabaseExcelExport(Resource):
         questions_df = pd.read_sql_query(questions_query.statement, connection)
         questions_blocks_df = pd.read_sql_query(questions_blocks_query.statement, connection)
         formatting_settings_df = pd.read_sql_query(formatting_settings_query.statement, connection)
-        forms_df = pd.read_sql_query(forms_query.statement, connection)
         all_forms_df = pd.read_sql_query(all_forms_query.statement, connection)
         users_df = pd.read_sql_query(users_query.statement, connection)
         toponyms_df = pd.read_sql_query(toponyms_query.statement, connection)
@@ -92,6 +92,14 @@ class DatabaseExcelExport(Resource):
         answers_df['export_value'].loc[answers_df['question_type'] == QuestionType.CHECKBOX] = answers_df['localized_answer_option']
         answers_df['export_value'].loc[answers_df['question_type'] == QuestionType.MULTIPLE_CHOICE] = answers_df['localized_answer_option']
         answers_df['export_value'].loc[answers_df['question_type'] == QuestionType.RELATION] = answers_df['related_form_name']
+
+        return answers_df
+
+    @staticmethod
+    def _export_form(form_type: FormType) -> DataFrame:
+        forms_query = FlaskApp().request(Form).filter_by(_form_type=form_type)
+        forms_df = pd.read_sql_query(forms_query.statement, FlaskApp().db.session.connection())
+        answers_df = DatabaseExcelExport._get_all_answers_df(form_type=form_type)
         answers_df['export_value'].loc[answers_df['table_id'].notna()] = answers_df['answer_table_row'].astype('Int64').astype(str) + '. ' + answers_df['export_value'].astype(str)
 
         cross_table = pd.crosstab(answers_df['form_id'], answers_df['localized_text'], values=answers_df['export_value'],
@@ -104,7 +112,36 @@ class DatabaseExcelExport(Resource):
         cross_table = pd.merge(forms_df[['id', 'name', 'state', 'deleted']], cross_table, left_on='id', right_on='form_id', how='left')
         cross_table['state'] = cross_table.apply(lambda row: row['state'].name, axis=1)
         cross_table['deleted'] = cross_table['deleted'].astype('Int64')
+        cross_table.set_index('id', inplace=True)
 
+        return cross_table
+
+    @staticmethod
+    def _export_recommendations() -> DataFrame:
+        forms_query = FlaskApp().request(Form).filter_by(_form_type=FormType.LEADER)
+        forms_df = pd.read_sql_query(forms_query.statement, FlaskApp().db.session.connection())
+        answers_df = DatabaseExcelExport._get_all_answers_df(form_type=FormType.LEADER)
+
+        recommendations_block_id = -1
+        for question_block in FlaskApp().request(QuestionBlock):
+            if question_block.name['en'] == 'RECOMMENDATIONS':
+                recommendations_block_id = question_block.id
+                break
+
+        answers_df = answers_df[answers_df['block_id'] == recommendations_block_id]
+
+        answers_df['id'] = answers_df['form_id'] + 0.1 * answers_df['answer_table_row']
+        cross_table = pd.crosstab(answers_df['id'], answers_df['localized_text'], values=answers_df['export_value'], aggfunc='first')
+        cross_table.index = cross_table.index.astype(str)
+
+        sorting_df = answers_df[['localized_text', 'sorting']].drop_duplicates(subset='localized_text')
+        sorting_df.sort_values('sorting', inplace=True)
+        cross_table = cross_table.reindex(columns=sorting_df['localized_text'])
+
+        cross_table['recommender_id'] = list(map(lambda x: int(x.split('.')[0]), cross_table.index.values))
+        cross_table = pd.merge(forms_df[['id', 'name']], cross_table, left_on='id', right_on='recommender_id')
+        cross_table.drop('recommender_id', axis=1, inplace=True)
+        cross_table.rename(columns={'name': 'Recommender'}, inplace=True)
         cross_table.set_index('id', inplace=True)
 
         return cross_table
