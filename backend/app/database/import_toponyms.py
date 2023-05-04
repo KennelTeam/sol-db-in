@@ -40,4 +40,4 @@ def import_toponyms():
                 names.add(city['city'])
                 total_count += 1
         FlaskApp().flush_to_database()
-        logger.debug(f'Successfully imported {total_count} toponyms')
+        logger.debug('Successfully imported %s toponyms', total_count)

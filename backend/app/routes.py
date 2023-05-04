@@ -48,7 +48,7 @@ logger = get_sol_db_logger('flask-server')
 @FlaskApp().app.route('/', defaults={'path': ''})
 @FlaskApp().app.route('/<path:path>')
 def serve(path):
-    logger.debug(f'Sending a static file at path {path}. Static folder is {FlaskApp().app.static_folder}')
+    logger.debug('Sending a static file at path %s. Static folder is %s', path, FlaskApp().app.static_folder)
     if path != "" and os.path.exists(FlaskApp().app.static_folder + '/' + path):
         return send_from_directory(FlaskApp().app.static_folder, path)
     return send_from_directory(FlaskApp().app.static_folder, 'index.html')
