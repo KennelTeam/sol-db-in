@@ -32,7 +32,7 @@ class DatabaseExcelExport(Resource):
         recommendations_df = DatabaseExcelExport._export_recommendations()
 
         file_name = 'forms.xlsx'
-        with pd.ExcelWriter(os.path.join(UPLOADS_DIRECTORY, file_name)) as writer:
+        with pd.ExcelWriter(os.path.join(UPLOADS_DIRECTORY, file_name)) as writer:  # pylint: disable=abstract-class-instantiated
             leaders_export_df.to_excel(writer, sheet_name='leaders')
             projects_export_df.to_excel(writer, sheet_name='projects')
             recommendations_df.to_excel(writer, sheet_name='recommendations')
@@ -43,7 +43,7 @@ class DatabaseExcelExport(Resource):
     def _get_all_answers_df(form_type: FormType) -> DataFrame:
         connection = FlaskApp().db.session.connection()
 
-        answers_query = FlaskApp().request(Answer).filter(Answer._form_id.in_(Form.get_all_ids(form_type=form_type)))
+        answers_query = FlaskApp().request(Answer).filter(Answer._form_id.in_(Form.get_all_ids(form_type=form_type)))  # pylint: disable=protected-access
         questions_query = FlaskApp().request(Question).filter_by(_form_type=form_type)
         questions_blocks_query = FlaskApp().request(QuestionBlock).filter_by(_form=form_type)
         formatting_settings_query = FlaskApp().request(FormattingSettings)
