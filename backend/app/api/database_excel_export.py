@@ -2,7 +2,6 @@ import json
 import os
 from typing import Final
 
-import numpy as np
 import pandas as pd
 from flask import send_from_directory, Response
 from flask_jwt_extended import jwt_required
