@@ -18,6 +18,7 @@ from flask_cors import CORS
 
 logger = get_sol_db_logger('flask-server')
 
+
 class FlaskApp(metaclass=Singleton):
     _app: Flask = None
     _api: Api = None

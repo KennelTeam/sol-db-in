@@ -9,7 +9,7 @@ from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 from pandas import DataFrame
 
-from backend.app import FlaskApp
+from backend.app.flask_app import FlaskApp
 from backend.app.api.auxiliary import get_request
 from backend.app.database import Answer, Form, Question, QuestionBlock, FormattingSettings, Toponym, AnswerOption, \
     RelationSettings
