@@ -1,5 +1,5 @@
 import { Box, TextField } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CommonQuestionProperties } from "./common";
 import {TextareaAutosize} from "@mui/core";
 
@@ -11,6 +11,12 @@ function TextQuestion(props: { questionData: TextQuestionInterface; onChange: (a
     let questionData: TextQuestionInterface = props.questionData
     const [value, setValue] = useState(questionData)
     const [text, setText] = useState(questionData.initialValue)
+
+    useEffect(() => {
+        setValue(props.questionData)
+        setText(props.questionData.initialValue)
+    }, [props.questionData])
+
     return <Box
       component={TextareaAutosize}
       display="inline-block"
