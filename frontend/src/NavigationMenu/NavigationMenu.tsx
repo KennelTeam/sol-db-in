@@ -66,7 +66,7 @@ function ChoiceOptionsList(user: UserType) : JSX.Element[] {
     let options_list : JSX.Element[]
     switch (user) { // this switch choices pages that will be shown to user by his role
         case UserType.Admin:
-            options_list = [leaders, projects, /*statistics, catalog, settings, users*/]
+            options_list = [leaders, projects, users, /*statistics, catalog, settings*/]
             break
         case UserType.Editor:
             options_list = [leaders, projects, /*statistics, catalog, settings*/]
