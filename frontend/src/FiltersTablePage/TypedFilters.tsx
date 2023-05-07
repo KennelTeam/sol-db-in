@@ -171,8 +171,8 @@ export function DateFilter({setFilter}: FilterProps) {
     useEffect(() => {
         setFilter({
             question_id: 0,
-            min_value: dateFrom === null ? undefined : dateFrom.format('DD-MM-YYYY'),
-            max_value: dateTo === null ? undefined : dateTo.format('DD-MM-YYYY')
+            min_value: dateFrom === null ? undefined : dateFrom.format('YYYY-MM-DD'),
+            max_value: dateTo === null ? undefined : dateTo.format('YYYY-MM-DD')
         })
     })
 
