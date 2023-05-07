@@ -17,7 +17,7 @@ from backend.app.database.form import Form, FormType, FormState
 from backend.app.database.answer import Answer
 from backend.app.database.tag_to_answer import TagToAnswer
 from backend.app.database.tag import Tag
-from backend.auxiliary.string_dt import string_to_datetime
+from backend.auxiliary.string_dt import string_to_datetime, string_to_date
 from backend.auxiliary.types import JSON
 from backend.app.database import Question
 from backend.app.database.question import AnswerType
@@ -72,7 +72,7 @@ class Forms(Resource):
         question_ids = Question.get_only_main_page(form_type)
 
         result = Forms._prepare_table(forms, question_ids)
-
+        print(result)
         return Response(json.dumps({'table': result}), 200)
 
     @staticmethod
@@ -126,6 +126,8 @@ class Forms(Resource):
                 title = question.relation_settings.inverse_main_page_count_title
             elif q_type == AnswerType.FORWARD_COUNT:
                 title = question.relation_settings.main_page_count_title
+            elif q_type == AnswerType.INVERSE_VALUE:
+                title = question.relation_settings.inverse_main_page_title
             else:
                 title = question.short_text
             result.append({
@@ -148,6 +150,15 @@ class Forms(Resource):
                 'type': QuestionType.NUMBER.name,
                 'value': Answer.count_inverse_answers(form_id, question_id)
             })
+        elif q_type == AnswerType.INVERSE_VALUE:
+            ans_object["answers"] = [
+                {
+                    'type': QuestionType.RELATION.name,
+                    'relation_type': Question.get_by_id(question_id).relation_settings.relation_type.name,
+                    'ref_id': ref_id,
+                    'value': Form.get_by_ids({ref_id})[0].name if len(Form.get_by_ids({ref_id})) > 0 else "DELETED"
+                } for ref_id in Answer.get_inverse_answers(form_id, question_id)
+            ]
         else:
             form_answers = Answer.get_form_answers(form_id, question_id)
             ans_object["answers"] = [
@@ -166,9 +177,9 @@ class Forms(Resource):
         max_value = filter.get('max_value', None)
 
         if isinstance(min_value, str):
-            min_value = string_to_datetime(min_value)
+            min_value = string_to_date(min_value)
         if isinstance(max_value, str):
-            max_value = string_to_datetime(max_value)
+            max_value = string_to_date(max_value)
 
         substring = filter.get('substring')
         if substring is not None and not isinstance(substring, str):
@@ -186,6 +197,8 @@ class Forms(Resource):
         exact_values = filter.get('exact_values', None)
         if exact_values is not None and not isinstance(exact_values, list):
             return False
+        if exact_values is None:
+            return True
         if len(exact_values) == 0:
             return False
         if len(set(type(item) for item in exact_values)) != 1:

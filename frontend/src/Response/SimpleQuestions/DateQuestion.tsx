@@ -1,4 +1,4 @@
-import {SetStateAction, useState} from "react";
+import {SetStateAction, useEffect, useState} from "react";
 import {Box, TextField} from "@mui/material";
 import {TextQuestionInterface} from "./TextQuestion";
 import {CommonQuestionProperties} from "./common";
@@ -8,6 +8,12 @@ export function DateQuestion(props: { questionData: TextQuestionInterface; onCha
     const [value, setValue] = useState(questionData)
     const [text, setText] = useState(questionData.initialValue)
     console.log(text)
+    useEffect(() => {
+        setValue(props.questionData)
+        setText(props.questionData.initialValue)
+    }, [props.questionData])
+
+
     return <Box display="inline-block">
         <TextField
             size="small"

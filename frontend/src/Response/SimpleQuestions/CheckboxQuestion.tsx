@@ -1,5 +1,5 @@
 import { Box, Checkbox, FormControl, FormControlLabel } from "@mui/material";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { CommonQuestionProperties } from "./common";
 
 export interface SingleCheckboxQuestionInterface extends CommonQuestionProperties {
@@ -15,6 +15,12 @@ function SingleCheckboxQuestion(props: { question: SingleCheckboxQuestionInterfa
     console.log(questionData)
     const [value, setValue] = useState(questionData);
     const [ans, setAns] = useState(questionData.initialValue)
+    useEffect(() => {
+        setValue(props.question)
+        setAns(props.question.initialValue)
+    }, [props.question])
+
+
     return <Box display="inline-block">
         <FormControlLabel
             control={<Checkbox checked={ans} onChange={(event) => {
@@ -34,6 +40,8 @@ function SingleCheckboxQuestion(props: { question: SingleCheckboxQuestionInterfa
 function CheckboxQuestion(props: { questionData: CheckboxQuestionInterface; onChange: any; }): JSX.Element {
     let questionData: CheckboxQuestionInterface = props.questionData
     const components = questionData.questions.map((question) => <SingleCheckboxQuestion question={question} onChange={props.onChange}/>)
+
+
     return <Box display="inline-block">
         <FormControl sx={{display: "inline-block"}}>
             {components}
