@@ -46,7 +46,7 @@ class FullnessStatistics(Resource):
             for question in Question.get_of_form_type(form_type):
                 result.append({
                     'id': question.id,
-                    'text': localize(question.text),
+                    'name': localize(question.text),
                     'count': Answer.count_answered_forms(question.id)
                 })
         return Response(json.dumps({

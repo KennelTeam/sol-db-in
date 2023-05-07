@@ -29,7 +29,24 @@ function Login({ changeUser } : { changeUser: (userType: UserType) => void }) {
       switch (res.status) {
           case 200: {
               setStatus(Status.SuccessfulLogIn)
-              changeUser(UserType.Admin)
+              console.log(res.data.role)
+              switch (res.data.role) {
+                  case "ADMIN": {
+                      changeUser(UserType.Admin)
+                      break;
+                  }
+                  case "EDITOR": {
+                      changeUser(UserType.Editor)
+                      break;
+                  }
+                  case "INTERN": {
+                      changeUser(UserType.Intern)
+                      break;
+                  }
+                  default: {
+                      changeUser(UserType.Guest)
+                  }
+              }
               break;
           }
           case 400: {

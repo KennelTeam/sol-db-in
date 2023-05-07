@@ -17,7 +17,7 @@ from backend.app.database.form import Form, FormType, FormState
 from backend.app.database.answer import Answer
 from backend.app.database.tag_to_answer import TagToAnswer
 from backend.app.database.tag import Tag
-from backend.auxiliary.string_dt import string_to_datetime
+from backend.auxiliary.string_dt import string_to_datetime, string_to_date
 from backend.auxiliary.types import JSON
 from backend.app.database import Question
 from backend.app.database.question import AnswerType
@@ -166,9 +166,9 @@ class Forms(Resource):
         max_value = filter.get('max_value', None)
 
         if isinstance(min_value, str):
-            min_value = string_to_datetime(min_value)
+            min_value = string_to_date(min_value)
         if isinstance(max_value, str):
-            max_value = string_to_datetime(max_value)
+            max_value = string_to_date(max_value)
 
         substring = filter.get('substring')
         if substring is not None and not isinstance(substring, str):
@@ -186,6 +186,8 @@ class Forms(Resource):
         exact_values = filter.get('exact_values', None)
         if exact_values is not None and not isinstance(exact_values, list):
             return False
+        if exact_values is None:
+            return True
         if len(exact_values) == 0:
             return False
         if len(set(type(item) for item in exact_values)) != 1:
