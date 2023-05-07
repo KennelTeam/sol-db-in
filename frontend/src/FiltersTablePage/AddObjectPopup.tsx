@@ -89,7 +89,7 @@ export default function AddObjectPopup(props : AddObjectPopupProps) {
                     <div>
                         <Typography color="red">{t("exists")}</Typography>
                         <Link to={(props.formType === 'LEADER' ? '/leader/' : '/project/')
-                                + value.id}>{t("follow_page")}</Link>
+                                + value.id} target={"_blanc"}>{t("follow_page")}</Link>
                     </div>  : null}
             </DialogContent>
             <DialogActions>

@@ -12,7 +12,7 @@ interface UserTypeProps { // props interface used by NavigationMenu for sending 
 }
 
 const MenuButton = (text: string, path: string, t : TFunction, padding=2) : JSX.Element => (
-    <ListItem component={Link} to={path} target={"_blanc"}
+    <ListItem component={Link} to={path}
         style={{ color: "inherit", textDecoration: "none" }}
         disablePadding
         >
