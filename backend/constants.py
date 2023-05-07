@@ -49,3 +49,4 @@ MAX_LEADERS_PAGE_SIZE: int = 200
 MAX_PROJECTS_PAGE_SIZE: int = 200
 MAX_COMMENT_SIZE_IN_LEADERS_LIST: int = 10
 LOGS_DIRECTORY = Path(__file__).resolve().parent.parent / 'logs'
+UPLOADS_DIRECTORY = Path(__file__).resolve().parent.parent / 'uploads'

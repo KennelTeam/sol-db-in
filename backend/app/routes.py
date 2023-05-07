@@ -7,6 +7,7 @@ from flask import send_from_directory
 from backend.auxiliary.misc import get_sol_db_logger
 
 from .api.actions import Actions
+from .api.database_excel_export import DatabaseExcelExport
 from .api.all_questions import AllQuestions
 from .api.forms_lightweight import FormsLightweight
 from .api.fullness_statistics import FullnessStatistics
@@ -36,7 +37,7 @@ from .flask_app import FlaskApp
 resources = [
     Login, Logout, Users, Forms, FormPage, Toponyms, ToponymTree, AnswerOptionsPage, AllAnswerBlocks, Language,
     AnswerBlockPage, QuestionBlockPage, Table, Tags, TagTypes, FormSchema, Questions, Actions, Statistics, Settings,
-    FormsLightweight, AllToponyms, FullnessStatistics, AllQuestions
+    FormsLightweight, AllToponyms, FullnessStatistics, DatabaseExcelExport, AllQuestions
 ]
 
 for resource in resources:
@@ -48,8 +49,7 @@ logger = get_sol_db_logger('flask-server')
 @FlaskApp().app.route('/', defaults={'path': ''})
 @FlaskApp().app.route('/<path:path>')
 def serve(path):
-    logger.debug(f'Sending a static file at path {path}. Static folder is {FlaskApp().app.static_folder}')
+    logger.debug('Sending a static file at path %s. Static folder is %s', path, FlaskApp().app.static_folder)
     if path != "" and os.path.exists(FlaskApp().app.static_folder + '/' + path):
         return send_from_directory(FlaskApp().app.static_folder, path)
     return send_from_directory(FlaskApp().app.static_folder, 'index.html')
-

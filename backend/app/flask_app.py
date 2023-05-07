@@ -1,7 +1,7 @@
 #  Copyright (c) 2020-2023. KennelTeam.
 #  All rights reserved
 import os
-from uuid import uuid4
+from pathlib import Path
 
 from sqlalchemy import NullPool
 from sqlalchemy.orm import Query
@@ -12,11 +12,12 @@ from cheroot.wsgi import Server, PathInfoDispatcher
 from backend.auxiliary.misc import get_sol_db_logger
 from backend.auxiliary.singleton import Singleton
 from backend.constants import DB_ENGINE, MODE, DB_CHARSET, PORT, NUM_THREADS, REQUEST_CONTEXT_USE_DELETED_ITEMS, \
-    DEFAULT_LANGUAGE
+    DEFAULT_LANGUAGE, UPLOADS_DIRECTORY
 from flask_cors import CORS
 
 
 logger = get_sol_db_logger('flask-server')
+
 
 class FlaskApp(metaclass=Singleton):
     _app: Flask = None
@@ -45,6 +46,7 @@ class FlaskApp(metaclass=Singleton):
         self.app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
             'poolclass': NullPool,
         }
+        Path(UPLOADS_DIRECTORY).mkdir(exist_ok=True)
         CORS(self.app, supports_credentials=True)
         self._configure_api()
         self._configure_db()
@@ -71,7 +73,7 @@ class FlaskApp(metaclass=Singleton):
         dispatcher = PathInfoDispatcher({'/': self.app})
         server = Server(('0.0.0.0', PORT), dispatcher, numthreads=NUM_THREADS)
         try:
-            logger.info(f"the server is working at http://127.0.0.1:{PORT}")
+            logger.info('the server is working at http://127.0.0.1:%s', PORT)
             server.start()
         except KeyboardInterrupt:
             server.stop()
@@ -113,7 +115,7 @@ class FlaskApp(metaclass=Singleton):
 
 @FlaskApp().app.before_request
 def before_request():
-    logger.info(f'Endpoint {request.method} {request.endpoint} was called')
+    logger.info('Endpoint %s %s was called', request.method, request.endpoint)
 
 
 # https://stackoverflow.com/questions/22256862/flask-how-to-store-and-retrieve-a-value-bound-to-the-request
@@ -122,6 +124,6 @@ def after_request(response):
     # clear the dev variables associated with current request
     values = g.get('dev_variables', {})
     values.clear()
-    logger.info(f'Endpoint {request.method} {request.endpoint} was finished with status {response.status_code}')
+    logger.info('Endpoint %s %s was finished with status %s', request.method, request.endpoint, response.status_code)
 
     return response
