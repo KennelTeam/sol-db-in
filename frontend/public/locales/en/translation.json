@@ -20,7 +20,9 @@
         "tags": "Tags",
         "catalog": "Catalog",
         "questionnaire": "Questionnaire",
-        "options": "Answers"
+        "options": "Answers",
+        "fullness-stats": "Fullness",
+        "distribution-stats": "Answers distribution"
     },
     "settings": {
         "title": "Settings",
@@ -155,5 +157,15 @@
             "title": "Not Found Page (404)",
             "text": "Type another page address, or just go to the /login page"
         }
+    },
+    "statistics-fullness": {
+        "form-type-selector": "Select form type",
+        "group-by-selector": "Group by",
+        "form-type-leader": "Leader",
+        "form-type-project": "Project",
+        "group-by-form": "Group by form",
+        "group-by-question": "Group by question",
+        "table-name-column-name": "Name",
+        "table-data-column-name": "Fullness"
     }
 }

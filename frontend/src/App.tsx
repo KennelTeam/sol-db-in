@@ -20,6 +20,8 @@ import { MENU_WIDTH } from "./types/global";
 import FilterTablePage from "./FiltersTablePage";
 import {useTranslation} from "react-i18next";
 import ErrorPage from "./ErrorPage";
+import FullnessStatistics from "./Statistics/Fullness";
+import DistributionStatistics from "./Statistics/Distribution";
 
 function App() {
   const {t} = useTranslation('translation', { keyPrefix: 'main' });
@@ -50,7 +52,8 @@ function App() {
           <Route path='/project/:id' element={<Project />}/>
           <Route path='/projects' element={<ProjectsList />}/>
           <Route path='/settings' element={<Settings />}/>
-          <Route path='/statistics' element={<Statistics />}/>
+          <Route path='/statistics/fullness' element={<FullnessStatistics />}/>
+          <Route path='/statistics/distribution' element={<DistributionStatistics />}/>
           <Route path='/tags' element={<Tags />}/>
           <Route path='/questionnaire' element={<Questionnaire />}/>
           <Route path='/options' element={<Options />}/>
