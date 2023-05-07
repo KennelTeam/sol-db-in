@@ -166,6 +166,7 @@
         "group-by-form": "Group by form",
         "group-by-question": "Group by question",
         "table-name-column-name": "Name",
-        "table-data-column-name": "Fullness"
+        "table-data-column-name": "Fullness",
+        "fullness-stats": "Fullness statistics"
     }
 }

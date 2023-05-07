@@ -42,6 +42,7 @@ function FullnessStatistics() {
         })
     }, [formType, groupBy]);
     return <Box>
+        <h1>{t("fullness-stats")}</h1>
         <Box
             sx={{
                 display: 'flex',

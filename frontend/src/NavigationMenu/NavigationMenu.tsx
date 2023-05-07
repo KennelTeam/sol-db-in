@@ -59,8 +59,8 @@ function ChoiceOptionsList(user: UserType) : JSX.Element[] {
     const leaders: JSX.Element = MenuButton("leaders", "/leaders", t)
     const statistics: JSX.Element = DropDownList(
         "statistics",
-        ["fullness-stats", "distribution-stats"],
-        ["/statistics/fullness", "/statistics/distribution"],
+        ["fullness-stats", /*"distribution-stats"*/],
+        ["/statistics/fullness", /*"/statistics/distribution"*/],
     )
     const settings: JSX.Element = MenuButton("settings", "/settings", t)
     const users: JSX.Element = MenuButton("users", "/users", t)
@@ -70,7 +70,7 @@ function ChoiceOptionsList(user: UserType) : JSX.Element[] {
     let options_list : JSX.Element[]
     switch (user) { // this switch choices pages that will be shown to user by his role
         case UserType.Admin:
-            options_list = [leaders, projects, users, statistics, catalog,/* settings*/]
+            options_list = [leaders, projects, users, statistics/*, catalog, settings*/]
             break
         case UserType.Editor:
             options_list = [leaders, projects, /*statistics, catalog, settings*/]
