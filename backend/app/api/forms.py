@@ -72,7 +72,7 @@ class Forms(Resource):
         question_ids = Question.get_only_main_page(form_type)
 
         result = Forms._prepare_table(forms, question_ids)
-
+        print(result)
         return Response(json.dumps({'table': result}), 200)
 
     @staticmethod
@@ -126,6 +126,8 @@ class Forms(Resource):
                 title = question.relation_settings.inverse_main_page_count_title
             elif q_type == AnswerType.FORWARD_COUNT:
                 title = question.relation_settings.main_page_count_title
+            elif q_type == AnswerType.INVERSE_VALUE:
+                title = question.relation_settings.inverse_main_page_title
             else:
                 title = question.short_text
             result.append({
@@ -148,6 +150,15 @@ class Forms(Resource):
                 'type': QuestionType.NUMBER.name,
                 'value': Answer.count_inverse_answers(form_id, question_id)
             })
+        elif q_type == AnswerType.INVERSE_VALUE:
+            ans_object["answers"] = [
+                {
+                    'type': QuestionType.RELATION.name,
+                    'relation_type': Question.get_by_id(question_id).relation_settings.relation_type.name,
+                    'ref_id': ref_id,
+                    'value': Form.get_by_ids({ref_id})[0].name if len(Form.get_by_ids({ref_id})) > 0 else "DELETED"
+                } for ref_id in Answer.get_inverse_answers(form_id, question_id)
+            ]
         else:
             form_answers = Answer.get_form_answers(form_id, question_id)
             ans_object["answers"] = [

@@ -24,6 +24,7 @@ class AnswerType(Enum):
     FORWARD_COUNT = 2
     INVERSE_COUNT = 3
     REFERENCE = 4
+    INVERSE_VALUE = 5
 
 
 class Question(Editable, FlaskApp().db.Model):
@@ -154,12 +155,18 @@ class Question(Editable, FlaskApp().db.Model):
         return FlaskApp().request(Question).filter(Question.text.like(f"%{text}%")).all()
 
     @staticmethod
+    def get_all_inverse(form_type: FormType):
+        relations = RelationSettings.get_inverse_questions(form_type)
+        return FlaskApp().request(Question).filter(Question._relation_settings.in_(relations)).all()
+
+    @staticmethod
     def get_only_main_page(form_type: FormType) -> List[JSON]:
         formattings = FormattingSettings.get_main_page()
         questions = Question.get_all_with_formattings(formattings)
         counted_relations = RelationSettings.get_main_page_count_presented(form_type)
         counted_questions_forward = Question.get_all_with_relation_settings(counted_relations[0])
         counted_questions_inverse = Question.get_all_with_relation_settings(counted_relations[1])
+        inverse_questions = Question.get_all_inverse(form_type)
 
         def form_type_filter(q: Question) -> bool:
             return q.form_type == form_type
@@ -177,7 +184,10 @@ class Question(Editable, FlaskApp().db.Model):
         } for item in counted_questions_forward] + [{
             'type': AnswerType.INVERSE_COUNT,
             'question': item
-        } for item in counted_questions_inverse]
+        } for item in counted_questions_inverse] + [{
+            'type': AnswerType.INVERSE_VALUE,
+            'question': item
+        } for item in inverse_questions]
 
         return result
 

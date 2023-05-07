@@ -33,10 +33,15 @@ class RelationSettings(Editable, FlaskApp().db.Model):
         FlaskApp().db.Text(MAX_SHORT_QUESTION_SIZE * MAX_LANGUAGES_COUNT),
         nullable=True)
 
+    _inverse_main_page_title = FlaskApp().db.Column('inverse_main_page_title',
+                                                    FlaskApp().db.Text(MAX_SHORT_QUESTION_SIZE * MAX_LANGUAGES_COUNT),
+                                                    nullable=True)
+
     def __init__(self, relation_type: str,
                  related_visualization_type: str, related_visualization_sorting: int = 0,
                  main_page_count_title: TranslatedText = None, inverse_main_page_count_title: TranslatedText = None,
-                 forward_relation_sheet_name: str = None, inverse_relation_sheet_name: str = None) -> None:
+                 forward_relation_sheet_name: str = None, inverse_relation_sheet_name: str = None,
+                 inverse_main_page_title: TranslatedText = None) -> None:
 
         super().__init__()
         self._relation_type = FormType[relation_type]
@@ -47,6 +52,7 @@ class RelationSettings(Editable, FlaskApp().db.Model):
         self.inverse_main_page_count_title = inverse_main_page_count_title
         self.forward_relation_sheet_name = forward_relation_sheet_name
         self.inverse_relation_sheet_name = inverse_relation_sheet_name
+        self.inverse_main_page_title = inverse_main_page_title
 
     def to_json(self) -> JSON:
         return super().to_json() | {
@@ -56,7 +62,8 @@ class RelationSettings(Editable, FlaskApp().db.Model):
             'forward_relation_sheet_name': self.forward_relation_sheet_name,
             'inverse_relation_sheet_name': self.inverse_relation_sheet_name,
             'main_page_count_title': self.main_page_count_title,
-            'inverse_main_page_count_title': self.inverse_main_page_count_title
+            'inverse_main_page_count_title': self.inverse_main_page_count_title,
+            'inverse_main_page_title': self.inverse_main_page_title
         }
 
     def copy(self, other: 'RelationSettings') -> None:
@@ -66,6 +73,7 @@ class RelationSettings(Editable, FlaskApp().db.Model):
         self.inverse_main_page_count_title = other.inverse_main_page_count_title
         self.forward_relation_sheet_name = other.forward_relation_sheet_name
         self.inverse_relation_sheet_name = other.inverse_relation_sheet_name
+        self.inverse_main_page_title = other.inverse_main_page_title
 
     @staticmethod
     def json_format() -> JSON:
@@ -76,7 +84,8 @@ class RelationSettings(Editable, FlaskApp().db.Model):
             'forward_relation_sheet_name': {str, None},
             'inverse_relation_sheet_name': {str, None},
             'main_page_count_title': {dict, None},
-            'inverse_main_page_count_title': {dict, None}
+            'inverse_main_page_count_title': {dict, None},
+            'inverse_main_page_title': {dict, None}
         }
 
     @staticmethod
@@ -88,6 +97,13 @@ class RelationSettings(Editable, FlaskApp().db.Model):
             .filter(RelationSettings._inverse_main_page_count_title.is_not(None)).with_entities(RelationSettings.id)
         inverse = [item.id for item in inverse_query.all()]
         return forward, inverse
+
+    @staticmethod
+    def get_inverse_questions(form_type: FormType) -> List[int]:
+        items = FlaskApp().request(RelationSettings).filter(
+            RelationSettings._inverse_main_page_title.is_not(None)).filter_by(_relation_type=form_type)\
+            .with_entities(RelationSettings.id).all()
+        return [item.id for item in items]
 
     @staticmethod
     def get_foreign_to_show_query(form: FormType):
@@ -127,6 +143,18 @@ class RelationSettings(Editable, FlaskApp().db.Model):
     def inverse_main_page_count_title(self, new_value: TranslatedText) -> str:
         self._inverse_main_page_count_title = json.dumps(new_value)
         return self._inverse_main_page_count_title
+
+    @property
+    def inverse_main_page_title(self) -> TranslatedText:
+        if self._inverse_main_page_title is None:
+            return None
+        return json.loads(self._inverse_main_page_title)
+
+    @inverse_main_page_title.setter
+    @Editable.on_edit
+    def inverse_main_page_title(self, new_value: TranslatedText) -> str:
+        self._inverse_main_page_title = json.dumps(new_value)
+        return self._inverse_main_page_title
 
     @property
     def related_visualization_type(self) -> VisualizationType:

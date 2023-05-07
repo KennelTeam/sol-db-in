@@ -32,7 +32,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
         console.log("ONITEMCHANGED")
         console.log(changedAnswer)
         let key = changedAnswer.uid.toString() + "/" + changedAnswer.table_row?.toString()
-        console.log(key)
+        console.log("onItemChanged: key:", key)
         if (changedAnswer.initialValue !== false && changedAnswer.deleted) {
             if (changedAnswer.deleted === true) {
                 if (changedAnswer.id != -1) {
@@ -44,7 +44,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
         } else {
             resultData[key] = changedAnswer
         }
-        console.log(resultData)
+        console.log("onItemChanged: resultData:", resultData)
     }
 
     const blocksComponents = responseData.blocks.map(

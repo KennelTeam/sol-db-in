@@ -7,7 +7,7 @@ from backend.app.flask_app import FlaskApp
 # from .tag_to_answer import TagToAnswer
 from .editable_value_holder import EditableValueHolder
 from enum import Enum
-from typing import Any, List, Set
+from typing import Any, List, Set, Tuple
 from .question_type import QuestionType
 from backend.auxiliary import JSON
 from ...auxiliary.string_dt import date_to_string
@@ -70,6 +70,11 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             result = list(filter(lambda x: x.id == id, Answer._cached))
             return None if len(result) == 0 else result[0]
         return FlaskApp().request(Answer).filter_by(id=id).first()
+
+    @staticmethod
+    def get_inverse_answers(form_id: int, question_id: int) -> List[int]:
+        items = FlaskApp().request(Answer).filter_by(value_int=form_id, _question_id=question_id).all()
+        return [item.form_id for item in items]
 
     @staticmethod
     def query_for_question_ids(question_ids: Set[int]) -> Query:
