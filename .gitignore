@@ -7,6 +7,8 @@ __pycache__/
 logs/
 # C extensions
 *.so
+uploads/
+*.sql
 frontend/package-lock.json
 # Distribution / packaging
 .Python

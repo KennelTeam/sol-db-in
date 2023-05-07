@@ -27,6 +27,12 @@ function App() {
   // setUser later will be passed with props to the Login component for changing the user
   // at first when the site is loaded user must be UserType.None, and then it will be saved in cookies
   document.title = t('title')
+
+  const changeUser = (user: UserType) => {
+    console.log(user)
+    setUser(user)
+  }
+
   return (
     <BrowserRouter>
       <Stack direction="row" alignItems="stretch" spacing={0} sx={{maxWidth: "unset"}}>
@@ -40,7 +46,7 @@ function App() {
           <Route path='/catalog' element={<Catalog />}/>
           <Route path='/leader/:id' element={<Leader />}/>
           <Route path='/leaders' element={<LeadersList />}/>
-          <Route path='/login' element={<Login changeUser={setUser}/>}/>
+          <Route path='/login' element={<Login changeUser={changeUser}/>}/>
           <Route path='/project/:id' element={<Project />}/>
           <Route path='/projects' element={<ProjectsList />}/>
           <Route path='/settings' element={<Settings />}/>
