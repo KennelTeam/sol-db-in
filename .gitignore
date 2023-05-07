@@ -5,8 +5,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 logs/
+uploads/
 # C extensions
 *.so
+uploads/
+*.sql
 frontend/package-lock.json
 # Distribution / packaging
 .Python

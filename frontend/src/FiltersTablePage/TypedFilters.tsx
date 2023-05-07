@@ -171,8 +171,8 @@ export function DateFilter({setFilter}: FilterProps) {
     useEffect(() => {
         setFilter({
             question_id: 0,
-            min_value: dateFrom === null ? undefined : dateFrom.format('DD-MM-YYYY'),
-            max_value: dateTo === null ? undefined : dateTo.format('DD-MM-YYYY')
+            min_value: dateFrom === null ? undefined : dateFrom.format('YYYY-MM-DD'),
+            max_value: dateTo === null ? undefined : dateTo.format('YYYY-MM-DD')
         })
     })
 
@@ -190,7 +190,7 @@ export function DateFilter({setFilter}: FilterProps) {
                 <Typography variant="overline">{t("from")}</Typography>
                 <DesktopDatePicker
                     label="from"
-                    inputFormat="DD.MM.YYYY"
+                    inputFormat="MM/DD/YYYY"
                     value={dateFrom}
                     onChange={handleChangeFrom}
                     renderInput={(params: JSX.IntrinsicAttributes & TextFieldProps) => <TextField size="small" {...params} />}
@@ -198,7 +198,7 @@ export function DateFilter({setFilter}: FilterProps) {
                 <Typography variant="overline">{t("to")}</Typography>
                 <DesktopDatePicker
                     label="to"
-                    inputFormat="DD.MM.YYYY"
+                    inputFormat="MM/DD/YYYY"
                     value={dateTo}
                     onChange={handleChangeTo}
                     renderInput={(params: JSX.IntrinsicAttributes & TextFieldProps) => <TextField size="small" {...params} />}

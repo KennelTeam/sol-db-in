@@ -1,3 +1,4 @@
-import Statistics from "./Statistics";
+import DistributionStatistics from "./Distribution";
+import FullnessStatistics from "./Fullness";
 
-export default Statistics;
+export default { FullnessStatistics, DistributionStatistics };

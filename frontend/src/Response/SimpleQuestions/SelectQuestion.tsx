@@ -9,7 +9,7 @@ import {
   TextField
 } from "@mui/material";
 import { CommonQuestionProperties } from "./common";
-import React, {ReactElement, SyntheticEvent, useState} from "react";
+import React, {ReactElement, SyntheticEvent, useEffect, useState} from "react";
 import {makeNewAnswerOption, makeNewObject} from "../../FiltersTablePage/requests2API";
 import {useNavigate} from "react-router-dom";
 import AddIcon from "@material-ui/icons/Add";
@@ -52,6 +52,11 @@ function SelectQuestion(props: { questionData: SelectQuestionInterface; onChange
         props.onChange(data)
       })
   }
+
+  useEffect(() => {
+      setValue(props.questionData)
+      setAns(props.questionData.initialValue)
+  }, [props.questionData])
 
   let creationalBlock: ReactElement
   if (questionData.answer_block_id != null) {

@@ -1,5 +1,5 @@
 import { Box, TextField } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CommonQuestionProperties } from "./common";
 
 export interface NumberQuestionInterface extends CommonQuestionProperties {
@@ -10,6 +10,12 @@ function NumberQuestion(props: { questionData: NumberQuestionInterface; onChange
     let questionData: NumberQuestionInterface = props.questionData
     const [value, setValue] = useState(questionData)
     const [ans, setAns] = useState(questionData.initialValue || '')
+
+    useEffect(() => {
+        setValue(props.questionData)
+        setAns(props.questionData.initialValue || '')
+    }, [props.questionData])
+
     return <Box display="inline-block">
         <TextField
         type="number"

@@ -3,11 +3,13 @@ import InputInfo, { InputInfoInterface } from "../SimpleQuestions/InputInfo";
 import { WithInputInfoInterface } from "../SimpleQuestions/LabeledQuestion";
 import SimpleQuestion, { SimpleQuestionInterface, SimpleQuestionType } from "../SimpleQuestions/SimpleQuestion";
 import BaseTable from "./BaseTable";
-import {Box, Button, IconButton} from "@mui/material";
+import {Box, Button, IconButton, Stack} from "@mui/material";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material"
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import AddIcon from "@material-ui/icons/Add"
 import DeleteIcon from "@material-ui/icons/Delete"
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { useTranslation } from "react-i18next";
 
 
@@ -26,14 +28,60 @@ function DynamicTable(props: { dynamicTableData: DynamicTableInterface, inputInf
 
     const {t} = useTranslation("translation", { keyPrefix: "dynamic_table" })
 
+    let inputInfoComponents = [
+        <div/>, // empty column for sorting buttons
+        ...dynamicTableData.inputInfos.map((inputInfo) => {
+            return <InputInfo {...inputInfo} />
+        })
+    ]
+
+    function swapRows(firstIdx: number) {
+      const newData = JSON.parse(JSON.stringify(dynamicTableData)) as DynamicTableWithInputInfoInterface
+      const buf = JSON.parse(JSON.stringify(newData.questions[firstIdx]))
+      newData.questions[firstIdx] = newData.questions[firstIdx + 1]
+      newData.questions[firstIdx + 1] = buf
+      for (let i = 0; i < newData.questions[firstIdx].length; i++) {
+        newData.questions[firstIdx][i].questionData.table_row = firstIdx
+        props.onChange(newData.questions[firstIdx][i].questionData)
+        newData.questions[firstIdx + 1][i].questionData.table_row = firstIdx + 1
+        props.onChange(newData.questions[firstIdx + 1][i].questionData)
+      }
+      console.log("NEW DATA:", newData)
+      setTable(newData)
+    }
+
+    const makeQuestionComponents = () => (
+      dynamicTableData.questions.map((quetionsDataRow, idx) =>
+      [
+        <Stack direction="column">
+          { idx !== 0 ?
+            <IconButton onClick={() => {
+              console.log("Move Up:", idx)
+              swapRows(idx - 1)
+            }}>
+              <ArrowDropUpIcon/>
+            </IconButton> : null
+          }
+          { idx !== a - 1 ?
+            <IconButton onClick={() => {
+              console.log("Move Down:", idx)
+              swapRows(idx)
+            }}>
+              <ArrowDropDownIcon/>
+            </IconButton> : null
+          }
+        </Stack>,
+        ...quetionsDataRow.map((question) => <SimpleQuestion questionData={question} onChange={props.onChange} />)
+      ]
+  ))
+
+    let questionComponents = makeQuestionComponents()
+
     console.log("REDRAW")
 
-    let inputInfoComponents = dynamicTableData.inputInfos.map((inputInfo) => {
-        return <InputInfo {...inputInfo} />
+    useEffect(() => {
+      questionComponents = makeQuestionComponents()
     })
-    let questionComponents = dynamicTableData.questions.map((quetionsDataRow) =>
-        quetionsDataRow.map((question) => <SimpleQuestion questionData={question} onChange={props.onChange} />)
-    )
 
     const addRow = () => {
         console.log("here")
