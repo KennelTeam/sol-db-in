@@ -37,16 +37,23 @@
         "role": "Role",
         "full-name": "Full Name",
         "edit": "Edit",
+        "add-user": "Add user",
         "dialog": {
             "title": "Edit User",
             "save": "Save",
             "cancel": "Cancel",
             "editor": "Editor",
             "intern": "Intern",
+            "admin": "Admin",
             "guest": "Guest",
             "new-password": "New password",
             "comment": "Comment",
-            "block-access": "Block access to the site"
+            "block-access": "Block access to the site",
+            "password-required": "When creating a new user password must be provided",
+            "user-exists": "User with this login already exists",
+            "login-required": "Login is required",
+            "ok": "Ok",
+            "info-title": "Information"
         }
     },
 
