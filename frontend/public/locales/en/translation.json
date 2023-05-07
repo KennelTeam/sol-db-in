@@ -22,7 +22,9 @@
         "questionnaire": "Questionnaire",
         "options": "Answers",
         "fullness-stats": "Fullness",
-        "distribution-stats": "Answers distribution"
+        "distribution-stats": "Answers distribution",
+        "export": "Data export",
+        "main-download": "Download Excel file"
     },
     "settings": {
         "title": "Settings",
