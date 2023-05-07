@@ -65,6 +65,7 @@ class DatabaseExcelExport(Resource):
         questions_df['localized_text'] = questions_df.apply(lambda row: localize(json.loads(row['text'])), axis=1)
         answer_options_df['localized_answer_option'] = answer_options_df.apply(lambda row: localize(json.loads(row['name'])), axis=1)
 
+
         questions_df_copy = questions_df[['id', 'localized_text']]
         questions_df_copy.rename(columns={'localized_text': 'localized_text_2'}, inplace=True)
         answers_df.rename(columns={'table_row': 'answer_table_row'}, inplace=True)
@@ -72,15 +73,25 @@ class DatabaseExcelExport(Resource):
         toponyms_df.rename(columns={'name': 'toponym_name'}, inplace=True)
         all_forms_df.rename(columns={'name': 'related_form_name'}, inplace=True)
 
-        answers_df = questions_df.merge(answers_df,left_on='id', right_on='question_id'
+        answers_df["row_question_id"] = answers_df["row_question_id"].astype('float64')
+        answer_options_df["id"] = answer_options_df["id"].astype('float64')
+
+        answers_df = questions_df.merge(answers_df, left_on='id', right_on='question_id'
         ).merge(formatting_settings_df, left_on='formatting_settings', right_on='id'
         ).merge(questions_df_copy, left_on='row_question_id', right_on='id', how='left'
         ).merge(questions_blocks_df, left_on='block_id', right_on='id', how='left'
         ).merge(users_df, left_on='value_int', right_on='id', how='left'
         ).merge(toponyms_df, left_on='value_int', right_on='id', how='left'
-        ).merge(answer_options_df, left_on='value_int', right_on='id', how='left'
-        ).merge(relation_settings_df, left_on='relation_settings', right_on='id', how='left'
-        ).merge(all_forms_df, left_on='value_int', right_on='id', how='left')
+        )
+
+        answers_df = answers_df.merge(answer_options_df, left_on='value_int', right_on='id', how='left')
+        relation_settings_df["id"] = relation_settings_df["id"].astype("float64")
+
+        answers_df["relation_settings"] = answers_df["relation_settings"].astype("float64")
+        answers_df = answers_df.merge(relation_settings_df, left_on='relation_settings', right_on='id', how='left')
+
+        all_forms_df["id"] = all_forms_df["id"].astype("float64")
+        answers_df = answers_df.merge(all_forms_df, left_on='value_int', right_on='id', how='left')
 
         answers_df['localized_text'].loc[answers_df['localized_text_2'].notna()] += ' [' + answers_df['localized_text_2'] + ']'
 
