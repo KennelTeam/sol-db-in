@@ -71,6 +71,7 @@
             "body": "Enter new leader's name",
             "exists": "This leader already exists in database",
             "input_label": "New leader's name",
+            "follow_page": "Follow leader's page",
             "cancel": "Cancel",
             "create": "Create"
         },
@@ -79,6 +80,7 @@
             "body": "Enter new lprojects's name",
             "exists": "This project already exists in database",
             "input_label": "New project's name",
+            "follow_page": "Follow project's page",
             "cancel": "Cancel",
             "create": "Create"
         }
