@@ -59,7 +59,7 @@ function DynamicTable(props: { dynamicTableData: DynamicTableInterface, inputInf
               console.log("Move Up:", idx)
               swapRows(idx - 1)
             }}>
-              <ArrowDropUpIcon/>
+              <ArrowDropUpIcon htmlColor="blue"/>
             </IconButton> : null
           }
           { idx !== a - 1 ?
@@ -67,7 +67,7 @@ function DynamicTable(props: { dynamicTableData: DynamicTableInterface, inputInf
               console.log("Move Down:", idx)
               swapRows(idx)
             }}>
-              <ArrowDropDownIcon/>
+              <ArrowDropDownIcon htmlColor="blue"/>
             </IconButton> : null
           }
         </Stack>,
