@@ -17,6 +17,7 @@ const StyledTableCell = styled(TableCell)({
     margin: 3,
     textAlign: "center"
 })
+
 function descendingComparator(a: Row, b: Row, orderBy: number) {
     let a_n: number | string = 0;
     let b_n: number | string = 0;

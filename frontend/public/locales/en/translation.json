@@ -66,6 +66,7 @@
         "submit_filter": "Submit filter",
         "add_leader": "Add leader",
         "add_project": "Add project",
+        "add_filter": "Add filter:",
         "add_leader_dialog": {
             "title": "Adding leader",
             "body": "Enter new leader's name",
