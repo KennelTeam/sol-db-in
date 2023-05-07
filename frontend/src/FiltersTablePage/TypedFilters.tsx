@@ -190,7 +190,7 @@ export function DateFilter({setFilter}: FilterProps) {
                 <Typography variant="overline">{t("from")}</Typography>
                 <DesktopDatePicker
                     label="from"
-                    inputFormat="DD.MM.YYYY"
+                    inputFormat="MM/DD/YYYY"
                     value={dateFrom}
                     onChange={handleChangeFrom}
                     renderInput={(params: JSX.IntrinsicAttributes & TextFieldProps) => <TextField size="small" {...params} />}
@@ -198,7 +198,7 @@ export function DateFilter({setFilter}: FilterProps) {
                 <Typography variant="overline">{t("to")}</Typography>
                 <DesktopDatePicker
                     label="to"
-                    inputFormat="DD.MM.YYYY"
+                    inputFormat="MM/DD/YYYY"
                     value={dateTo}
                     onChange={handleChangeTo}
                     renderInput={(params: JSX.IntrinsicAttributes & TextFieldProps) => <TextField size="small" {...params} />}
