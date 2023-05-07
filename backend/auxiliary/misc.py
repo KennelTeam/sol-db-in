@@ -1,11 +1,12 @@
 import logging
 import time
+from pathlib import Path
 
 from backend.constants import LOGS_DIRECTORY
 
-
 _loggers = {}
 
+Path(LOGS_DIRECTORY).mkdir(exist_ok=True)
 logs_file_handler = logging.FileHandler(LOGS_DIRECTORY / f'sol-db-in-{int(time.time())}.log')  # Initilize file handler
 logs_stream_handler = logging.StreamHandler()  # Initialize stdout handler
 

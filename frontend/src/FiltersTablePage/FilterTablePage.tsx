@@ -172,6 +172,25 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
         rows: []
     })
     const [addDialogOpen, setAddDialogOpen] = useState<boolean>(false)
+
+    const [names, setNames] = useState<AnswerVariant[]>([])
+    const [searchInputValue, setSearchInputValue] = useState<string>("")
+    const [searchValue, setSearchValue] = useState<AnswerVariant>({
+        name: "",
+        id: -1
+    })
+
+    const handleSearchChange = (event: React.SyntheticEvent, newValue: string | AnswerVariant | null) => {
+        setSearchValue(newValue as AnswerVariant)
+    }
+
+    const handleSearchInputChange = (event: React.SyntheticEvent, newInputValue: string | null) => {
+        if (newInputValue !== null) {
+            setSearchInputValue(newInputValue as string)
+            setNameSubstr(newInputValue as string)
+        }
+    }
+
     const isInitialMount = useRef(true)
     const navigate = useNavigate()
 
@@ -299,6 +318,9 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
                 })
             // })
         handleSubmitFilter()
+        getObjectsList(formType, navigate).then((response) => {
+            setNames(response)
+        })
     }, [])
 
     const isCorrectSelect = () => (
@@ -311,18 +333,34 @@ function FilterTablePage({ formType } : { formType: 'LEADER' | 'PROJECT' }) {
             <List disablePadding>
                 {filtersList}
             </List>
-            <TextField
-                size="small"
-                label={t('name_search')}
-                value={name_substr}
-                onChange={(event) => {setNameSubstr(event.target.value)}}
-                InputLabelProps={{
-                    shrink: true,
-                }}
-            />
+            <Autocomplete
+                    sx={{ width: 450, margin: 5 }}
+                    options={names}
+                    disableCloseOnSelect
+                    getOptionLabel={(option) => (typeof option === 'string' ?
+                        option : option.name)}
+                    value={searchValue}
+                    inputValue={searchInputValue}
+                    onChange={handleSearchChange}
+                    onInputChange={handleSearchInputChange}
+                    isOptionEqualToValue={(option, value) => (option.name.trim() === value.name.trim())}
+                    freeSolo
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            size="small"
+                            label={t('name_search')}
+                            inputProps={{
+                                ...params.inputProps,
+                                autoComplete: 'new-password',
+                            }}
+                            >
+                        </TextField>
+                    )}
+                />
             <Card>
                 <Stack direction="row" spacing={1} padding={2} alignItems="center">
-                    <Typography variant="caption">Add filter:</Typography>
+                    <Typography variant="caption">{t("add_filter")}</Typography>
                     <Autocomplete
                         disablePortal
                         options={questions}

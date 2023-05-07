@@ -11,18 +11,28 @@ interface UserTypeProps { // props interface used by NavigationMenu for sending 
     user: UserType
 }
 
-const MenuButton = (text: string, path: string, t : TFunction, padding=2) : JSX.Element => (
-    <ListItem component={Link} to={path} target={"_blanc"}
-        style={{ color: "inherit", textDecoration: "none" }}
-        disablePadding
-        >
-        <ListItemButton sx={{ pl: padding}} selected={useLocation().pathname.startsWith(path)}>
+const MenuButton = (text: string, path: string, t : TFunction, padding=2, download=false) : JSX.Element => {
+    let selected=useLocation().pathname.startsWith(path)
+    if (download) {
+        return <a href={path} target={"_blank"}
+            style={{color: "inherit", textDecoration: "none"}}>
+            <ListItemButton sx={{pl: padding}} selected={selected}>
                 <ListItemText primary={t(text)}/>
+            </ListItemButton>
+        </a>
+    }
+
+    return <ListItem component={Link} to={path} target={download ? "_blanc" : undefined} download={download}
+              style={{color: "inherit", textDecoration: "none"}}
+              disablePadding
+    >
+        <ListItemButton sx={{pl: padding}} selected={selected}>
+            <ListItemText primary={t(text)}/>
         </ListItemButton>
     </ListItem>
-)
+}
 
-function DropDownList(text: string, itemsNames: string[], itemsPaths: string[]) : JSX.Element {
+function DropDownList(text: string, itemsNames: string[], itemsPaths: string[], download=false) : JSX.Element {
     const { t } = useTranslation('translation', { keyPrefix: "menu" })
 
     const [open, setOpen] = React.useState(false)
@@ -32,7 +42,7 @@ function DropDownList(text: string, itemsNames: string[], itemsPaths: string[]) 
 
     let items = []
     for (let i = 0; i < itemsNames.length; i++) {
-        items.push(MenuButton(itemsNames[i], itemsPaths[i], t, 4))
+        items.push(MenuButton(itemsNames[i], itemsPaths[i], t, 4, download))
     }
     return (
         <div>
@@ -62,6 +72,11 @@ function ChoiceOptionsList(user: UserType) : JSX.Element[] {
         ["fullness-stats", /*"distribution-stats"*/],
         ["/statistics/fullness", /*"/statistics/distribution"*/],
     )
+    const export_menu: JSX.Element = DropDownList(
+        "export",
+        ["main-download"],
+        ["/api/export/forms"], true
+    )
     const settings: JSX.Element = MenuButton("settings", "/settings", t)
     const users: JSX.Element = MenuButton("users", "/users", t)
     const catalog: JSX.Element = DropDownList("catalog", ["tags", "questionnaire", "options"],
@@ -70,10 +85,10 @@ function ChoiceOptionsList(user: UserType) : JSX.Element[] {
     let options_list : JSX.Element[]
     switch (user) { // this switch choices pages that will be shown to user by his role
         case UserType.Admin:
-            options_list = [leaders, projects, users, statistics/*, catalog, settings*/]
+            options_list = [leaders, projects, users, statistics, export_menu/*, catalog, settings*/]
             break
         case UserType.Editor:
-            options_list = [leaders, projects, /*statistics, catalog, settings*/]
+            options_list = [leaders, projects, statistics/*, catalog, settings*/]
             break
         case UserType.Intern:
             options_list = [leaders, projects, /*statistics, catalog*/]

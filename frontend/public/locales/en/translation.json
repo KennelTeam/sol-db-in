@@ -22,7 +22,9 @@
         "questionnaire": "Questionnaire",
         "options": "Answers",
         "fullness-stats": "Fullness",
-        "distribution-stats": "Answers distribution"
+        "distribution-stats": "Answers distribution",
+        "export": "Data export",
+        "main-download": "Download Excel file"
     },
     "settings": {
         "title": "Settings",
@@ -75,11 +77,13 @@
         "submit_filter": "Submit filter",
         "add_leader": "Add leader",
         "add_project": "Add project",
+        "add_filter": "Add filter:",
         "add_leader_dialog": {
             "title": "Adding leader",
             "body": "Enter new leader's name",
             "exists": "This leader already exists in database",
             "input_label": "New leader's name",
+            "follow_page": "Follow leader's page",
             "cancel": "Cancel",
             "create": "Create"
         },
@@ -88,6 +92,7 @@
             "body": "Enter new lprojects's name",
             "exists": "This project already exists in database",
             "input_label": "New project's name",
+            "follow_page": "Follow project's page",
             "cancel": "Cancel",
             "create": "Create"
         }

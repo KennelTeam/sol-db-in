@@ -9,6 +9,7 @@ import { AnswerVariant } from './TypedFilters';
 import { getObjectsList } from './requests2API';
 import { TextField, Autocomplete, Typography, Button } from '@mui/material';
 import React from 'react'
+import { Link } from 'react-router-dom';
 
 interface AddObjectPopupProps {
     formType: 'LEADER' | 'PROJECT'
@@ -85,7 +86,11 @@ export default function AddObjectPopup(props : AddObjectPopupProps) {
                     )}
                 />
                 {isExists(inputValue) ?
-                    <Typography color="red">{t("exists")}</Typography> : null}
+                    <div>
+                        <Typography color="red">{t("exists")}</Typography>
+                        <Link to={(props.formType === 'LEADER' ? '/leader/' : '/project/')
+                                + value.id} target={"_blanc"}>{t("follow_page")}</Link>
+                    </div>  : null}
             </DialogContent>
             <DialogActions>
                 <Button onClick={props.onCancel}>{t("cancel")}</Button>

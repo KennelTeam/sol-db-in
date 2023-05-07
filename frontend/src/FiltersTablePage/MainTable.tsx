@@ -17,6 +17,7 @@ const StyledTableCell = styled(TableCell)({
     margin: 3,
     textAlign: "center"
 })
+
 function descendingComparator(a: Row, b: Row, orderBy: number) {
     let a_n: number | string = 0;
     let b_n: number | string = 0;
@@ -131,7 +132,7 @@ function RenderRow(props: Row) {
 
     const SingleElement = (props: {data: string, link?: string}) : JSX.Element => {
         if (props.link !== undefined) {
-            return <Link to={props.link}>{props.data}</Link>
+            return <Link to={props.link} target={"_blanc"}>{props.data}</Link>
         } else {
             return <>{props.data === "*yes*" ? <CheckIcon fontSize="small" htmlColor="green"/> : props.data }</>
         }
