@@ -41,14 +41,10 @@ function DynamicTable(props: { dynamicTableData: DynamicTableInterface, inputInf
       newData.questions[firstIdx] = newData.questions[firstIdx + 1]
       newData.questions[firstIdx + 1] = buf
       for (let i = 0; i < newData.questions[firstIdx].length; i++) {
-        if (typeof newData.questions[firstIdx][i].questionData.initialValue !== "string") {
-          (newData.questions[firstIdx][i].questionData.initialValue as { table_row: number })
-              .table_row = firstIdx
-        }
-        if (typeof newData.questions[firstIdx + 1][i].questionData.initialValue !== "string") {
-          (newData.questions[firstIdx + 1][i].questionData.initialValue as { table_row: number })
-              .table_row = firstIdx + 1
-        }
+        newData.questions[firstIdx][i].questionData.table_row = firstIdx
+        props.onChange(newData.questions[firstIdx][i].questionData)
+        newData.questions[firstIdx + 1][i].questionData.table_row = firstIdx + 1
+        props.onChange(newData.questions[firstIdx + 1][i].questionData)
       }
       console.log("NEW DATA:", newData)
       setTable(newData)
