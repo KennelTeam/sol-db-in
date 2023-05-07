@@ -110,6 +110,8 @@ export async function getFilteredTableData(data: FiltersRequestData,
     }
 
     function makeLink(id: number, relType: 'LEADER' | 'PROJECT') {
+        console.log(id)
+        console.log("IDIDIDID")
         return '/' + relType.toLowerCase() + '/' + id
     }
 
