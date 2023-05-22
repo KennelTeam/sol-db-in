@@ -25,7 +25,6 @@ export default function RelationQuestion(props: {
     const [inputValue, setInputValue] = useState<string>(questionData.initialValue ? questionData.initialValue.name : "")
     const [addDialogOpen, setOpen] = useState(false)
 
-    console.log("Relation name:", questionData.initialValue.name)
 
     const {t} = useTranslation("translation", { keyPrefix: "dynamic_table" })
     const navigate = useNavigate()
@@ -50,7 +49,7 @@ export default function RelationQuestion(props: {
         console.log("Change questionData:", props.questionData.initialValue)
         setData(props.questionData)
         setValue(props.questionData.initialValue)
-        setInputValue(props.questionData.initialValue.name)
+        setInputValue(props.questionData.initialValue ? props.questionData.initialValue.name : "")
     }, [props.questionData])
 
     useEffect(() => {

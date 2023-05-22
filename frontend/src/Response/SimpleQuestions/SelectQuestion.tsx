@@ -140,6 +140,7 @@ function SelectQuestion(props: { questionData: SelectQuestionInterface; onChange
           let data = value
           data.initialValue = newInputValue
           if (data.dataToChooseFrom.find((item) => item.name == newInputValue) != null) {
+            data.value = data.dataToChooseFrom.find((item) => item.name == newInputValue)?.id
             setValue(data)
             props.onChange(value)
           }

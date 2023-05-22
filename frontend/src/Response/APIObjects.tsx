@@ -12,8 +12,8 @@ export interface APIQuestionElement {
 }
 
 export enum APIFormState {
+    RECOMMENDED = "RECOMMENDED",
     PLANNED = "PLANNED",
-    STARTED = "STARTED",
     FINISHED = "FINISHED"
 }
 
