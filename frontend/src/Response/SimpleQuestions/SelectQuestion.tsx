@@ -103,7 +103,15 @@ function SelectQuestion(props: { questionData: SelectQuestionInterface; onChange
         sx={{ width: 200 }}
         disableCloseOnSelect
         disablePortal
-        options={variants.map((x) => x.name)}
+        options={variants.sort((a, b) => {
+          if (!a.name) {
+            return -1
+          }
+          if (!b.name) {
+            return 1
+          }
+          return a.name > b.name ? 1 : -1
+        }).map((x) => x.name)}
         value={ans}
         inputValue={ans ? ans : ""}
         freeSolo
@@ -115,6 +123,7 @@ function SelectQuestion(props: { questionData: SelectQuestionInterface; onChange
             } }}
         />}
         onChange={(e, val) => {
+          console.log("On change")
           e.preventDefault()
           let data = value
           data.initialValue = val
@@ -126,7 +135,14 @@ function SelectQuestion(props: { questionData: SelectQuestionInterface; onChange
         }
         }
         onInputChange={(event: SyntheticEvent, newInputValue: string | null) => {
+          console.log("on Input change")
           setAns(newInputValue)
+          let data = value
+          data.initialValue = newInputValue
+          if (data.dataToChooseFrom.find((item) => item.name == newInputValue) != null) {
+            setValue(data)
+            props.onChange(value)
+          }
         }
         }
       />
