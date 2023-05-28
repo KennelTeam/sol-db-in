@@ -42,6 +42,14 @@ export default function RelationQuestion(props: {
     const handleInputChange = (event: SyntheticEvent, newInputValue: string | null) => {
         if (newInputValue !== null) {
             setInputValue(newInputValue as string)
+            let val = variants.find((variant) => variant.name == newInputValue)
+            if (val != null) {
+                setValue(val)
+                let data = questionData
+                data.initialValue = val
+                data.value = val.id
+                props.onChange(data)
+            }
         }
     }
 
