@@ -160,7 +160,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
             {nameInput}
             <Autocomplete
                 disablePortal
-                options={[APIFormState.PLANNED.toString(), APIFormState.STARTED.toString(), APIFormState.FINISHED.toString()]}
+                options={[APIFormState.RECOMMENDED.toString(), APIFormState.PLANNED.toString(), APIFormState.FINISHED.toString()]}
                 value={state.toString()}
                 size="small"
                 sx={{ display: "block", minWidth: "300px" }}
@@ -169,7 +169,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
                 />}
                 onChange={(e, val) => {
                     e.preventDefault()
-                    setState(val ? val.toString() : "PLANNED")
+                    setState(val ? val.toString() : "RECOMMENDED")
                 }
                 }
             />

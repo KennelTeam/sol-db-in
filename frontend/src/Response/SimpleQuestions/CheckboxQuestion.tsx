@@ -39,6 +39,15 @@ function SingleCheckboxQuestion(props: { question: SingleCheckboxQuestionInterfa
 
 function CheckboxQuestion(props: { questionData: CheckboxQuestionInterface; onChange: any; }): JSX.Element {
     let questionData: CheckboxQuestionInterface = props.questionData
+    questionData.questions.sort((a, b) => {
+        if (!a.label) {
+            return -1
+        }
+        if (!b.label) {
+            return 1
+        }
+        return a.label > b.label ? 1 : -1
+    })
     const components = questionData.questions.map((question) => <SingleCheckboxQuestion question={question} onChange={props.onChange}/>)
 
 

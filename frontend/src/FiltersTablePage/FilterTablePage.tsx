@@ -1,19 +1,45 @@
-import { Stack } from "@mui/system";
-import { Card, Typography, IconButton, ListItem, List, TextField, TextFieldProps, Autocomplete, Button, Box, Dialog } from "@mui/material";
-import { AnswerType, SERVER_ADDRESS } from "../types/global"
+import {Stack} from "@mui/system";
+import {
+    Autocomplete,
+    Box,
+    Button,
+    Card,
+    Dialog,
+    IconButton,
+    List,
+    ListItem,
+    TextField,
+    TextFieldProps,
+    Typography
+} from "@mui/material";
+import {AnswerType, SERVER_ADDRESS} from "../types/global"
 import ClearIcon from '@material-ui/icons/Clear'
 import AddIcon from '@material-ui/icons/Add'
-import * as Test from './_testFunctions'
-import { NumberFilter, TextFilter, CheckboxFilter, ChoiceFilter, AutocompleteChoiceFilter, DateFilter, AnswerFilter, AnswerVariant } from './TypedFilters'
-import { getUsersList, getAnswersList, getObjectsList, getToponymsList, getFilteredTableData, makeNewObject } from "./requests2API";
-import { useState, useEffect, useRef } from "react";
-import MainTable, { TableData } from "./MainTable";
-import { useImmer } from "use-immer"
-import { useTranslation } from 'react-i18next'
+import {
+    AnswerFilter,
+    AnswerVariant,
+    AutocompleteChoiceFilter,
+    ChoiceFilter,
+    DateFilter,
+    NumberFilter,
+    TextFilter
+} from './TypedFilters'
+import {
+    getAnswersList,
+    getFilteredTableData,
+    getObjectsList,
+    getToponymsList,
+    getUsersList,
+    makeNewObject
+} from "./requests2API";
+import {useEffect, useRef, useState} from "react";
+import MainTable, {TableData} from "./MainTable";
+import {useImmer} from "use-immer"
+import {useTranslation} from 'react-i18next'
 import i18next from "i18next";
 import axios from "axios";
-import { Buffer } from "buffer";
-import { Link, useNavigate } from "react-router-dom";
+import {Buffer} from "buffer";
+import {useNavigate} from "react-router-dom";
 import AddObjectPopup from "./AddObjectPopup";
 
 interface QuestionAttributes {
@@ -57,6 +83,7 @@ function SingleFilter(props : SingleFilterProps) {
 
     useEffect(() => {
         switch (type) {
+            case AnswerType.Checkbox:
             case AnswerType.List :
                 if (answer_block_id !== undefined) {
                     getAnswersList(answer_block_id, navigate).then((answers) => {
@@ -96,7 +123,7 @@ function SingleFilter(props : SingleFilterProps) {
             filter = <TextFilter setFilter={setFilter}/>
             break
         case AnswerType.Checkbox :
-            filter = <CheckboxFilter setFilter={setFilter}/>
+            filter = <ChoiceFilter variants={variants} setFilter={setFilter}/>
             break
         case AnswerType.List :
             filter = <ChoiceFilter variants={variants} setFilter={setFilter}/>

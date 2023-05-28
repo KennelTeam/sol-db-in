@@ -160,7 +160,7 @@ export async function getFilteredTableData(data: FiltersRequestData,
 export async function makeNewObject(navigate: NavigateFunction,
                 formType: 'LEADER' | 'PROJECT', name?: string) : Promise<number> {
     return await axios.post(SERVER_ADDRESS + '/forms', {
-        state: 'PLANNED',
+        state: 'RECOMMENDED',
         name: name ? name : "insert name here",
         form_type: formType,
         answers: []

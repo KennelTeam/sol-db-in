@@ -19,8 +19,8 @@ from backend.auxiliary import JSON, LogicException
 
 
 class FormState(Enum):
-    PLANNED = 1
-    STARTED = 2
+    RECOMMENDED = 1
+    PLANNED = 2
     FINISHED = 3
 
     @staticmethod
