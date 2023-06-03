@@ -224,7 +224,7 @@ class Forms(Resource):
         for answer in content['answers']:
             status = Forms._update_form_answer(form, answer)
             if status != HTTPErrorCode.SUCCESS:
-                return post_failure(status, 400)
+                logger.log(0, json.dumps(answer, indent=4) + str(status))
 
         FlaskApp().flush_to_database()
         return Response(str(form.id), status=200)

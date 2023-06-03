@@ -104,7 +104,6 @@ class Form(Editable, FlaskApp().db.Model):
 
         question = Question.get_by_id(question_id)
         filters = Form._get_statistics_filters(question, min_value, max_value, step)
-
         result = {}
         for state in FormState:
             forms = FlaskApp().request(Form).with_entities(Form.id)
@@ -155,8 +154,10 @@ class Form(Editable, FlaskApp().db.Model):
         if question.question_type in {QuestionType.DATE, QuestionType.NUMBER}:
             if min_value is None:
                 min_value = Answer.get_extremum(question.id, question.question_type, ExtremumType.MINIMUM)
+                print(min_value)
             if max_value is None:
                 max_value = Answer.get_extremum(question.id, question.question_type, ExtremumType.MAXIMUM)
+                print(max_value)
             if step is None:
                 raise LogicException(
                     f"step is not passed as argument while it's required for {question.question_type.name}"
@@ -182,6 +183,8 @@ class Form(Editable, FlaskApp().db.Model):
     def _prepare_date(min_value: datetime, max_value: datetime, step: int):
         step_timedelta = timedelta(days=step)
         count = 1 + (max_value - min_value) // step_timedelta
+        print(max_value - min_value)
+        print(count)
         bounds = [min_value + step_timedelta * i for i in range(count)]
         return [{
             'name': Form._range_format(bound.strftime(DATE_FORMAT), (bound + step_timedelta).strftime(DATE_FORMAT)),

@@ -180,5 +180,16 @@
         "table-name-column-name": "Name",
         "table-data-column-name": "Fullness",
         "fullness-stats": "Fullness statistics"
+    },
+    "statistics": {
+        "form-type-selector": "Select form type",
+        "question-selector": "Question",
+        "form-type-leader": "Leader",
+        "form-type-project": "Project",
+        "group-by-form": "Group by form",
+        "group-by-question": "Group by question",
+        "table-name-column-name": "Name",
+        "table-data-column-name": "Fullness",
+        "stats": "Distribution statistics"
     }
 }

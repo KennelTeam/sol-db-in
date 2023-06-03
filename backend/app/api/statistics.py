@@ -21,7 +21,7 @@ class Statistics(Resource):
     def get() -> Response:
         parser = GetRequestParser()
         parser.add_argument('question_id', type=int, required=True)
-        parser.add_argument('step', type=int, required=False, default=1)
+        parser.add_argument('step', type=int, required=False, default=365)
         if parser.error is not None:
             return parser.error
         arguments = parser.parse_args()
