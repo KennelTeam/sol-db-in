@@ -1,5 +1,4 @@
-//const SERVER_ADDRESS = window.location.origin + '/api'
-const SERVER_ADDRESS = "http://localhost:5000/api"
+const SERVER_ADDRESS = window.location.origin + '/api'
 enum UserType {
     Admin,
     Editor,

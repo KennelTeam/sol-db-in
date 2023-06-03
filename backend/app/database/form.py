@@ -7,6 +7,7 @@ import sqlalchemy
 from sqlalchemy.dialects.mysql import VARCHAR
 from enum import Enum
 from backend.app.flask_app import FlaskApp
+from . import question_type
 from .editable import Editable
 from .answer import Answer, ExtremumType
 from .question import Question, QuestionType
@@ -159,9 +160,13 @@ class Form(Editable, FlaskApp().db.Model):
                 max_value = Answer.get_extremum(question.id, question.question_type, ExtremumType.MAXIMUM)
                 print(max_value)
             if step is None:
-                raise LogicException(
-                    f"step is not passed as argument while it's required for {question.question_type.name}"
-                )
+                if question_type == QuestionType.DATE:
+                    step = 365
+                else:
+                    step = 10
+                #raise LogicException(
+                #    f"step is not passed as argument while it's required for {question.question_type.name}"
+                #)
             if min_value is None:
                 return []
             if question.question_type == QuestionType.DATE:
