@@ -13,7 +13,7 @@ function DistributionStatistics() {
     const [t] = useTranslation('translation', { keyPrefix: "statistics" });
     const [selectedQuestion, setSelectedQuestion] = useState({text: "Select form type, please", id: -1})
     const [options, setOptions] = useState([] as Array<{text: string, id: number}>)
-    const [formType, setFormType] = useState("LEADER")
+    const [formType, setFormType] = useState("NONE")
     const navigate = useNavigate()
     const [statistics, setStatistics] = useState({} as {[id: string]: {[d: string]: number}})
     async function load_options(current_form_type: string) {
@@ -101,6 +101,7 @@ function DistributionStatistics() {
                     value={formType}
                     onChange={(event) => { changeFormType(event.target.value) }}
                 >
+                    <MenuItem value="NONE">Select</MenuItem>
                     <MenuItem value="LEADER">{t('form-type-leader')}</MenuItem>
                     <MenuItem value="PROJECT">{t('form-type-project')}</MenuItem>
                 </Select>
@@ -110,7 +111,7 @@ function DistributionStatistics() {
                 <h3>{t('question-selector')}</h3>
                 <Select
                     label={t('question-selector')}
-                    value={selectedQuestion.text}
+                    value={selectedQuestion.id}
                     onChange={(event) => { console.log(event.target.value)
                         onQuestionSelected(+event.target.value, "test") }}
                     style={{minWidth: "50%"}}

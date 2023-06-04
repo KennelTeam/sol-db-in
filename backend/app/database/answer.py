@@ -87,7 +87,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
 
     @staticmethod
     def count_with_condition(ids: List[int], condition) -> int:
-        query = FlaskApp().request(Answer).filter(condition)
+        query = FlaskApp().request(Answer).filter(condition).with_entities(Answer._form_id)
         query = query.filter(Answer._form_id.in_(ids)).distinct(Answer._form_id)
         return query.count()
 
