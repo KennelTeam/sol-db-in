@@ -86,8 +86,8 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             .group_by(Answer._form_id).with_entities(Answer._form_id)
 
     @staticmethod
-    def count_with_condition(ids: List[int], condition) -> int:
-        query = FlaskApp().request(Answer).filter(condition).with_entities(Answer._form_id)
+    def count_with_condition(ids: List[int], condition, question_id) -> int:
+        query = FlaskApp().request(Answer).filter_by(_question_id=question_id).filter(condition).with_entities(Answer._form_id)
         query = query.filter(Answer._form_id.in_(ids)).distinct(Answer._form_id)
         return query.count()
 

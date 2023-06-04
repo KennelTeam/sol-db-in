@@ -112,7 +112,8 @@ class Form(Editable, FlaskApp().db.Model):
             ids = [form.id for form in forms.all()]
             result[state.name] = {}
             for condition in filters:
-                result[state.name][str(condition['name'])] = Answer.count_with_condition(ids, condition['filter'])
+                result[state.name][str(condition['name'])] = Answer.count_with_condition(ids, condition['filter']
+                                                                                         , question_id)
 
         return result
 
