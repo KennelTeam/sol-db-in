@@ -164,7 +164,7 @@ class Form(Editable, FlaskApp().db.Model):
                 if question_type == QuestionType.DATE:
                     step = 365
                 else:
-                    step = 10
+                    step = (max_value - min_value) // 20
                 #raise LogicException(
                 #    f"step is not passed as argument while it's required for {question.question_type.name}"
                 #)
