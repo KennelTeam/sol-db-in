@@ -30,7 +30,8 @@ class QuestionsLightweight(Resource):
             return get_failure(HTTPErrorCode.INVALID_ARG_FORMAT, 400)
         form_type = FormType[arguments['form_type']]
         data = [item.to_json() for item in Question.get_of_form_type(form_type) if item.question_type in
-                      {QuestionType.DATE, QuestionType.CHECKBOX, QuestionType.MULTIPLE_CHOICE, QuestionType.NUMBER}]
+                    {QuestionType.DATE, QuestionType.CHECKBOX, QuestionType.MULTIPLE_CHOICE, QuestionType.NUMBER
+                        , QuestionType.USER, QuestionType.LOCATION}]
         return Response(json.dumps(
             {"questions": data}
         ), 200)
