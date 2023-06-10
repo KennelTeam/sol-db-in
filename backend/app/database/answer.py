@@ -4,7 +4,7 @@ import datetime
 
 from sqlalchemy.orm import Query
 from backend.app.flask_app import FlaskApp
-# from .tag_to_answer import TagToAnswer
+from .tag_to_answer import TagToAnswer
 from .editable_value_holder import EditableValueHolder
 from enum import Enum
 from typing import Any, List, Set, Tuple
@@ -42,7 +42,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             'question_id': self.question_id,
             'table_row': self.table_row if self.table_row is not None else 0,
             'row_question_id': self.row_question_id,
-            # 'tags': TagToAnswer.get_answers_tags(self.id),
+            'tags': TagToAnswer.get_answers_tags(self.id),
             'value': self.value if not isinstance(self.value, datetime.datetime) else date_to_string(self.value)
         }
 
@@ -86,10 +86,15 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             .group_by(Answer._form_id).with_entities(Answer._form_id)
 
     @staticmethod
-    def count_with_condition(ids: List[int], condition, question_id) -> int:
-        query = FlaskApp().request(Answer).filter_by(_question_id=question_id).filter(condition).with_entities(Answer._form_id)
+    def count_with_condition(ids: List[int], condition, question_id) -> Set[int]:
+        query = FlaskApp().request(Answer).filter_by(_question_id=question_id).filter(condition).with_entities(
+            Answer._form_id)
         query = query.filter(Answer._form_id.in_(ids)).distinct(Answer._form_id)
-        return query.count()
+        print(ids)
+        print(condition)
+        print(question_id)
+        print(query.count())
+        return {item._form_id for item in query.all()}
 
     @staticmethod
     def get_extremum(question_id: int, question_type: QuestionType, extremum: ExtremumType):

@@ -5,8 +5,8 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { SERVER_ADDRESS } from "../types/global";
 import {getRequest} from "../Response/APIRequests";
-import {useNavigate} from "react-router-dom";
-import {APIFormType} from "../Response/APIObjects";
+import {Link, useNavigate} from "react-router-dom";
+import {APIForm, APIFormSimple, APIFormType} from "../Response/APIObjects";
 
 
 function DistributionStatistics() {
@@ -15,7 +15,8 @@ function DistributionStatistics() {
     const [options, setOptions] = useState([] as Array<{text: string, id: number}>)
     const [formType, setFormType] = useState("NONE")
     const navigate = useNavigate()
-    const [statistics, setStatistics] = useState({} as {[id: string]: {[d: string]: number}})
+    const [statistics, setStatistics] = useState({} as {[id: string]: {[d: string]: Array<APIFormSimple>}})
+    const [dataToShow, setDataToShow] = useState([] as Array<APIFormSimple>)
     async function load_options(current_form_type: string) {
         let data = await getRequest("questions_lightweight", {form_type: current_form_type}, navigate) as unknown as {data:{questions: Object}}
         console.log(data)
@@ -29,7 +30,7 @@ function DistributionStatistics() {
     }
 
     async function load_statistics(questionId: number) {
-        let statistics = (await getRequest("statistics", {question_id: questionId}, navigate)).data as unknown as {[id: string]: {[d: string]: number}}
+        let statistics = (await getRequest("statistics", {question_id: questionId}, navigate)).data as unknown as {[id: string]: {[d: string]: Array<APIFormSimple>}}
         setStatistics(statistics)
     }
 
@@ -52,12 +53,17 @@ function DistributionStatistics() {
         return data.map((item) => <TableCell>{item}</TableCell>)
     }
 
+    const showItems = (items: Array<APIFormSimple>) => {
+        setDataToShow(items)
+    }
+
     const prepareTable = () => {
+        console.log(statistics)
         let rows = []
         for (const key in statistics) {
             for (const key2 in statistics[key]) {
                 rows.push({
-                    values: [] as Array<number>,
+                    values: [] as Array<Array<APIFormSimple>>,
                     title: key2
                 })
             }
@@ -75,7 +81,7 @@ function DistributionStatistics() {
                 <TableCell>{row.title}</TableCell>
                 {
                     row.values.map((cell) =>
-                        <TableCell>{cell}</TableCell>
+                        <TableCell onClick={() => showItems(cell)}>{cell.length}</TableCell>
                     )
                 }
             </TableRow>
@@ -123,6 +129,13 @@ function DistributionStatistics() {
                 </Select>
             </Box>
         </Box>
+        <div>
+            {dataToShow.length > 0 ? <h3>Selected cell elements:</h3> : <div></div>}
+            {dataToShow.map((form: APIFormSimple) => <div>
+                <Link to={(form.form_type === 'LEADER' ? '/leader/' : '/project/')
+                    + form.id} target={"_blanc"}>{form.name}</Link>
+            </div>)}
+        </div>
         <TableContainer>
             <Table>
                 <TableHead>

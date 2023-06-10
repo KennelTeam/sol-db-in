@@ -25,6 +25,13 @@ export interface APIForm {
     answers: Array<APIQuestionBlock>
 }
 
+export interface APIFormSimple {
+    id: number,
+    state: APIFormState,
+    name: string,
+    form_type: APIFormType
+}
+
 export interface APITranslatedText {
     ru: string,
     en: string

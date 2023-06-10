@@ -112,8 +112,10 @@ class Form(Editable, FlaskApp().db.Model):
             ids = [form.id for form in forms.all()]
             result[state.name] = {}
             for condition in filters:
-                result[state.name][str(condition['name'])] = Answer.count_with_condition(ids, condition['filter']
-                                                                                         , question_id)
+                filtered_ids = Answer.count_with_condition(ids, condition['filter'], question_id)
+                print(filtered_ids)
+
+                result[state.name][str(condition['name'])] = [form.to_json(with_answers=False) for form in Form.get_by_ids(filtered_ids)]
 
         return result
 
