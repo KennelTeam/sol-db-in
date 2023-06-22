@@ -71,13 +71,23 @@ function Tags() {
     })
     const [names, setNames] = React.useState<{ [id: number]: TagData }>(startNames)
 
+    // getTags().then((tags) => {
+    //     const newNames : { [id: number]: TagData } = {}
+    //     data.map((value) => {
+    //         newNames[value.id] = value
+    //     })
+    //     console.log("Changed names!")
+    //     setNames(newNames)
+    // })
     React.useEffect(() => {
         getTags().then((tags) => {
             const newNames : { [id: number]: TagData } = {}
-            data.map((value) => {
+            tags.map((value) => {
                 newNames[value.id] = value
             })
+            console.log("Changed names!", newNames)
             setNames(newNames)
+            console.log("Names:", Object.values(names))
         })
     }, [])
 
