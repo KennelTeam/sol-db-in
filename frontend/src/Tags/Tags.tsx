@@ -8,8 +8,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import SubdirectoryArrowRightRoundedIcon from '@mui/icons-material/SubdirectoryArrowRightRounded';
+import { getTags, changeTag, newTag } from "./requests2API"
 
-interface TagData {
+export interface TagData {
     id: number,
     text: string,
     parent_id?: number
@@ -69,6 +70,17 @@ function Tags() {
         startNames[value.id] = value
     })
     const [names, setNames] = React.useState<{ [id: number]: TagData }>(startNames)
+
+    React.useEffect(() => {
+        getTags().then((tags) => {
+            const newNames : { [id: number]: TagData } = {}
+            data.map((value) => {
+                newNames[value.id] = value
+            })
+            setNames(newNames)
+        })
+    }, [])
+
     // {
     //     '1': 'Category 1',
     //     '2': 'Subcategory 1',
@@ -80,15 +92,16 @@ function Tags() {
     //     '8': 'Tag 8'
     // })
 
-    function addTag(parentId: number) {
-        const newNames = {...names}
-        const newId = Object.keys(names).length + 1
-        newNames[newId] = {
-            id: newId,
-            text: "",
-            parent_id: parentId
-        }
-        setNames(newNames)
+    function addTag(parentId?: number) {
+        newTag(parentId).then((newId) => {
+            const newNames = {...names}
+            newNames[newId] = {
+                id: newId,
+                text: "",
+                parent_id: parentId
+            }
+            setNames(newNames)
+        })
     }
 
     const Tag = (tagProps: TagProps) => {
@@ -104,6 +117,10 @@ function Tags() {
                 const newNames = {...names}
                 newNames[tagId].text = tagName
                 setNames(newNames)
+                changeTag({
+                    id: tagId,
+                    text: tagName
+                })
             }
         }
 
@@ -162,13 +179,21 @@ function Tags() {
                     children={children}/>
     }
 
+    const categories = Object.values(names).filter((value) => (!value.parent_id))
+            .map((value) => makeTags(value))
+
     return <TreeView
         aria-label="file system navigator"
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
-        sx={{ height: 1000, flexGrow: 1, maxWidth: 1000, overflowY: 'auto' }}
+        sx={{ minHeight: 1500, flexGrow: 1, overflowY: 'auto' }}
     >
-        {makeTags(data[0])}
+        {categories}
+        <IconButton onClick={() => {
+            addTag()
+        }}>
+            <AddIcon htmlColor='green'/>
+        </IconButton>
     </TreeView>
 }
 
