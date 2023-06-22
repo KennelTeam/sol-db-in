@@ -69,8 +69,8 @@ function ChoiceOptionsList(user: UserType) : JSX.Element[] {
     const leaders: JSX.Element = MenuButton("leaders", "/leaders", t)
     const statistics: JSX.Element = DropDownList(
         "statistics",
-        ["fullness-stats", /*"distribution-stats"*/],
-        ["/statistics/fullness", /*"/statistics/distribution"*/],
+        ["fullness-stats", "distribution-stats"],
+        ["/statistics/fullness", "/statistics/distribution"],
     )
     const export_menu: JSX.Element = DropDownList(
         "export",

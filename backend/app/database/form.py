@@ -7,6 +7,7 @@ import sqlalchemy
 from sqlalchemy.dialects.mysql import VARCHAR
 from enum import Enum
 from backend.app.flask_app import FlaskApp
+from . import question_type
 from .editable import Editable
 from .answer import Answer, ExtremumType
 from .question import Question, QuestionType
@@ -104,7 +105,6 @@ class Form(Editable, FlaskApp().db.Model):
 
         question = Question.get_by_id(question_id)
         filters = Form._get_statistics_filters(question, min_value, max_value, step)
-
         result = {}
         for state in FormState:
             forms = FlaskApp().request(Form).with_entities(Form.id)
@@ -112,7 +112,10 @@ class Form(Editable, FlaskApp().db.Model):
             ids = [form.id for form in forms.all()]
             result[state.name] = {}
             for condition in filters:
-                result[state.name][str(condition['name'])] = Answer.count_with_condition(ids, condition['filter'])
+                filtered_ids = Answer.count_with_condition(ids, condition['filter'], question_id)
+                print(filtered_ids)
+
+                result[state.name][str(condition['name'])] = [form.to_json(with_answers=False) for form in Form.get_by_ids(filtered_ids)]
 
         return result
 
@@ -155,12 +158,18 @@ class Form(Editable, FlaskApp().db.Model):
         if question.question_type in {QuestionType.DATE, QuestionType.NUMBER}:
             if min_value is None:
                 min_value = Answer.get_extremum(question.id, question.question_type, ExtremumType.MINIMUM)
+                print(min_value)
             if max_value is None:
                 max_value = Answer.get_extremum(question.id, question.question_type, ExtremumType.MAXIMUM)
+                print(max_value)
             if step is None:
-                raise LogicException(
-                    f"step is not passed as argument while it's required for {question.question_type.name}"
-                )
+                if question_type == QuestionType.DATE:
+                    step = 365
+                elif min_value is not None and max_value is not None:
+                    step = (max_value - min_value) // 20
+                #raise LogicException(
+                #    f"step is not passed as argument while it's required for {question.question_type.name}"
+                #)
             if min_value is None:
                 return []
             if question.question_type == QuestionType.DATE:
@@ -182,6 +191,8 @@ class Form(Editable, FlaskApp().db.Model):
     def _prepare_date(min_value: datetime, max_value: datetime, step: int):
         step_timedelta = timedelta(days=step)
         count = 1 + (max_value - min_value) // step_timedelta
+        print(max_value - min_value)
+        print(count)
         bounds = [min_value + step_timedelta * i for i in range(count)]
         return [{
             'name': Form._range_format(bound.strftime(DATE_FORMAT), (bound + step_timedelta).strftime(DATE_FORMAT)),

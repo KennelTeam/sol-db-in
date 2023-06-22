@@ -31,13 +31,15 @@ from .api.tag_types import TagTypes
 from .api.form import FormSchema
 from .api.all_toponyms import AllToponyms
 from .api.questions import Questions
+from .api.questions_lightweight import QuestionsLightweight
+from .api.all_tags import AllTags
 
 from .flask_app import FlaskApp
 
 resources = [
     Login, Logout, Users, Forms, FormPage, Toponyms, ToponymTree, AnswerOptionsPage, AllAnswerBlocks, Language,
     AnswerBlockPage, QuestionBlockPage, Table, Tags, TagTypes, FormSchema, Questions, Actions, Statistics, Settings,
-    FormsLightweight, AllToponyms, FullnessStatistics, DatabaseExcelExport, AllQuestions
+    FormsLightweight, AllToponyms, FullnessStatistics, DatabaseExcelExport, AllQuestions, QuestionsLightweight, AllTags
 ]
 
 for resource in resources:
@@ -45,6 +47,7 @@ for resource in resources:
 
 
 logger = get_sol_db_logger('flask-server')
+
 
 @FlaskApp().app.route('/', defaults={'path': ''})
 @FlaskApp().app.route('/<path:path>')
