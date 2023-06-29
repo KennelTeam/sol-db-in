@@ -165,6 +165,16 @@ async function ProcessQuestion(question: APIQuestion, answers: Array<APIAnswer>,
             } as TextQuestionInterface
             break;
         }
+        case SimpleQuestionType.LONG_TEXT:
+        case SimpleQuestionType.SHORT_TEXT: {
+            let initialValue = answers.length > 0 ? answers[0].value as string : "";
+            questionData = {
+                initialValue: initialValue,
+                label: question.text,
+                tags: answers.length > 0 ? answers[0].tags : [],
+            } as TextQuestionInterface
+            break
+        }
         default: {
             let initialValue = answers.length > 0 ? answers[0].value as string : "";
             questionData = {

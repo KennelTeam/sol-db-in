@@ -9,11 +9,13 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import SubdirectoryArrowRightRoundedIcon from '@mui/icons-material/SubdirectoryArrowRightRounded';
 import { getTags, changeTag, newTag } from "./requests2API"
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export interface TagData {
     id: number,
     text: string,
-    parent_id?: number
+    parent_id?: number,
+    deleted?: boolean
 }
 
 const data : TagData[] = [
@@ -61,15 +63,11 @@ const data : TagData[] = [
 type TagProps = TreeItemProps & {
     tagId: number,
     name: string
-  }
+}
 
 function Tags() {
 
-    const startNames : { [id: number]: TagData } = {}
-    data.map((value) => {
-        startNames[value.id] = value
-    })
-    const [names, setNames] = React.useState<{ [id: number]: TagData }>(startNames)
+    const [names, setNames] = React.useState<{ [id: number]: TagData }>([])
 
     // getTags().then((tags) => {
     //     const newNames : { [id: number]: TagData } = {}
@@ -134,8 +132,24 @@ function Tags() {
             }
         }
 
+        const deleteTag = () => {
+            setEdit(false)
+            const newNames = {...names}
+            newNames[tagId].deleted = true
+            setNames(newNames)
+            changeTag({
+                id: tagId,
+                text: tagName,
+                deleted: true
+            })
+        }
+
+        const hasntChildren = !tagProps.children || Object.keys(tagProps.children).length === 0
+
         return <TreeItem label={
-            <Container sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+            <Container sx={{ display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between'}}>
                 {edit ? 
                     <Container maxWidth={false} disableGutters>
                         <TextField value={tagName} variant='standard' fullWidth={true}
@@ -153,25 +167,29 @@ function Tags() {
                     <span onDoubleClick={endEditing}>
                         <Typography variant='body1' sx={{flexGrow: 1}}>{tagName}</Typography>
                     </span>}
-                <Box>
+                <Stack direction='row' justifyContent='flex-end'>
                     <IconButton onClick={endEditing}>
                         <EditIcon fontSize='small'/>
                     </IconButton>
-                    { !tagProps.children || Object.keys(tagProps.children).length === 0 ?
+                    { hasntChildren ?
                         <IconButton onClick={() => {
                             addTag(tagId)
                         }}>
                             <SubdirectoryArrowRightRoundedIcon
                                 htmlColor='green' fontSize='small'/>
                         </IconButton> : null }
-                </Box>
+                    { hasntChildren ?
+                        <IconButton onClick={deleteTag}>
+                            <DeleteIcon htmlColor='red'/>
+                        </IconButton> : null }
+                </Stack>
             </Container>
         } {...other}/>
     }
 
     function makeTags(root: TagData) : JSX.Element{
         const childrenData = Object.values(names).filter(
-            (value) => (value.parent_id && value.parent_id === root.id))
+            (value) => (value.parent_id && value.parent_id === root.id && !value.deleted))
         const children = childrenData.map((value) => makeTags(value))
         if (children.length > 0) {
             children.push(
@@ -189,7 +207,7 @@ function Tags() {
                     children={children}/>
     }
 
-    const categories = Object.values(names).filter((value) => (!value.parent_id))
+    const categories = Object.values(names).filter((value) => (!value.parent_id && !value.deleted))
             .map((value) => makeTags(value))
 
     return <TreeView

@@ -6,7 +6,8 @@ import { SERVER_ADDRESS } from "../types/global";
 interface ResponseTagData {
     id: number,
     text: string
-    parent_id?: number
+    parent_id?: number,
+    deleted?: boolean
 }
 
 export async function getTags() : Promise<TagData[]> {
@@ -18,7 +19,8 @@ export async function getTags() : Promise<TagData[]> {
             return {
                 id: data.id,
                 text: data.text,
-                parent_id: data.parent_id
+                parent_id: data.parent_id,
+                deleted: data.deleted
             } as TagData
         })
     })
@@ -35,7 +37,8 @@ export async function changeTag(tag: TagData) {
             en: tag.text
         },
         parent_id: tag.parent_id,
-        type_id: 0
+        type_id: 0,
+        deleted: tag.deleted
     },
     { withCredentials: true })
     .then((response) => {
