@@ -29,14 +29,14 @@ class TagToAnswer(FlaskApp().db.Model):
         return TagToAnswer.query.filter_by(_tag_id=tag_id).count()
 
     @staticmethod
-    def get_answers_tags(answer_id: int) -> List[int]:
+    def get_answers_tags(answer_id: int) -> List[JSON]:
         tags = TagToAnswer.query.filter_by(_answer_id=answer_id)
         tags = tags.all()
-        return [item.tag_id for item in tags]
+        return [item.to_json() for item in tags]
 
     @staticmethod
     def get_answers_tag_ids(answer_id: int) -> List[int]:
-        return [item['id'] for item in TagToAnswer.get_answers_tags(answer_id)]
+        return [item['tag_id'] for item in TagToAnswer.get_answers_tags(answer_id)]
 
     @staticmethod
     def add_tag(tag_id: int, answer_id: int) -> 'TagToAnswer':

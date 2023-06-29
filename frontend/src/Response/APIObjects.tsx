@@ -61,12 +61,13 @@ export interface APIAnswer {
     row_question_id: number | null,
     value: number | string | boolean,
     ref_id: number | null,
-    tags: Array<APITag>,
+    tags: Array<number>,
     create_timestamp: string,
     deleted: boolean
 }
 
 export interface APITag {
+    text: string | undefined;
     id: number,
     name: APITranslatedText,
     type_id: number,

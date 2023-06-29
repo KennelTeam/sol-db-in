@@ -42,7 +42,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             'question_id': self.question_id,
             'table_row': self.table_row if self.table_row is not None else 0,
             'row_question_id': self.row_question_id,
-            'tags': TagToAnswer.get_answers_tags(self.id),
+            'tags': TagToAnswer.get_answers_tag_ids(self.id),
             'value': self.value if not isinstance(self.value, datetime.datetime) else date_to_string(self.value)
         }
 
