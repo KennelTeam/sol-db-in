@@ -272,17 +272,14 @@ class Forms(Resource):
         return Forms._update_answer_tags(current_ans.id, answer.get('tags', None))
 
     @staticmethod
-    def _update_answer_tags(answer_id: int, tags: List[JSON]) -> HTTPErrorCode:
+    def _update_answer_tags(answer_id: int, tags: List[int]) -> HTTPErrorCode:
         if tags is None:
             return HTTPErrorCode.SUCCESS
         tags_set = set()
         for tag in tags:
-            status = check_json_format(tag, {'id': int})
-            if status != HTTPErrorCode.SUCCESS:
-                return status
-            if Tag.get_by_id(tag['id']) is None:
+            if Tag.get_by_id(tag) is None:
                 return HTTPErrorCode.WRONG_ID
-            tags_set.add(tag['id'])
+            tags_set.add(tag)
         old_tag_ids = TagToAnswer.get_answers_tag_ids(answer_id)
         for tag_id in old_tag_ids:
             if tag_id not in tags_set:
