@@ -46,7 +46,10 @@ function SimpleQuestion(props: { questionData: SimpleQuestionInterface; onChange
                 break;
             case SimpleQuestionType.LONG_TEXT:
             case SimpleQuestionType.SHORT_TEXT:
-                newComponent = <TextQuestion questionData={(questionData.questionData as TextQuestionInterface)} onChange={props.onChange}/>;
+                newComponent = <TextQuestion
+                    questionData={(questionData.questionData as TextQuestionInterface)}
+                    onChange={props.onChange}
+                    questionType={questionData.questionType}/>;
                 break;
             case SimpleQuestionType.RELATION:
                 console.log("RELATION TYPE:", questionData.questionData.initialValue)

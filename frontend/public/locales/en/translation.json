@@ -135,7 +135,11 @@
     "response": {
         "name": "Name",
         "surname": "Surname",
-        "other_name": "Other name parts"
+        "other_name": "Other name parts",
+        "tags-dialog-title": "Choose Tags for this question",
+        "cancel": "Cancel",
+        "submit": "Submit",
+        "edit-tags": "Edit tags..."
     },
     "main": {
         "title": "NSF DB"
