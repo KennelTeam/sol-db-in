@@ -71,7 +71,7 @@ function TextQuestion(props: {
         }
         { props.questionType === 'LONG_TEXT' ?
             <Dialog open={tagsOpen} sx={{ minWidth: 400, minHeight: 200 }}>
-                <TagsChoice chosenTags={props.questionData.tags.map((tag) => (tag))}
+                <TagsChoice chosenTags={value.tags.map((tag) => (tag))}
                 onCancel={() => {
                     setTagsOpen(false)
                 }} onSubmit={(newTags: APITag[]) => {
