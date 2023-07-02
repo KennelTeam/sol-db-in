@@ -1,8 +1,15 @@
-import * as React from 'react';
+import * as React from 'react'
 import TreeView from '@mui/lab/TreeView';
+import { alpha, styled } from '@mui/material/styles';
+import TreeItem, {
+  TreeItemProps,
+  useTreeItem,
+  TreeItemContentProps,
+  treeItemClasses
+} from '@mui/lab/TreeItem';
+import clsx from 'clsx';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import TreeItem, { TreeItemProps, treeItemClasses } from '@mui/lab/TreeItem';
 import { Box, Container, IconButton, Stack, TextField, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
@@ -18,47 +25,93 @@ export interface TagData {
     deleted?: boolean
 }
 
-const data : TagData[] = [
-    {
-        id: 1,
-        text: "Category 1"
+const CustomContent = React.forwardRef(function CustomContent(
+    props: TreeItemContentProps,
+    ref,
+  ) {
+    const {
+      classes,
+      className,
+      label,
+      nodeId,
+      icon: iconProp,
+      expansionIcon,
+      displayIcon,
+    } = props;
+  
+    const {
+      disabled,
+      expanded,
+      selected,
+      focused,
+      handleExpansion,
+      handleSelection,
+      preventSelection,
+    } = useTreeItem(nodeId);
+  
+    const icon = iconProp || expansionIcon || displayIcon;
+  
+    const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      preventSelection(event);
+    };
+  
+    const handleExpansionClick = (
+      event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    ) => {
+      handleExpansion(event);
+    };
+  
+    const handleSelectionClick = (
+      event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    ) => {
+      handleSelection(event);
+    };
+  
+    return (
+      // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+      <div
+        className={clsx(className, classes.root, {
+          [classes.expanded]: expanded,
+          [classes.selected]: selected,
+          [classes.focused]: focused,
+          [classes.disabled]: disabled,
+        })}
+        onMouseDown={handleMouseDown}
+        ref={ref as React.Ref<HTMLDivElement>}
+      >
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+        <div onClick={handleExpansionClick} className={classes.iconContainer}>
+          {icon}
+        </div>
+        <Typography
+          onClick={handleSelectionClick}
+          component="div"
+          className={classes.label}
+        >
+          {label}
+        </Typography>
+      </div>
+    );
+  });
+
+function CustomTreeItem(props: TreeItemProps) {
+    return <TreeItem ContentComponent={CustomContent} {...props} />;
+}
+  
+const StyledTreeItem = styled((props: TreeItemProps) => (
+    <CustomTreeItem {...props} />
+))(({ theme }) => ({
+    [`& .${treeItemClasses.iconContainer}`]: {
+    '& .close': {
+        opacity: 0.3,
     },
-    {
-        id: 2,
-        text: "Subcategory 1.1",
-        parent_id: 1
     },
-    {
-        id: 3,
-        text: "Subcategory 1.2",
-        parent_id: 1
+    [`& .${treeItemClasses.group}`]: {
+    marginLeft: 15,
+    paddingLeft: 18,
+    borderLeft: `1px dashed ${alpha(theme.palette.text.primary, 0.4)}`,
     },
-    {
-        id: 4,
-        text: "Tag 1.1.1",
-        parent_id: 2
-    },
-    {
-        id: 5,
-        text: "Tag 1.1.2",
-        parent_id: 2
-    },
-    {
-        id: 6,
-        text: "Tag 1.2.1",
-        parent_id: 3
-    },
-    {
-        id: 7,
-        text: "Subcategory 1.2.1 lalala",
-        parent_id: 2
-    },
-    {
-        id: 8,
-        text: "Tag 1.2.1.1",
-        parent_id: 7
-    }
-]
+}));
 
 type TagProps = TreeItemProps & {
     tagId: number,
@@ -69,14 +122,6 @@ function Tags() {
 
     const [names, setNames] = React.useState<{ [id: number]: TagData }>([])
 
-    // getTags().then((tags) => {
-    //     const newNames : { [id: number]: TagData } = {}
-    //     data.map((value) => {
-    //         newNames[value.id] = value
-    //     })
-    //     console.log("Changed names!")
-    //     setNames(newNames)
-    // })
     React.useEffect(() => {
         getTags().then((tags) => {
             const newNames : { [id: number]: TagData } = {}
@@ -88,17 +133,6 @@ function Tags() {
             console.log("Names:", Object.values(names))
         })
     }, [])
-
-    // {
-    //     '1': 'Category 1',
-    //     '2': 'Subcategory 1',
-    //     '4': 'Tag 1',
-    //     '5': 'Tag 2',
-    //     '3': 'Subcategory 2',
-    //     '6': 'Tag 4',
-    //     '7': 'Subsubcategory 3',
-    //     '8': 'Tag 8'
-    // })
 
     function addTag(parentId?: number) {
         newTag(parentId).then((newId) => {
@@ -146,7 +180,7 @@ function Tags() {
 
         const hasntChildren = !tagProps.children || Object.keys(tagProps.children).length === 0
 
-        return <TreeItem label={
+        return <StyledTreeItem label={
             <Container sx={{ display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'space-between'}}>
