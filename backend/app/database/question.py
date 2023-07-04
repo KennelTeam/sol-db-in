@@ -108,6 +108,10 @@ class Question(Editable, FlaskApp().db.Model):
         Question._cached = None
 
     @staticmethod
+    def get_long_text():
+        return FlaskApp().request(Question).filter_by(_question_type=QuestionType.LONG_TEXT).all()
+
+    @staticmethod
     def filter_by_answer_block(answer_block_id: int) -> Query:
         return FlaskApp().request(Question).filter_by(_answer_block_id=answer_block_id)
 
@@ -213,6 +217,15 @@ class Question(Editable, FlaskApp().db.Model):
                 'answers': sorted(jsons, key=lambda x: x['table_row'])
             })
         return result
+
+    def to_json_light(self) -> JSON:
+        return super().to_json() | {
+            'text': localize(self.text),
+            'short_text': localize(self.short_text),
+            'question_type': self.question_type.name,
+            'comment': localize(self.comment),
+            'form_type': self.form_type.name
+        }
 
     @staticmethod
     def _order_answers(my_table: List['Question']) -> List[JSON]:

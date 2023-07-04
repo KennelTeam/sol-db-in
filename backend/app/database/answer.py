@@ -77,6 +77,11 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
         return [item.form_id for item in items]
 
     @staticmethod
+    def count_with_tag(tag_id: int, question_id: int) -> int:
+        ids = TagToAnswer.get_answers_with_tag(tag_id)
+        return FlaskApp().request(Answer).filter_by(_question_id=question_id).filter(Answer.id.in_(ids)).count()
+
+    @staticmethod
     def query_for_question_ids(question_ids: Set[int]) -> Query:
         return FlaskApp().request(Answer).filter(Answer._question_id.in_(question_ids))
 

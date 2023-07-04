@@ -16,6 +16,7 @@ from .api.login import Login
 from .api.logout import Logout
 from .api.settings import Settings
 from .api.statistics import Statistics
+from .api.tags_statistics import TagsStatistics
 from .api.users import Users
 from .api.forms import Forms
 from .api.form_page import FormPage
@@ -39,7 +40,8 @@ from .flask_app import FlaskApp
 resources = [
     Login, Logout, Users, Forms, FormPage, Toponyms, ToponymTree, AnswerOptionsPage, AllAnswerBlocks, Language,
     AnswerBlockPage, QuestionBlockPage, Table, Tags, TagTypes, FormSchema, Questions, Actions, Statistics, Settings,
-    FormsLightweight, AllToponyms, FullnessStatistics, DatabaseExcelExport, AllQuestions, QuestionsLightweight, AllTags
+    FormsLightweight, AllToponyms, FullnessStatistics, DatabaseExcelExport, AllQuestions, QuestionsLightweight, AllTags,
+    TagsStatistics
 ]
 
 for resource in resources:

@@ -2,7 +2,7 @@
 #  All rights reserved
 from backend.app.flask_app import FlaskApp
 from backend.auxiliary.types import JSON
-from typing import List
+from typing import List, Set
 
 
 # I decided not to use Editable base class, because it's too easy to add and delete tags to answers
@@ -50,6 +50,10 @@ class TagToAnswer(FlaskApp().db.Model):
     @staticmethod
     def remove_tag(tag_id: int, answer_id: int):
         TagToAnswer.query.filter_by(_tag_id=tag_id, _answer_id=answer_id).delete()
+
+    @staticmethod
+    def get_answers_with_tag(tag_id: int) -> Set[int]:
+        return set(item.answer_id for item in TagToAnswer.query.filter_by(_tag_id=tag_id).all())
 
     @property
     def tag_id(self):
