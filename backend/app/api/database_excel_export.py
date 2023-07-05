@@ -26,15 +26,21 @@ class DatabaseExcelExport(Resource):
     @jwt_required()
     @get_request(Role.ADMIN)
     def get() -> Response:
-        leaders_export_df = DatabaseExcelExport._export_form(form_type=FormType.LEADER)
-        projects_export_df = DatabaseExcelExport._export_form(form_type=FormType.PROJECT)
-        recommendations_df = DatabaseExcelExport._export_recommendations()
+        leaders_answers_df = DatabaseExcelExport._get_all_answers_df(form_type=FormType.LEADER)
+        projects_answers_df = DatabaseExcelExport._get_all_answers_df(form_type=FormType.PROJECT)
+
+        leaders_export_df = DatabaseExcelExport._export_form(FormType.LEADER, leaders_answers_df.copy())
+        projects_export_df = DatabaseExcelExport._export_form(FormType.PROJECT, projects_answers_df.copy())
+
+        relation_sheets_df = leaders_answers_df[['forward_relation_sheet_name', 'block_id']].groupby('forward_relation_sheet_name').first().reset_index()
 
         file_name = 'forms.xlsx'
-        with pd.ExcelWriter(os.path.join(UPLOADS_DIRECTORY, file_name)) as writer:  # pylint: disable=abstract-class-instantiated
+        with pd.ExcelWriter(os.path.join(UPLOADS_DIRECTORY, file_name), engine='xlsxwriter', engine_kwargs={'options': {'strings_to_urls': False}}) as writer:  # pylint: disable=abstract-class-instantiated
             leaders_export_df.to_excel(writer, sheet_name='leaders')
             projects_export_df.to_excel(writer, sheet_name='projects')
-            recommendations_df.to_excel(writer, sheet_name='recommendations')
+            for index, relation_sheet in relation_sheets_df.iterrows():
+                DatabaseExcelExport._export_recommendations(relation_sheet['block_id'], leaders_answers_df.copy()).to_excel(
+                    writer, sheet_name=relation_sheet['forward_relation_sheet_name'])
 
         return send_from_directory(directory=UPLOADS_DIRECTORY, path=file_name)
 
@@ -65,7 +71,6 @@ class DatabaseExcelExport(Resource):
         questions_df['localized_text'] = questions_df.apply(lambda row: localize(json.loads(row['text'])), axis=1)
         answer_options_df['localized_answer_option'] = answer_options_df.apply(lambda row: localize(json.loads(row['name'])), axis=1)
 
-
         questions_df_copy = questions_df[['id', 'localized_text']]
         questions_df_copy.rename(columns={'localized_text': 'localized_text_2'}, inplace=True)
         answers_df.rename(columns={'table_row': 'answer_table_row'}, inplace=True)
@@ -81,8 +86,7 @@ class DatabaseExcelExport(Resource):
         ).merge(questions_df_copy, left_on='row_question_id', right_on='id', how='left'
         ).merge(questions_blocks_df, left_on='block_id', right_on='id', how='left'
         ).merge(users_df, left_on='value_int', right_on='id', how='left'
-        ).merge(toponyms_df, left_on='value_int', right_on='id', how='left'
-        )
+        ).merge(toponyms_df, left_on='value_int', right_on='id', how='left')
 
         answers_df = answers_df.merge(answer_options_df, left_on='value_int', right_on='id', how='left')
         relation_settings_df["id"] = relation_settings_df["id"].astype("float64")
@@ -106,10 +110,9 @@ class DatabaseExcelExport(Resource):
         return answers_df
 
     @staticmethod
-    def _export_form(form_type: FormType) -> DataFrame:
+    def _export_form(form_type: FormType, answers_df: DataFrame) -> DataFrame:
         forms_query = FlaskApp().request(Form).filter_by(_form_type=form_type)
         forms_df = pd.read_sql_query(forms_query.statement, FlaskApp().db.session.connection())
-        answers_df = DatabaseExcelExport._get_all_answers_df(form_type=form_type)
         answers_df['export_value'].loc[answers_df['table_id'].notna()] = answers_df['answer_table_row'].astype('Int64').astype(str) + '. ' + answers_df['export_value'].astype(str)
 
         cross_table = pd.crosstab(answers_df['form_id'], answers_df['localized_text'], values=answers_df['export_value'],
@@ -127,16 +130,9 @@ class DatabaseExcelExport(Resource):
         return cross_table
 
     @staticmethod
-    def _export_recommendations() -> DataFrame:
+    def _export_recommendations(recommendations_block_id: int, answers_df: DataFrame) -> DataFrame:
         forms_query = FlaskApp().request(Form).filter_by(_form_type=FormType.LEADER)
         forms_df = pd.read_sql_query(forms_query.statement, FlaskApp().db.session.connection())
-        answers_df = DatabaseExcelExport._get_all_answers_df(form_type=FormType.LEADER)
-
-        recommendations_block_id = -1
-        for question_block in FlaskApp().request(QuestionBlock):
-            if question_block.name['en'] == 'RECOMMENDATIONS':
-                recommendations_block_id = question_block.id
-                break
 
         answers_df = answers_df[answers_df['block_id'] == recommendations_block_id]
 
