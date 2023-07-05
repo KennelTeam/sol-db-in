@@ -38,7 +38,7 @@ class DatabaseExcelExport(Resource):
         with pd.ExcelWriter(os.path.join(UPLOADS_DIRECTORY, file_name), engine='xlsxwriter', engine_kwargs={'options': {'strings_to_urls': False}}) as writer:  # pylint: disable=abstract-class-instantiated
             leaders_export_df.to_excel(writer, sheet_name='leaders')
             projects_export_df.to_excel(writer, sheet_name='projects')
-            for index, relation_sheet in relation_sheets_df.iterrows():
+            for _, relation_sheet in relation_sheets_df.iterrows():
                 DatabaseExcelExport._export_recommendations(relation_sheet['block_id'], leaders_answers_df.copy()).to_excel(
                     writer, sheet_name=relation_sheet['forward_relation_sheet_name'])
 

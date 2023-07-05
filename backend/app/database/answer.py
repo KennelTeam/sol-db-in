@@ -7,7 +7,7 @@ from backend.app.flask_app import FlaskApp
 # from .tag_to_answer import TagToAnswer
 from .editable_value_holder import EditableValueHolder
 from enum import Enum
-from typing import Any, List, Set, Tuple
+from typing import Any, List, Set
 from .question_type import QuestionType
 from backend.auxiliary import JSON
 from ...auxiliary.string_dt import date_to_string
