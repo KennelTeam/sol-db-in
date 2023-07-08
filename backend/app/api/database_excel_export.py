@@ -39,7 +39,7 @@ class DatabaseExcelExport(Resource):
             leaders_export_df.to_excel(writer, sheet_name='leaders')
             projects_export_df.to_excel(writer, sheet_name='projects')
             for _, relation_sheet in relation_sheets_df.iterrows():
-                DatabaseExcelExport._export_recommendations(relation_sheet['block_id'], leaders_answers_df.copy()).to_excel(
+                DatabaseExcelExport._export_relations(relation_sheet['block_id'], leaders_answers_df.copy()).to_excel(
                     writer, sheet_name=relation_sheet['forward_relation_sheet_name'])
 
         return send_from_directory(directory=UPLOADS_DIRECTORY, path=file_name)
@@ -130,7 +130,7 @@ class DatabaseExcelExport(Resource):
         return cross_table
 
     @staticmethod
-    def _export_recommendations(recommendations_block_id: int, answers_df: DataFrame) -> DataFrame:
+    def _export_relations(recommendations_block_id: int, answers_df: DataFrame) -> DataFrame:
         forms_query = FlaskApp().request(Form).filter_by(_form_type=FormType.LEADER)
         forms_df = pd.read_sql_query(forms_query.statement, FlaskApp().db.session.connection())
 
