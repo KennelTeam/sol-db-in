@@ -23,6 +23,7 @@
         "options": "Answers",
         "fullness-stats": "Fullness",
         "distribution-stats": "Answers distribution",
+        "tags-stats": "Tags Distribution",
         "export": "Data export",
         "main-download": "Download Excel file"
     },
@@ -194,6 +195,7 @@
         "group-by-question": "Group by question",
         "table-name-column-name": "Name",
         "table-data-column-name": "Fullness",
-        "stats": "Distribution statistics"
+        "stats": "Distribution statistics",
+        "tags-stats": "Tags Distribution"
     }
 }
