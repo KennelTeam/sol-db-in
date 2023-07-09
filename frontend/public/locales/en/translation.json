@@ -24,7 +24,8 @@
         "fullness-stats": "Fullness",
         "distribution-stats": "Answers distribution",
         "export": "Data export",
-        "main-download": "Download Excel file"
+        "main-download": "Download Excel file",
+        "raw-download": "Download raw database"
     },
     "settings": {
         "title": "Settings",
