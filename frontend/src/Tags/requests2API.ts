@@ -10,26 +10,6 @@ interface ResponseTagData {
     deleted?: boolean
 }
 
-export async function getTags() : Promise<TagData[]> {
-    return await axios.get(SERVER_ADDRESS + "/all_tags",
-    { withCredentials: true })
-    .then((response) => {
-        console.log("/all_tags response:", response.data)
-        return (response.data.data as ResponseTagData[]).map((data: ResponseTagData) => {
-            return {
-                id: data.id,
-                text: data.text,
-                parent_id: data.parent_id,
-                deleted: data.deleted
-            } as TagData
-        })
-    })
-    .catch((error) => {
-        console.log("Error while requesting /all_tags:", error)
-        return []
-    })
-}
-
 export async function changeTag(tag: TagData) {
     axios.post(SERVER_ADDRESS + "/tags", {
         id: tag.id,

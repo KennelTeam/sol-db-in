@@ -10,12 +10,12 @@ import TreeItem, {
 import clsx from 'clsx';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Box, Container, IconButton, Stack, TextField, Typography } from '@mui/material';
+import { Container, IconButton, Stack, TextField, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import SubdirectoryArrowRightRoundedIcon from '@mui/icons-material/SubdirectoryArrowRightRounded';
-import { getTags, changeTag, newTag } from "./requests2API"
+import { changeTag, newTag } from "./requests2API"
 import DeleteIcon from '@mui/icons-material/Delete';
 import { getRequest } from '../Response/APIRequests';
 import { useNavigate } from 'react-router-dom';
