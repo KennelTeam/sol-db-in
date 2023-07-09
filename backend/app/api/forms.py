@@ -17,7 +17,7 @@ from backend.app.database.form import Form, FormType, FormState
 from backend.app.database.answer import Answer
 from backend.app.database.tag_to_answer import TagToAnswer
 from backend.app.database.tag import Tag
-from backend.auxiliary.string_dt import string_to_datetime, string_to_date
+from backend.auxiliary.string_dt import string_to_date
 from backend.auxiliary.types import JSON
 from backend.app.database import Question
 from backend.app.database.question import AnswerType
