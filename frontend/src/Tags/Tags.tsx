@@ -17,6 +17,8 @@ import CheckIcon from '@mui/icons-material/Check';
 import SubdirectoryArrowRightRoundedIcon from '@mui/icons-material/SubdirectoryArrowRightRounded';
 import { getTags, changeTag, newTag } from "./requests2API"
 import DeleteIcon from '@mui/icons-material/Delete';
+import { getRequest } from '../Response/APIRequests';
+import { useNavigate } from 'react-router-dom';
 
 export interface TagData {
     id: number,
@@ -122,10 +124,11 @@ function Tags() {
 
     const [names, setNames] = React.useState<{ [id: number]: TagData }>([])
 
+    const navigate = useNavigate()
     React.useEffect(() => {
-        getTags().then((tags) => {
+        getRequest('all_tags', {}, navigate).then((response) => {
             const newNames : { [id: number]: TagData } = {}
-            tags.map((value) => {
+            response.data.data.map((value: TagData) => {
                 newNames[value.id] = value
             })
             console.log("Changed names!", newNames)
@@ -184,7 +187,7 @@ function Tags() {
             <Container sx={{ display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'space-between'}}>
-                {edit ? 
+                { edit ? 
                     <Container maxWidth={false} disableGutters>
                         <TextField value={tagName} variant='standard' fullWidth={true}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {

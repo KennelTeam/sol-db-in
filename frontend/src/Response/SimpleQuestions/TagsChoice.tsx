@@ -128,64 +128,6 @@ interface ResponseTagData {
     deleted?: boolean
 }
 
-const data : TagData[] = [
-    {
-        id: 1,
-        text: "Category 1",
-        chosen: false,
-        type_id: 1
-    },
-    {
-        id: 2,
-        text: "Subcategory 1.1",
-        parent_id: 1,
-        chosen: false,
-        type_id: 1
-    },
-    {
-        id: 3,
-        text: "Subcategory 1.2",
-        parent_id: 1,
-        chosen: false,
-        type_id: 1
-    },
-    {
-        id: 4,
-        text: "Tag 1.1.1",
-        parent_id: 2,
-        chosen: true,
-        type_id: 1
-    },
-    {
-        id: 5,
-        text: "Tag 1.1.2",
-        parent_id: 2,
-        chosen: false,
-        type_id: 1
-    },
-    {
-        id: 6,
-        text: "Tag 1.2.1",
-        parent_id: 3,
-        chosen: true,
-        type_id: 1
-    },
-    {
-        id: 7,
-        text: "Subcategory 1.2.1 lalala",
-        parent_id: 2,
-        chosen: false,
-        type_id: 1
-    },
-    {
-        id: 8,
-        text: "Tag 1.2.1.1",
-        parent_id: 7,
-        chosen: false,
-        type_id: 1
-    }
-]
-
 async function getTags() : Promise<TagData[]> {
     return await axios.get(SERVER_ADDRESS + "/all_tags",
     { withCredentials: true })
@@ -216,10 +158,6 @@ export interface TagsChoiceProps {
 
 export default function TagsChoice(props: TagsChoiceProps) {
 
-    const newNames : { [id: number]: TagData } = {}
-    data.map((value) => {
-        newNames[value.id] = value
-    })
     const [tagsData, setTagsData] = React.useState<{ [id: number]: TagData }>([])
 
     const {t} = useTranslation("translation", { keyPrefix: "response"})
