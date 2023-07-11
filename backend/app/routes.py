@@ -14,6 +14,7 @@ from .api.fullness_statistics import FullnessStatistics
 from .api.language import Language
 from .api.login import Login
 from .api.logout import Logout
+from .api.raw_db_excel_export import RawDbExcelExport
 from .api.settings import Settings
 from .api.statistics import Statistics
 from .api.tags_statistics import TagsStatistics

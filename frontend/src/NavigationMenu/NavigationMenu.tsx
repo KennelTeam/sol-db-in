@@ -74,8 +74,8 @@ function ChoiceOptionsList(user: UserType) : JSX.Element[] {
     )
     const export_menu: JSX.Element = DropDownList(
         "export",
-        ["main-download"],
-        ["/api/export/forms"], true
+        ["main-download", "raw-download"],
+        ["/api/export/forms", "/api/export/database"], true
     )
     const settings: JSX.Element = MenuButton("settings", "/settings", t)
     const users: JSX.Element = MenuButton("users", "/users", t)
