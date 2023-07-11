@@ -42,7 +42,7 @@ function Response(responseData: ResponseDataInterface): JSX.Element {
                 }
             }
         } else {
-            resultData[key] = changedAnswer
+            resultData[key] = {...changedAnswer}
         }
         console.log("onItemChanged: resultData:", resultData)
     }

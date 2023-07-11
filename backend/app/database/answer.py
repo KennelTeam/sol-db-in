@@ -4,7 +4,7 @@ import datetime
 
 from sqlalchemy.orm import Query
 from backend.app.flask_app import FlaskApp
-# from .tag_to_answer import TagToAnswer
+from .tag_to_answer import TagToAnswer
 from .editable_value_holder import EditableValueHolder
 from enum import Enum
 from typing import Any, List, Set
@@ -42,7 +42,7 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             'question_id': self.question_id,
             'table_row': self.table_row if self.table_row is not None else 0,
             'row_question_id': self.row_question_id,
-            # 'tags': TagToAnswer.get_answers_tags(self.id),
+            'tags': TagToAnswer.get_answers_tag_ids(self.id),
             'value': self.value if not isinstance(self.value, datetime.datetime) else date_to_string(self.value)
         }
 
@@ -77,6 +77,11 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
         return [item.form_id for item in items]
 
     @staticmethod
+    def count_with_tag(tag_id: int, question_id: int) -> int:
+        ids = TagToAnswer.get_answers_with_tag(tag_id)
+        return FlaskApp().request(Answer).filter_by(_question_id=question_id).filter(Answer.id.in_(ids)).count()
+
+    @staticmethod
     def query_for_question_ids(question_ids: Set[int]) -> Query:
         return FlaskApp().request(Answer).filter(Answer._question_id.in_(question_ids))
 
@@ -86,18 +91,23 @@ class Answer(EditableValueHolder, FlaskApp().db.Model):
             .group_by(Answer._form_id).with_entities(Answer._form_id)
 
     @staticmethod
-    def count_with_condition(ids: List[int], condition) -> int:
-        query = FlaskApp().request(Answer).filter(condition)
+    def count_with_condition(ids: List[int], condition, question_id) -> Set[int]:
+        query = FlaskApp().request(Answer).filter_by(_question_id=question_id).filter(condition).with_entities(
+            Answer._form_id)
         query = query.filter(Answer._form_id.in_(ids)).distinct(Answer._form_id)
-        return query.count()
+        print(ids)
+        print(condition)
+        print(question_id)
+        print(query.count())
+        return {item._form_id for item in query.all()}
 
     @staticmethod
     def get_extremum(question_id: int, question_type: QuestionType, extremum: ExtremumType):
         if question_type == QuestionType.NUMBER:
-            sorting = Answer.value_int.desc() if extremum == ExtremumType.MINIMUM else Answer.value_int.asc()
+            sorting = Answer.value_int.asc() if extremum == ExtremumType.MINIMUM else Answer.value_int.desc()
         else:
-            sorting = Answer.value_datetime.desc() if extremum == ExtremumType.MINIMUM else Answer.value_datetime.asc()
-        item = FlaskApp().request(Answer).filter_by(question_id=question_id).order_by(sorting).first()
+            sorting = Answer.value_datetime.asc() if extremum == ExtremumType.MINIMUM else Answer.value_datetime.desc()
+        item = FlaskApp().request(Answer).filter_by(_question_id=question_id).order_by(sorting).first()
         if item is None:
             return None
         return item.value_datetime if question_type == QuestionType.DATE else item.value_int

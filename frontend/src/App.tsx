@@ -22,6 +22,7 @@ import {useTranslation} from "react-i18next";
 import ErrorPage from "./ErrorPage";
 import FullnessStatistics from "./Statistics/Fullness";
 import DistributionStatistics from "./Statistics/Distribution";
+import TagsStats from "./Statistics/TagsStats";
 
 function App() {
   const {t} = useTranslation('translation', { keyPrefix: 'main' });
@@ -54,6 +55,7 @@ function App() {
           <Route path='/settings' element={<Settings />}/>
           <Route path='/statistics/fullness' element={<FullnessStatistics />}/>
           <Route path='/statistics/distribution' element={<DistributionStatistics />}/>
+          <Route path='/statistics/tags' element={<TagsStats />}/>
           <Route path='/tags' element={<Tags />}/>
           <Route path='/questionnaire' element={<Questionnaire />}/>
           <Route path='/options' element={<Options />}/>

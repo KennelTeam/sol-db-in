@@ -23,6 +23,7 @@
         "options": "Answers",
         "fullness-stats": "Fullness",
         "distribution-stats": "Answers distribution",
+        "tags-stats": "Tags Distribution",
         "export": "Data export",
         "main-download": "Download Excel file",
         "raw-download": "Download raw database"
@@ -136,7 +137,11 @@
     "response": {
         "name": "Name",
         "surname": "Surname",
-        "other_name": "Other name parts"
+        "other_name": "Other name parts",
+        "tags-dialog-title": "Choose Tags for this question",
+        "cancel": "Cancel",
+        "submit": "Submit",
+        "edit-tags": "Edit tags..."
     },
     "main": {
         "title": "NSF DB"
@@ -181,5 +186,17 @@
         "table-name-column-name": "Name",
         "table-data-column-name": "Fullness",
         "fullness-stats": "Fullness statistics"
+    },
+    "statistics": {
+        "form-type-selector": "Select form type",
+        "question-selector": "Question",
+        "form-type-leader": "Leader",
+        "form-type-project": "Project",
+        "group-by-form": "Group by form",
+        "group-by-question": "Group by question",
+        "table-name-column-name": "Name",
+        "table-data-column-name": "Fullness",
+        "stats": "Distribution statistics",
+        "tags-stats": "Tags Distribution"
     }
 }
