@@ -128,12 +128,12 @@ interface ResponseTagData {
     deleted?: boolean
 }
 
-async function getTags() : Promise<TagData[]> {
+async function getTags(question_id: number) : Promise<TagData[]> {
     return await axios.get(SERVER_ADDRESS + "/all_tags",
     { withCredentials: true })
     .then((response) => {
         console.log("/all_tags response:", response.data)
-        return (response.data.data as ResponseTagData[])
+        let all_tags = (response.data.data as ResponseTagData[])
             .filter((data: ResponseTagData) => (!data.deleted))
             .map((data: ResponseTagData) => {
                 return {
@@ -143,6 +143,21 @@ async function getTags() : Promise<TagData[]> {
                     type_id: data.type_id
                 } as TagData
             })
+        let main_tag = all_tags.filter(tag => tag.text.startsWith(question_id.toString() + "."))[0]
+        if (main_tag == null) return all_tags
+        let my_tags = [] as TagData[]
+        for (let tag of all_tags) {
+            let root_id = tag.id
+            let id = tag.parent_id
+            while(id != null) {
+                root_id = id
+                id = all_tags.filter(tag => tag.id == id)[0].parent_id
+            }
+            if (root_id == main_tag.id) {
+                my_tags.push(tag)
+            }
+        }
+        return my_tags
     })
     .catch((error) => {
         console.log("Error while requesting /all_tags:", error)
@@ -151,6 +166,7 @@ async function getTags() : Promise<TagData[]> {
 }
 
 export interface TagsChoiceProps {
+    question_id: number,
     chosenTags: number[],
     onCancel: () => void,
     onSubmit: (newTags: APITag[]) => void
@@ -163,7 +179,7 @@ export default function TagsChoice(props: TagsChoiceProps) {
     const {t} = useTranslation("translation", { keyPrefix: "response"})
 
     React.useEffect(() => {
-        getTags().then((tags) => {
+        getTags(props.question_id).then((tags) => {
             const newTagsData : { [id: number]: TagData } = {}
             tags.map((value) => {
                 newTagsData[value.id] = {
@@ -208,8 +224,11 @@ export default function TagsChoice(props: TagsChoiceProps) {
                     children={children}/>
     }
 
-    const categories = Object.values(tagsData).filter((value) => (!value.parent_id))
+    let categories = Object.values(tagsData).filter((value) => (!value.parent_id || value.parent_id == -1))
             .map((value) => makeTags(value))
+    if (categories.length == 1) {
+        categories = categories[0].props.children
+    }
 
     return (
     <div>

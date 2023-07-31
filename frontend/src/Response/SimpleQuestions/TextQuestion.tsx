@@ -44,7 +44,7 @@ function TextQuestion(props: {
         setText(props.questionData.initialValue)
         uploadTags().then(() => {console.log("Tags uploaded")})
     }, [props.questionData])
-
+    console.log(props.questionData.question_id.toString() + ": " + questionData.label)
     return (
     <div>
         <Box
@@ -71,7 +71,7 @@ function TextQuestion(props: {
         }
         { props.questionType === 'LONG_TEXT' ?
             <Dialog open={tagsOpen} sx={{ minWidth: 400, minHeight: 200 }}>
-                <TagsChoice chosenTags={value.tags.map((tag) => (tag))}
+                <TagsChoice question_id={props.questionData.question_id} chosenTags={value.tags.map((tag) => (tag))}
                 onCancel={() => {
                     setTagsOpen(false)
                 }} onSubmit={(newTags: APITag[]) => {
