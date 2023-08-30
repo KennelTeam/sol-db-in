@@ -23,6 +23,7 @@ import ErrorPage from "./ErrorPage";
 import FullnessStatistics from "./Statistics/Fullness";
 import DistributionStatistics from "./Statistics/Distribution";
 import TagsStats from "./Statistics/TagsStats";
+import TagsUsage from "./Statistics/TagsUsage";
 
 function App() {
   const {t} = useTranslation('translation', { keyPrefix: 'main' });
@@ -56,6 +57,7 @@ function App() {
           <Route path='/statistics/fullness' element={<FullnessStatistics />}/>
           <Route path='/statistics/distribution' element={<DistributionStatistics />}/>
           <Route path='/statistics/tags' element={<TagsStats />}/>
+            <Route path='/statistics/tags_usage' element={<TagsUsage />}/>
           <Route path='/tags' element={<Tags />}/>
           <Route path='/questionnaire' element={<Questionnaire />}/>
           <Route path='/options' element={<Options />}/>

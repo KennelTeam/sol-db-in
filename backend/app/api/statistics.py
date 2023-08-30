@@ -43,7 +43,6 @@ class Statistics(Resource):
 
         if Question.get_by_id(arguments['question_id']) is None:
             return get_failure(HTTPErrorCode.WRONG_ID, 404)
-
         try:
             statistics = Form.prepare_statistics(arguments['question_id'], min_value, max_value, arguments['step'])
             return Response(json.dumps(statistics), 200)

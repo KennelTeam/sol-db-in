@@ -35,6 +35,7 @@ from .api.all_toponyms import AllToponyms
 from .api.questions import Questions
 from .api.questions_lightweight import QuestionsLightweight
 from .api.all_tags import AllTags
+from .api.tags_usage import TagsUsage
 
 from .flask_app import FlaskApp
 
@@ -42,7 +43,7 @@ resources = [
     Login, Logout, Users, Forms, FormPage, Toponyms, ToponymTree, AnswerOptionsPage, AllAnswerBlocks, Language,
     AnswerBlockPage, QuestionBlockPage, Table, Tags, TagTypes, FormSchema, Questions, Actions, Statistics, Settings,
     FormsLightweight, AllToponyms, FullnessStatistics, DatabaseExcelExport, AllQuestions, QuestionsLightweight, AllTags,
-    TagsStatistics, RawDbExcelExport
+    TagsStatistics, RawDbExcelExport, TagsUsage
 ]
 
 for resource in resources:
