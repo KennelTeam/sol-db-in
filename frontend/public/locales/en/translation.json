@@ -24,6 +24,7 @@
         "fullness-stats": "Fullness",
         "distribution-stats": "Answers distribution",
         "tags-stats": "Tags Distribution",
+        "tags-usage": "Tags Usage",
         "export": "Data export",
         "main-download": "Download Excel file",
         "raw-download": "Download raw database"
