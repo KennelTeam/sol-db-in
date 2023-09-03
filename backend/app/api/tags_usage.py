@@ -19,19 +19,22 @@ class TagsUsage(Resource):
     @jwt_required()
     @get_request(Role.ADMIN)
     def get() -> Response:
+
         tagged_answers = set(item.answer_id for item in TagToAnswer.query.all())
+        forms = []
         print(tagged_answers)
-        tagging_questions = set(item.id for item in FlaskApp().request(Question).
-                                filter_by(_question_type=QuestionType.LONG_TEXT).all())
-        table_formattings = set(item.id for item in FlaskApp().request(FormattingSettings).filter(FormattingSettings._table_id != None).all())
-        table_questions = set(item.id for item in FlaskApp().request(Question).filter(Question._formatting_settings.in_(table_formattings)))
-        print(tagging_questions)
-        tagging_questions = tagging_questions - table_questions
-        not_tagged_answers = FlaskApp().request(Answer).filter(Answer._question_id.in_(tagging_questions)).\
-            filter(Answer.id.notin_(tagged_answers)).all()
-        for answer in not_tagged_answers:
-            print(json.dumps(answer.to_json()))
-        forms = FlaskApp().request(Form).filter(Form.id.in_(set(item.form_id for item in not_tagged_answers))).all()
+        for form in FlaskApp().request(Form).all():
+            print(form.id)
+            for question in FlaskApp().request(Question).filter_by(_question_type=QuestionType.LONG_TEXT).all():
+                if question.form_type != form.form_type:
+                    continue
+                answers = FlaskApp().request(Answer).filter_by(_form_id=form.id).filter_by(_question_id=question.id).all()
+                if len(answers) > 0:
+                    print(answers)
+                if len(answers) > 0 and len(set(item.id for item in answers) & tagged_answers) == 0:
+                    forms.append(form)
+                    break
+
         links = [
             {
                 'link': "/" + str(item.form_type).split('.')[1].lower() + "/" + str(item.id),
