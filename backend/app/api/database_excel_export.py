@@ -11,7 +11,7 @@ from pandas import DataFrame
 from backend.app.flask_app import FlaskApp
 from backend.app.api.auxiliary import get_request
 from backend.app.database import Answer, Form, Question, QuestionBlock, FormattingSettings, Toponym, AnswerOption, \
-    RelationSettings
+    RelationSettings, TagToAnswer, Tag
 from backend.app.database.form_type import FormType
 from backend.app.database.localization import localize
 from backend.app.database.question_type import QuestionType
@@ -26,18 +26,28 @@ class DatabaseExcelExport(Resource):
     @jwt_required()
     @get_request(Role.ADMIN)
     def get() -> Response:
-        leaders_answers_df = DatabaseExcelExport._get_all_answers_df(form_type=FormType.LEADER)
-        projects_answers_df = DatabaseExcelExport._get_all_answers_df(form_type=FormType.PROJECT)
+        leaders_answers_df, leaders_tags = DatabaseExcelExport._get_all_answers_df(form_type=FormType.LEADER)
+        projects_answers_df, projects_tags = DatabaseExcelExport._get_all_answers_df(form_type=FormType.PROJECT)
 
         leaders_export_df = DatabaseExcelExport._export_form(FormType.LEADER, leaders_answers_df.copy())
         projects_export_df = DatabaseExcelExport._export_form(FormType.PROJECT, projects_answers_df.copy())
 
-        relation_sheets_df = leaders_answers_df[['forward_relation_sheet_name', 'block_id']].groupby('forward_relation_sheet_name').first().reset_index()
+        leaders_tags_export_df = DatabaseExcelExport._export_form(FormType.LEADER, leaders_tags.copy())
+        projects_tags_export_df = DatabaseExcelExport._export_form(FormType.PROJECT, projects_tags.copy())
 
+        relation_sheets_df = leaders_answers_df[['forward_relation_sheet_name', 'block_id']].groupby('forward_relation_sheet_name').first().reset_index()
+        print(relation_sheets_df)
+        print(leaders_answers_df[['forward_relation_sheet_name', 'block_id']])
+        print("DOOOOONEEEE")
         file_name = 'forms.xlsx'
         with pd.ExcelWriter(os.path.join(UPLOADS_DIRECTORY, file_name), engine='xlsxwriter', engine_kwargs={'options': {'strings_to_urls': False}}) as writer:  # pylint: disable=abstract-class-instantiated
             leaders_export_df.to_excel(writer, sheet_name='leaders')
             projects_export_df.to_excel(writer, sheet_name='projects')
+
+            leaders_tags_export_df.to_excel(writer, sheet_name='leaders_tags')
+            projects_tags_export_df.to_excel(writer, sheet_name='projects_tags')
+
+            DatabaseExcelExport._export_tags_sheet().to_excel(writer, sheet_name='tags')
             for _, relation_sheet in relation_sheets_df.iterrows():
                 DatabaseExcelExport._export_relations(relation_sheet['block_id'], leaders_answers_df.copy()).to_excel(
                     writer, sheet_name=relation_sheet['forward_relation_sheet_name'])
@@ -45,7 +55,7 @@ class DatabaseExcelExport(Resource):
         return send_from_directory(directory=UPLOADS_DIRECTORY, path=file_name)
 
     @staticmethod
-    def _get_all_answers_df(form_type: FormType) -> DataFrame:
+    def _get_all_answers_df(form_type: FormType) -> [DataFrame, DataFrame]:
         connection = FlaskApp().db.session.connection()
 
         answers_query = FlaskApp().request(Answer).filter(Answer._form_id.in_(Form.get_all_ids(form_type=form_type)))  # pylint: disable=protected-access
@@ -57,6 +67,7 @@ class DatabaseExcelExport(Resource):
         toponyms_query = Toponym.query
         answer_options_query = FlaskApp().request(AnswerOption)
         relation_settings_query = FlaskApp().request(RelationSettings)
+        tags_query = TagToAnswer.query
 
         answers_df = pd.read_sql_query(answers_query.statement, connection)
         questions_df = pd.read_sql_query(questions_query.statement, connection)
@@ -67,6 +78,7 @@ class DatabaseExcelExport(Resource):
         toponyms_df = pd.read_sql_query(toponyms_query.statement, connection)
         answer_options_df = pd.read_sql_query(answer_options_query.statement, connection)
         relation_settings_df = pd.read_sql_query(relation_settings_query.statement, connection)
+        tags_df = pd.read_sql_query(tags_query.statement, connection)
 
         questions_df['localized_text'] = questions_df.apply(lambda row: localize(json.loads(row['text'])), axis=1)
         answer_options_df['localized_answer_option'] = answer_options_df.apply(lambda row: localize(json.loads(row['name'])), axis=1)
@@ -80,6 +92,8 @@ class DatabaseExcelExport(Resource):
 
         answers_df["row_question_id"] = answers_df["row_question_id"].astype('float64')
         answer_options_df["id"] = answer_options_df["id"].astype('float64')
+
+        answers_df_copy = answers_df.copy()
 
         answers_df = questions_df.merge(answers_df, left_on='id', right_on='question_id'
         ).merge(formatting_settings_df, left_on='formatting_settings', right_on='id'
@@ -107,7 +121,24 @@ class DatabaseExcelExport(Resource):
         answers_df['export_value'].loc[answers_df['question_type'] == QuestionType.MULTIPLE_CHOICE] = answers_df['localized_answer_option']
         answers_df['export_value'].loc[answers_df['question_type'] == QuestionType.RELATION] = answers_df['related_form_name']
 
-        return answers_df
+        answers_df_copy = answers_df_copy.merge(tags_df, left_on='id', right_on='answer_id')
+        answers_df_copy = questions_df.merge(answers_df_copy, left_on='id', right_on='question_id'
+        ).merge(formatting_settings_df, left_on='formatting_settings', right_on='id'
+        ).merge(questions_df_copy, left_on='row_question_id', right_on='id', how='left'
+        ).merge(questions_blocks_df, left_on='block_id', right_on='id', how='left'
+        ).merge(users_df, left_on='value_int', right_on='id', how='left'
+        ).merge(toponyms_df, left_on='value_int', right_on='id', how='left')
+        answers_df_copy['export_value'] = answers_df_copy['tag_id']
+
+        return answers_df, answers_df_copy
+
+    @staticmethod
+    def _export_tags_sheet() -> DataFrame:
+        tags_query = FlaskApp().request(Tag)
+        tags_df = pd.read_sql_query(tags_query.statement, FlaskApp().db.session.connection())
+        tags_df['text'] = tags_df.apply(lambda row: localize(json.loads(row['text'])), axis=1)
+        tags_df.set_index('id')
+        return tags_df
 
     @staticmethod
     def _export_form(form_type: FormType, answers_df: DataFrame) -> DataFrame:
