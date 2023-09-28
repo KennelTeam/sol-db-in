@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 from typing import Final
@@ -114,6 +115,7 @@ class DatabaseExcelExport(Resource):
         answers_df['localized_text'].loc[answers_df['localized_text_2'].notna()] += ' [' + answers_df['localized_text_2'] + ']'
 
         answers_df['export_value'] = answers_df['value_text']
+        answers_df['export_value'].loc[((answers_df['question_type'] == QuestionType.DATE) &(answers_df['value_datetime']).notna())] = pd.to_datetime(answers_df['value_datetime']).dt.date
         answers_df['export_value'].loc[answers_df['question_type'] == QuestionType.USER] = answers_df['user_name']
         answers_df['export_value'].loc[answers_df['question_type'] == QuestionType.LOCATION] = answers_df['toponym_name']
         answers_df['export_value'].loc[answers_df['question_type'] == QuestionType.NUMBER] = answers_df['value_int'].astype('Int64')
