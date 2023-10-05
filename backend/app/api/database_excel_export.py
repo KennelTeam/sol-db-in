@@ -36,9 +36,6 @@ class DatabaseExcelExport(Resource):
         projects_tags_export_df = DatabaseExcelExport._export_form(FormType.PROJECT, projects_tags.copy())
 
         relation_sheets_df = leaders_answers_df[['forward_relation_sheet_name', 'block_id']].groupby('forward_relation_sheet_name').first().reset_index()
-        print(relation_sheets_df)
-        print(leaders_answers_df[['forward_relation_sheet_name', 'block_id']])
-        print("DOOOOONEEEE")
         file_name = 'forms.xlsx'
         with pd.ExcelWriter(os.path.join(UPLOADS_DIRECTORY, file_name), engine='xlsxwriter', engine_kwargs={'options': {'strings_to_urls': False}}) as writer:  # pylint: disable=abstract-class-instantiated
             leaders_export_df.to_excel(writer, sheet_name='leaders')
@@ -137,8 +134,19 @@ class DatabaseExcelExport(Resource):
     def _export_tags_sheet() -> DataFrame:
         tags_query = FlaskApp().request(Tag)
         tags_df = pd.read_sql_query(tags_query.statement, FlaskApp().db.session.connection())
+        print(tags_df)
         tags_df['text'] = tags_df.apply(lambda row: localize(json.loads(row['text'])), axis=1)
+
+        tags_copy1 = tags_df.copy().drop(["deleted", "create_timestamp", "type_id"], axis=1)
+        tags_copy2 = tags_df.copy().drop(["deleted", "create_timestamp", "type_id"], axis=1)
+        tags_copy3 = tags_df.copy().drop(["deleted", "create_timestamp", "type_id"], axis=1)
+
         tags_df.set_index('id')
+        tags_df = tags_df.merge(tags_copy1, left_on='parent_id', right_on='id'
+                    ).merge(tags_copy2, left_on='parent_id_y', right_on='id'
+                    )
+        print(tags_df)
+        tags_df = tags_df.merge(tags_copy3, left_on='parent_id', right_on='id')
         return tags_df
 
     @staticmethod
