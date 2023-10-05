@@ -134,8 +134,9 @@ class DatabaseExcelExport(Resource):
         tags_query = FlaskApp().request(Tag)
         tags_df = pd.read_sql_query(tags_query.statement, FlaskApp().db.session.connection())
         print(tags_df)
+        tags_df["parent_id"] = tags_df.apply(lambda row: -1 if row["parent_id"] != row['parent_id'] else row["parent_id"], axis=1)
         tags_df['text'] = tags_df.apply(lambda row: localize(json.loads(row['text'])), axis=1)
-
+        print(tags_df)
         tags_copy1 = tags_df.copy().drop(["deleted", "create_timestamp", "type_id"], axis=1)
         tags_copy2 = tags_df.copy().drop(["deleted", "create_timestamp", "type_id"], axis=1)
         tags_copy3 = tags_df.copy().drop(["deleted", "create_timestamp", "type_id"], axis=1)
@@ -144,7 +145,6 @@ class DatabaseExcelExport(Resource):
         tags_df = tags_df.merge(tags_copy1, left_on='parent_id', right_on='id'
                     ).merge(tags_copy2, left_on='parent_id_y', right_on='id'
                     )
-        print(tags_df)
         tags_df = tags_df.merge(tags_copy3, left_on='parent_id', right_on='id')
         return tags_df
 
