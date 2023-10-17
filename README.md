@@ -1,4 +1,4 @@
-# Welcome to the sol-db-in website source repository
+# Welcome to the Nuanu Social Fund website source repository
 
 Sol-db-in is an opensource platform to collect and analyse data about leaders,
 innovators and changemakers in Indonesia. 
